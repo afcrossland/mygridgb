@@ -12,18 +12,23 @@
     .mix-section { margin: 32px 0; }
 
     .mix-title {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #1565C0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1E90FF;
       text-align: center;
       margin-bottom: 6px;
     }
 
     .mix-subtitle {
+      font-family: 'Segoe UI', Arial, sans-serif;
       text-align: center;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 1rem;
       margin-bottom: 24px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .mix-body {
@@ -41,14 +46,17 @@
     }
 
     .mix-stat-label {
+      font-family: 'Segoe UI', Arial, sans-serif;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 1rem;
       color: var(--text);
       margin-bottom: 2px;
     }
 
     .mix-stat-value {
+      font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 2.8rem;
+      font-weight: 300;
       line-height: 1;
       color: var(--text);
     }
@@ -58,7 +66,7 @@
       font-weight: 400;
       color: var(--muted);
       vertical-align: baseline;
-      margin-left: 2px;
+      margin-left: 3px;
     }
 
     .mix-chart-wrap {
@@ -161,16 +169,18 @@
   const LOWCARBON_ID  = '1vJ9CsBl4VbzGVlF05YdlOS0f5L3wMw8ICZ--qpvegDc';
 
   const PALETTE = {
-    'Nuclear':  '#4CAF50',
-    'Biomass':  '#6D4C41',
-    'Wind*':    '#F44336',
-    'Wind':     '#F44336',
-    'Solar':    '#FFD600',
-    'Coal':     '#212121',
-    'Gas':      '#29B6F6',
-    'Storage':  '#FF9800',
-    'Hydro':    '#1565C0',
-    'Imports':  '#9C27B0',
+    'Nuclear':       '#59d600',
+    'Biomass':       '#824e1a',
+    'Wind*':         '#ed2a2a',
+    'Wind':          '#ed2a2a',
+    'Embedded Wind': '#ed7474',
+    'Solar':         '#ede310',
+    'Coal':          '#3d3d3d',
+    'Gas':           '#2f82d6',
+    'Storage':       '#f96c00',
+    'Large Hydro':   '#001cf4',
+    'Hydro':         '#001cf4',
+    'Imports':       '#7100e2',
   };
 
   async function fetchSheet(id) {
@@ -245,7 +255,7 @@
         legend: {
           position: 'bottom',
           labels: {
-            font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+            font: { family: "'Segoe UI', Arial, sans-serif", size: 13 },
             padding: 14,
             usePointStyle: true,
             pointStyle: 'circle',
