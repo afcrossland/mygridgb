@@ -1,21 +1,21 @@
 /* ===== MyGridGB — shared stylesheet ===== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --brand:        #1E90FF;
-  --brand-dark:   #1270CC;
-  --brand-bg:     #EBF5FF;
-  --green:        #2e7d32;
-  --green-light:  #43a047;
-  --green-bg:     #e8f5e9;
+  --brand:        #1a5c3a;
+  --brand-dark:   #145030;
+  --brand-bg:     #d4ede0;
+  --green:        #2d8c5a;
+  --green-light:  #4fbe85;
+  --green-bg:     #d4ede0;
   --text:         #0F172A;
   --muted:        #64748B;
   --border:       #EBEBEB;
   --bg:           #FAFAFA;
   --surface:      #FFFFFF;
-  --nav-bg:       #0F172A;
+  --nav-bg:       #0d2b1a;
   --sidebar-width: 260px;
   --nav-height:   60px;
   --radius:       10px;
@@ -24,7 +24,7 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   font-size: 16px;
   color: var(--text);
   background: var(--bg);
@@ -55,10 +55,19 @@ a:hover { color: var(--brand-dark); text-decoration: underline; }
   gap: 28px;
 }
 
-#site-header .logo img {
-  height: 38px;
-  display: block;
+#site-header .logo {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-decoration: none;
 }
+
+#site-header .logo:hover { text-decoration: none; color: #fff; }
+
+.logo-accent { color: #4fbe85; }
 
 /* ===== NAV ===== */
 nav { flex: 1; }
@@ -174,11 +183,12 @@ nav ul ul li a:hover {
 }
 
 .page-title {
+  font-family: 'DM Serif Display', Georgia, serif;
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 400;
   color: var(--text);
   margin-bottom: 6px;
-  letter-spacing: -.03em;
+  letter-spacing: -.01em;
   line-height: 1.2;
 }
 
@@ -247,7 +257,7 @@ nav ul ul li a:hover {
 
 .follow-btn {
   display: inline-block;
-  background: #000;
+  background: var(--brand);
   color: #fff;
   padding: 9px 18px;
   border-radius: 20px;
@@ -259,7 +269,7 @@ nav ul ul li a:hover {
 
 /* ===== HOME PAGE ===== */
 .home-hero {
-  background: linear-gradient(135deg, #1E90FF 0%, #0D47A1 100%);
+  background: linear-gradient(135deg, #2d8c5a 0%, #1a5c3a 100%);
   color: #fff;
   padding: 52px 36px;
   border-radius: 8px;
