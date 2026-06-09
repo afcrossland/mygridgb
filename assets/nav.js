@@ -1,0 +1,107 @@
+/* nav.js — injects header + footer into every page */
+
+const NAV_HTML = `
+<header id="site-header">
+  <div class="header-inner">
+    <a class="logo" href="/index.html">
+      <img src="https://www.mygridgb.co.uk/wp-content/uploads/2020/08/cropped-cropped-siteLogo.png" alt="MyGridGB">
+    </a>
+    <button id="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="main-nav">
+      <ul>
+        <li><a href="/dashboard/index.html">Dashboard</a></li>
+        <li><a href="/podcast/index.html">Podcasts</a></li>
+        <li><a href="/blog/index.html">Blog</a></li>
+        <li>
+          <a href="/last-28-days/index.html">Electricity Data ▾</a>
+          <ul>
+            <li><a href="/last-28-days/index.html">Last 28 Days</a></li>
+            <li><a href="/last-12-months/index.html">Last 12 Months</a></li>
+            <li><a href="/historicaldata/index.html">Electricity since 2012</a></li>
+            <li><a href="/gas-tracker/index.html">Gas Tracker</a></li>
+            <li><a href="/carbon-tracker/index.html">Carbon Tracker</a></li>
+            <li><a href="/coal-tracker/index.html">Coal Tracker</a></li>
+          </ul>
+        </li>
+        <li><a href="/2030grid/index.html">The 2030 Grid</a></li>
+        <li>
+          <a href="/map/index.html">Other Resources ▾</a>
+          <ul>
+            <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">UK Renewables Map (External)</a></li>
+            <li><a href="/map/index.html">UK Renewable Energy Map</a></li>
+            <li><a href="/waste-heat-map/index.html">Waste Heat Map</a></li>
+            <li><a href="/blog/index.html">Blog</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="/about/index.html">About ▾</a>
+          <ul>
+            <li><a href="/about/index.html">About</a></li>
+            <li><a href="/sponsorship/index.html">Sponsorship Opportunities</a></li>
+            <li><a href="/educational-resources/index.html">Educational Resources</a></li>
+          </ul>
+        </li>
+        <li><a href="/about-me/index.html">About Me</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>`;
+
+const FOOTER_HTML = `
+<footer id="site-footer">
+  <p>MyGridGB is kindly supported by the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute</a>.</p>
+  <p style="margin-top:8px">© MyGridGB · <a href="https://twitter.com/mygridgb" target="_blank">@mygridgb</a></p>
+</footer>`;
+
+const SIDEBAR_HTML = `
+<aside class="sidebar">
+  <div class="sidebar-widget">
+    <h4>Support MyGridGB</h4>
+    <p style="font-size:13px;color:#555;margin-bottom:10px">Kindly supported by the Durham Energy Institute.</p>
+    <a href="https://www.dur.ac.uk/dei/" target="_blank">
+      <img src="http://www.mygridgb.co.uk/wp-content/uploads/2016/12/unnamed-300x152.jpg" alt="Durham Energy Institute">
+    </a>
+  </div>
+  <div class="sidebar-widget">
+    <h4>Book</h4>
+    <a class="book-link" href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">
+      <img src="https://www.mygridgb.co.uk/wp-content/uploads/2021/10/BookCover-194x300.jpg" alt="Decarbonising Electricity book">
+    </a>
+    <p style="font-size:12px;color:#555;margin-top:8px;text-align:center">Click to purchase on Amazon</p>
+  </div>
+  <div class="sidebar-widget">
+    <h4>Follow on Twitter / X</h4>
+    <a href="https://twitter.com/intent/follow?screen_name=mygridgb" target="_blank"
+       style="display:inline-block;background:#1da1f2;color:#fff;padding:8px 16px;border-radius:4px;font-size:13px;font-weight:600">
+      Follow @mygridgb
+    </a>
+  </div>
+</aside>`;
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Inject header
+  document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
+  // Inject footer
+  document.body.insertAdjacentHTML('beforeend', FOOTER_HTML);
+
+  // Inject sidebar where placeholder exists
+  const sidebarPlaceholder = document.getElementById('sidebar-placeholder');
+  if (sidebarPlaceholder) sidebarPlaceholder.outerHTML = SIDEBAR_HTML;
+
+  // Highlight active nav link
+  const path = window.location.pathname;
+  document.querySelectorAll('#main-nav a').forEach(a => {
+    if (a.getAttribute('href') && path.includes(a.getAttribute('href').split('/')[1])) {
+      a.classList.add('active');
+    }
+  });
+
+  // Mobile nav toggle
+  const toggle = document.getElementById('nav-toggle');
+  const nav = document.getElementById('main-nav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', () => nav.classList.toggle('open'));
+  }
+});
