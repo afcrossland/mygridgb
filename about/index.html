@@ -7,28 +7,29 @@
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
   <style>
-    .about-section { margin-bottom: 32px; }
+    .about-section { margin-bottom: 36px; }
     .about-section h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--brand);
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+      color: var(--text);
       margin-bottom: 10px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid var(--brand-bg);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
     }
-    .about-section p { margin-bottom: 12px; line-height: 1.7; }
+    .about-section p { margin-bottom: 12px; line-height: 1.75; }
     .data-source-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 16px;
-      margin-top: 8px;
+      margin-top: 12px;
     }
     .data-source-card {
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 16px;
+      border-radius: 8px;
+      padding: 18px;
       font-size: 14px;
-      line-height: 1.6;
+      line-height: 1.65;
     }
     .data-source-card h4 {
       font-size: 0.9rem;
@@ -42,8 +43,33 @@
       border-radius: 0 6px 6px 0;
       padding: 14px 18px;
       font-size: 14px;
-      line-height: 1.7;
+      line-height: 1.8;
     }
+    .carbon-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+    .carbon-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--brand-bg);
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--brand);
+      border-bottom: 2px solid var(--border);
+    }
+    .carbon-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .carbon-table tr:last-child td { border-bottom: none; }
+    .carbon-table tr:hover td { background: var(--bg); }
+    .carbon-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -53,9 +79,9 @@
 
     <div class="about-section">
       <h2>Welcome to MyGridGB</h2>
-      <p>MyGridGB provides real-time information and analysis of energy and carbon emissions in Great Britain. The site was created to make the story of Britain's energy transition easy to understand — whether you're a policymaker, researcher, student, or just curious about where your electricity comes from.</p>
-      <p>The platform tracks electricity production and consumption across all generating technologies, shows how much carbon is being emitted at any moment, and places it all in the context of Britain's decarbonisation targets. You can come back any time to see how the grid is changing.</p>
-      <p>MyGridGB also includes a <a href="../2030grid/index.html">Clean Power 2030 simulation</a> that models what the GB grid could look like under different combinations of power station technologies.</p>
+      <p>The way that electricity is being generated in Great Britain changes every minute of every day. MyGridGB provides real-time information and analysis of energy generation and carbon emissions across Great Britain — making the story of Britain's energy transition easy to understand, whether you're a policymaker, researcher, student, or just curious about where your electricity comes from.</p>
+      <p>The platform tracks electricity production and consumption across all generating technologies, shows how much carbon is being emitted at any moment, and places it all in the context of Britain's decarbonisation targets.</p>
+      <p>MyGridGB also charts carbon emissions from electricity — of critical importance for a country with legally binding carbon reduction targets — and includes a <a href="../2030grid/index.html">Clean Power 2030 simulation</a> that models what the GB grid could look like under different combinations of power station technologies.</p>
     </div>
 
     <div class="about-section">
@@ -68,7 +94,7 @@
 
     <div class="about-section">
       <h2>Carbon Targets</h2>
-      <p>The UK Committee on Climate Change has set a target of <strong>50–100 grams of CO₂ equivalent per kWh</strong> for British electricity by 2030. MyGridGB tracks progress against this in real time. The carbon intensity figures shown on this site use life-cycle emissions estimates based on <a href="https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources" target="_blank">IPCC reference data</a>.</p>
+      <p>The assumed 2030 carbon target used on this site is <strong>50–100 grams of CO₂ equivalent per kWh</strong>, based on analysis by the Committee on Climate Change. MyGridGB tracks progress against this in real time. The carbon intensity figures use life-cycle emissions estimates based on <a href="https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources" target="_blank">IPCC reference data</a>, capturing the full carbon cost of each generation type rather than combustion emissions alone.</p>
     </div>
 
     <div class="about-section">
@@ -76,15 +102,15 @@
       <div class="data-source-grid">
         <div class="data-source-card">
           <h4>Generation &amp; Grid Data</h4>
-          <p>Electricity generation and transmission data comes from <a href="http://bmreports.com/" target="_blank">BM Reports</a> via Elexon — the electricity trading body for England and Wales. Data updates every 5 minutes.</p>
+          <p>Electricity generation and transmission data comes from <a href="http://bmreports.com/" target="_blank">BM Reports</a> via Elexon — the electricity trading body for England and Wales. Data updates every 5 minutes. Note: as of November 2019, embedded wind estimates are no longer included in grid generation figures.</p>
         </div>
         <div class="data-source-card">
           <h4>Solar Data</h4>
-          <p>Solar generation is provided by the <a href="https://www.solar.sheffield.ac.uk/pvlive/" target="_blank">Sheffield Solar PVLive</a> service at the <a href="https://www.sheffield.ac.uk/" target="_blank">University of Sheffield</a>, aggregated from approximately 20,000 UK solar installations. Regional and forecast data also available via Sheffield Solar.</p>
+          <p>Solar generation is provided by the <a href="https://www.solar.sheffield.ac.uk/pvlive/" target="_blank">Sheffield Solar PVLive</a> service at the University of Sheffield, aggregated from approximately 20,000 UK solar installations. Sheffield Solar also provides PV_Regional and PV_Forecast services to National Grid and the energy industry.</p>
         </div>
         <div class="data-source-card">
           <h4>Carbon Intensity</h4>
-          <p>Carbon intensity is calculated using life-cycle emissions factors for each generating technology, based on IPCC reference values. This captures the full carbon cost of each generation type, not just combustion emissions.</p>
+          <p>Carbon intensity is calculated using life-cycle emissions factors for each generating technology, based on IPCC median reference values. See the full table below.</p>
         </div>
         <div class="data-source-card">
           <h4>2030 Grid Simulation</h4>
@@ -94,13 +120,42 @@
     </div>
 
     <div class="about-section">
+      <h2>Carbon Dioxide Equivalent Estimation</h2>
+      <p>Carbon intensity values are calculated using IPCC median life-cycle figures. These capture emissions across the full lifetime of each technology — manufacturing, operation and decommissioning — not just fuel combustion.</p>
+      <table class="carbon-table">
+        <thead>
+          <tr>
+            <th>Technology</th>
+            <th>Median Carbon Factor (gCO₂eq./kWh)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Coal</td><td>820</td></tr>
+          <tr><td>Gas</td><td>490</td></tr>
+          <tr><td>Biomass</td><td>230</td></tr>
+          <tr><td>Imports — Belgium</td><td>230</td></tr>
+          <tr><td>Imports — Netherlands</td><td>483</td></tr>
+          <tr><td>Imports — Ireland</td><td>431</td></tr>
+          <tr><td>Solar PV — Utility Scale</td><td>48</td></tr>
+          <tr><td>Solar PV — Rooftop</td><td>41</td></tr>
+          <tr><td>Hydropower</td><td>24</td></tr>
+          <tr><td>Storage</td><td>24</td></tr>
+          <tr><td>Wind — Onshore</td><td>12</td></tr>
+          <tr><td>Wind — Offshore</td><td>12</td></tr>
+          <tr><td>Imports — France</td><td>12</td></tr>
+          <tr><td>Imports — Norway</td><td>12</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="about-section">
       <h2 id="solar-petition">Solar Petition</h2>
       <p>MyGridGB ran a petition calling for solar panels on all new homes built in the UK. The petition did not reach its target, but the case for rooftop solar in new builds remains strong. <a href="https://www.mygridgb.co.uk/solar-petition/" target="_blank">Read the full justification.</a></p>
     </div>
 
     <div class="about-section">
       <h2>Funding</h2>
-      <p>MyGridGB is primarily self-funded. In 2016 the site received support from the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute</a>, whose ongoing support we gratefully acknowledge.</p>
+      <p>MyGridGB is primarily self-funded and supported by donations. In December 2016 the site received support from the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute</a>, whose ongoing support we gratefully acknowledge. The Durham Energy Institute has no editorial influence over the content published on this site.</p>
     </div>
 
   </main>

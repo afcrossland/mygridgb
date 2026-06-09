@@ -36,7 +36,6 @@ const NAV_HTML = `
           <ul>
             <li><a href="/about/index.html">About MyGridGB</a></li>
             <li><a href="/about-me/index.html">About Me</a></li>
-            <li><a href="/sponsorship/index.html">Sponsorship Opportunities</a></li>
             <li><a href="/educational-resources/index.html">Educational Resources</a></li>
           </ul>
         </li>

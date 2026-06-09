@@ -6,12 +6,147 @@
   <title>Educational Resources — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <style>
+    .edu-section { margin-bottom: 40px; }
+    .edu-section h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .edu-section p { margin-bottom: 12px; line-height: 1.75; color: var(--muted); }
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .resource-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color .2s;
+    }
+    .resource-card:hover { border-color: var(--brand); }
+    .resource-card .resource-type {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--brand);
+    }
+    .resource-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .resource-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+    .resource-card a.download-btn {
+      display: inline-block;
+      margin-top: 4px;
+      background: var(--brand);
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      align-self: flex-start;
+      transition: background .15s;
+    }
+    .resource-card a.download-btn:hover { background: var(--brand-dark); text-decoration: none; }
+    .contact-box {
+      background: var(--brand-bg);
+      border-left: 4px solid var(--brand);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Educational Resources</h1>
-    <p class="page-intro"><!-- Paste your educational resources content here --></p>
+    <p class="page-intro">Resources for teachers and students exploring energy, electricity and the clean energy transition. Datasets are provided by MyGridGB; reading materials are provided by educational professionals.</p>
+
+    <div class="contact-box" style="margin-bottom:36px">
+      Working in the education sector and want to contribute material? Contact us at <a href="mailto:mygridapp@gmail.com">mygridapp@gmail.com</a>.
+    </div>
+
+    <!-- Reading Materials -->
+    <div class="edu-section">
+      <h2>Reading Materials</h2>
+      <p>Classroom resources by educator Pamela Dugdale, covering energy generation, climate and the energy transition.</p>
+      <div class="resource-grid">
+
+        <div class="resource-card">
+          <div class="resource-type">PDF — Classroom Activity</div>
+          <h3>Investigating Solar Power in Different Weather Conditions</h3>
+          <p>A practical investigation into how solar energy output varies with weather, designed for classroom use.</p>
+          <a class="download-btn" href="Investigating-solar-power-in-different-weather-conditions.pdf" download>Download PDF</a>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-type">PDF — Reading Material</div>
+          <h3>Heat Mining or Replenishable Geothermal</h3>
+          <p>Explores the difference between extractive and renewable geothermal energy and the implications for long-term energy planning.</p>
+          <a class="download-btn" href="Heat_mining_or_replenishable_geothermal.pdf" download>Download PDF</a>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-type">PDF — Case Study</div>
+          <h3>Think Global, Act Local — A Power Generation Case Study</h3>
+          <p>Connects global energy challenges to local decision-making through a structured power generation case study.</p>
+          <a class="download-btn" href="Think_global_act_local_a_power_generatio.pdf" download>Download PDF</a>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-type">PDF — Classroom Activity</div>
+          <h3>Powering the Future — A Card Activity for Classroom Use</h3>
+          <p>An interactive card-based activity helping students explore different energy sources and their trade-offs.</p>
+          <a class="download-btn" href="Powering_the_future_a_card_activity_for.pdf" download>Download PDF</a>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-type">PDF — Project Resource</div>
+          <h3>Students to Solve the World's Energy Problems</h3>
+          <p>A project-based resource challenging students to propose real solutions to global energy challenges.</p>
+          <a class="download-btn" href="Students_to_solve_the_worlds_energy_prob.pdf" download>Download PDF</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Solar in Schools -->
+    <div class="edu-section">
+      <h2>Solar in Schools</h2>
+      <p>A case study on solar installation at a British primary school, including data on generation and the learning opportunities it creates.</p>
+      <div class="resource-grid">
+
+        <div class="resource-card">
+          <div class="resource-type">PDF — Case Study</div>
+          <h3>Case Study — Carr Hill School</h3>
+          <p>Documents the solar installation at Carr Hill School, covering system performance, educational integration, and outcomes.</p>
+          <a class="download-btn" href="Case-Study-Carr-Hill-School.pdf" download>Download PDF</a>
+        </div>
+
+      </div>
+    </div>
+
   </main>
   <div id="sidebar-placeholder"></div>
 </div>

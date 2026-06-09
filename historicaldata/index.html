@@ -14,7 +14,7 @@
     <h1 class="page-title">Electricity since 2012</h1>
     <p class="page-intro">Historical British electricity generation data going back to 2012.</p>
 
-    <h2 style="font-size:1.3rem; font-weight:700; color:#1a5c3a; margin:24px 0 8px;">Annual electricity mix</h2>
+    <h2 style="font-size:1.3rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a5c3a; margin:24px 0 8px;">Annual electricity mix</h2>
     <p style="color:var(--muted); margin-bottom:16px;">Share of electricity generation by source each year since 2012.</p>
     <div style="position:relative; height:520px;">
       <canvas id="history-chart"></canvas>
@@ -131,7 +131,7 @@
     const labels  = rows.map(r => String(r.c[1]?.v ?? '').match(/(\d{4})/)?.[1] ?? '');
     const values  = rows.map(r => parseFloat(r.c[0]?.v ?? 0));
     const partial = rows.map(r => String(r.c[1]?.v ?? '').includes('so far'));
-    const colors  = rows.map((_, i) => partial[i] ? '#90CAF9' : '#2f82d6');
+    const colors  = rows.map((_, i) => partial[i] ? '#9E9E9E' : '#3d3d3d');
 
     new Chart(document.getElementById('carbon-emissions-chart'), {
       type: 'bar',
