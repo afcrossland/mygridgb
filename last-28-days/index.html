@@ -6,6 +6,7 @@
   <title>Last 28 Days — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="page-wrap">
@@ -13,11 +14,135 @@
     <h1 class="page-title">Last 28 Days</h1>
     <p class="page-intro">British electricity generation over the last 28 days. Data sources: MyGridGB, Elexon Portal, Sheffield University.</p>
     <div class="share-box"><strong>Share:</strong> <a href="https://infogram.com/british-electricity-over-last-28-days-1g0n2ozdd3xnp4y?live" target="_blank">https://infogram.com/british-electricity-over-last-28-days-1g0n2ozdd3xnp4y?live</a></div>
-    <div class="embed-area">
-      <p>Chart embed to be wired up — paste your Infogram embed code here.</p>
+
+    <h2 style="font-size:1.4rem; font-weight:700; color:#1E90FF; margin:24px 0 12px;">Hourly electricity generation</h2>
+    <p style="color:var(--muted); margin-bottom:8px;">The chart below shows you the typical make up of our electricity over a 24 hour period. This is based on data from the last 28 days.</p>
+    <p style="color:var(--muted); margin-bottom:20px;">Electricity generation in Great Britain, every hour for the last 28 days. Note the solar peaks and the way that generally we have long periods of strong wind followed by periods of low wind.</p>
+
+    <div style="position:relative; height:400px;">
+      <canvas id="gen-chart"></canvas>
     </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
+
+<script>
+(async () => {
+  const SHEET_ID = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
+  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+
+  const SOURCES = [
+    { label: 'Nuclear',       color: '#59d600' },
+    { label: 'Biomass',       color: '#824e1a' },
+    { label: 'Large Hydro',   color: '#001cf4' },
+    { label: 'Onshore Wind',  color: '#ed2a2a' },
+    { label: 'Offshore Wind', color: '#ed7474' },
+    { label: 'Solar',         color: '#ede310' },
+    { label: 'Imports',       color: '#7100e2' },
+    { label: 'Coal',          color: '#3d3d3d' },
+    { label: 'Gas',           color: '#2f82d6' },
+    { label: 'Storage',       color: '#f96c00' },
+  ];
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function parseGDate(s) {
+    const m = String(s).match(/Date\((\d+),(\d+),(\d+)\)/);
+    return m ? new Date(+m[1], +m[2], +m[3]) : null;
+  }
+
+  function fmtDate(d) {
+    return d.getDate() + ' ' + MONTHS[d.getMonth()];
+  }
+
+  try {
+    const resp = await fetch(URL);
+    const text = await resp.text();
+    const start = text.indexOf('('), end = text.lastIndexOf(')');
+    const { rows } = JSON.parse(text.slice(start + 1, end)).table;
+
+    // Drop rows where all generation values are null
+    const valid = rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
+
+    // X-axis labels — one per row, formatted as "12 May"
+    const labels = valid.map(r => {
+      const d = parseGDate(r.c[0].v);
+      return d ? fmtDate(d) : '';
+    });
+
+    // Build one dataset per generation source (cols 1–10)
+    const datasets = SOURCES.map((src, i) => ({
+      label: src.label,
+      data: valid.map(r => r.c[i + 1]?.v ?? null),
+      backgroundColor: src.color,
+      borderColor: src.color,
+      borderWidth: 0.5,
+      fill: true,
+      pointRadius: 0,
+      tension: 0.2,
+    }));
+
+    new Chart(document.getElementById('gen-chart'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+              padding: 16,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              pointStyleWidth: 10,
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(2) + ' GW' : '—'}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 10 },
+              maxRotation: 90,
+              minRotation: 90,
+              autoSkip: false,
+              // Only label the first data point of each new day
+              callback: (val, idx) => labels[idx] !== labels[idx - 1] ? labels[idx] : ''
+            },
+            grid: { display: false }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Power, GW',
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+              color: '#555'
+            },
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
+              stepSize: 5
+            },
+            grid: { color: '#eeeeee' }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Generation chart error:', err);
+  }
+})();
+</script>
+
 </body>
 </html>
