@@ -11,30 +11,28 @@ const NAV_HTML = `
     </button>
     <nav id="main-nav">
       <ul>
-        <li><a href="/dashboard/index.html">Dashboard</a></li>
-        <li><a href="/podcast/index.html">In the Media</a></li>
-        <li><a href="/blog/index.html">Blog</a></li>
         <li>
           <a href="/last-28-days/index.html">Electricity Data ▾</a>
           <ul>
             <li><a href="/last-28-days/index.html">Last 28 Days</a></li>
             <li><a href="/last-12-months/index.html">Last 12 Months</a></li>
             <li><a href="/historicaldata/index.html">Electricity since 2012</a></li>
-            <li><a href="/gas-tracker/index.html">Gas Tracker</a></li>
             <li><a href="/carbon-tracker/index.html">Carbon Tracker</a></li>
+            <li><a href="/gas-tracker/index.html">Gas Tracker</a></li>
             <li><a href="/coal-tracker/index.html">Coal Tracker</a></li>
           </ul>
         </li>
         <li><a href="/2030grid/index.html">The 2030 Grid</a></li>
         <li>
-          <a href="/map/index.html">Other Resources ▾</a>
+          <a href="/map/index.html">Maps ▾</a>
           <ul>
-            <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">UK Renewables Map (External)</a></li>
             <li><a href="/map/index.html">UK Renewable Energy Map</a></li>
             <li><a href="/waste-heat-map/index.html">Waste Heat Map</a></li>
-            <li><a href="/blog/index.html">Blog</a></li>
+            <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
           </ul>
         </li>
+        <li><a href="/blog/index.html">Blog</a></li>
+        <li><a href="/podcast/index.html">In the Media</a></li>
         <li>
           <a href="/about/index.html">About ▾</a>
           <ul>
@@ -56,29 +54,27 @@ const FOOTER_HTML = `
 </footer>`;
 
 const SIDEBAR_HTML = `
-<aside class="sidebar">
-  <div class="sidebar-widget">
-    <h4>Support MyGridGB</h4>
-    <p style="font-size:13px;color:#555;margin-bottom:10px">Kindly supported by the Durham Energy Institute.</p>
+<div class="bottom-cards">
+  <div class="bottom-card">
+    <div class="bottom-card-label">Supported by</div>
     <a href="https://www.dur.ac.uk/dei/" target="_blank">
       <img src="http://www.mygridgb.co.uk/wp-content/uploads/2016/12/unnamed-300x152.jpg" alt="Durham Energy Institute">
     </a>
+    <p>MyGridGB is kindly supported by the Durham Energy Institute.</p>
   </div>
-  <div class="sidebar-widget">
-    <h4>Book</h4>
-    <a class="book-link" href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">
-      <img src="https://www.mygridgb.co.uk/wp-content/uploads/2021/10/BookCover-194x300.jpg" alt="Decarbonising Electricity book">
+  <div class="bottom-card">
+    <div class="bottom-card-label">Book</div>
+    <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">
+      <img src="https://www.mygridgb.co.uk/wp-content/uploads/2021/10/BookCover-194x300.jpg" alt="Decarbonising Electricity Made Simple" style="max-height:160px;width:auto">
     </a>
-    <p style="font-size:12px;color:#555;margin-top:8px;text-align:center">Click to purchase on Amazon</p>
+    <p>Decarbonising Electricity Made Simple — <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">buy on Amazon</a></p>
   </div>
-  <div class="sidebar-widget">
-    <h4>Follow on Twitter / X</h4>
-    <a href="https://twitter.com/intent/follow?screen_name=mygridgb" target="_blank"
-       style="display:inline-block;background:#1da1f2;color:#fff;padding:8px 16px;border-radius:4px;font-size:13px;font-weight:600">
-      Follow @mygridgb
-    </a>
+  <div class="bottom-card">
+    <div class="bottom-card-label">Follow</div>
+    <p style="margin-bottom:12px">Keep up with the latest GB electricity data and analysis.</p>
+    <a href="https://twitter.com/intent/follow?screen_name=mygridgb" target="_blank" class="follow-btn">Follow @mygridgb on X</a>
   </div>
-</aside>`;
+</div>`;
 
 document.addEventListener('DOMContentLoaded', () => {
   // On GitHub Pages the site lives under /<repo>/ rather than /.
