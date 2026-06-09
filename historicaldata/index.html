@@ -6,18 +6,113 @@
   <title>Electricity since 2012 — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Electricity since 2012</h1>
     <p class="page-intro">Historical British electricity generation data going back to 2012.</p>
-    
-    <div class="embed-area">
-      <p>Chart embed to be wired up — paste your Infogram embed code here.</p>
+
+    <h2 style="font-size:1.3rem; font-weight:700; color:#1E90FF; margin:24px 0 8px;">Annual electricity mix</h2>
+    <p style="color:var(--muted); margin-bottom:16px;">Share of electricity generation by source each year since 2012.</p>
+    <div style="position:relative; height:520px;">
+      <canvas id="history-chart"></canvas>
     </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
+
+<script>
+(async () => {
+  const SHEET_ID = '1_dUFSVKiTItbbuyQNc2XuhQ1tmkQBBbgvQwqmekdfvU';
+  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+
+  const SOURCES = [
+    { label: 'Nuclear',     color: '#59d600', col: 1 },
+    { label: 'Biomass',     color: '#824e1a', col: 2 },
+    { label: 'Wind',        color: '#ed2a2a', col: 3 },
+    { label: 'Solar',       color: '#ede310', col: 4 },
+    { label: 'Large Hydro', color: '#001cf4', col: 5 },
+    { label: 'Coal',        color: '#3d3d3d', col: 6 },
+    { label: 'Gas',         color: '#2f82d6', col: 7 },
+    { label: 'Imports',     color: '#7100e2', col: 8 },
+  ];
+
+  try {
+    const resp = await fetch(URL);
+    const text = await resp.text();
+    const start = text.indexOf('('), end = text.lastIndexOf(')');
+    const { rows } = JSON.parse(text.slice(start + 1, end)).table;
+
+    const labels = rows.map(r => r.c[0]?.v ?? '');
+
+    const datasets = SOURCES.map(src => ({
+      label: src.label,
+      data: rows.map(r => r.c[src.col]?.v ?? 0),
+      backgroundColor: src.color,
+      borderColor: '#fff',
+      borderWidth: 1,
+    }));
+
+    new Chart(document.getElementById('history-chart'), {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+              padding: 16,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 10,
+              boxHeight: 10,
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${(ctx.parsed.x * 100).toFixed(1)}%`
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            min: 0,
+            max: 1,
+            title: {
+              display: true,
+              text: 'Electricity mix',
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+              color: '#555'
+            },
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
+              callback: v => Math.round(v * 100) + '%'
+            },
+            grid: { color: '#eeeeee' }
+          },
+          y: {
+            stacked: true,
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
+              crossAlign: 'far',
+            },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('History chart error:', err);
+  }
+})();
+</script>
+
 </body>
 </html>

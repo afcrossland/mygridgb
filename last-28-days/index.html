@@ -55,8 +55,6 @@
     'Storage':       '#f96c00',
   };
 
-  // Append BB (73% opacity) for stacked area fills
-  function withAlpha(hex) { return hex + 'BB'; }
 
   const STACK_SOURCES = [
     'Nuclear', 'Biomass', 'Large Hydro', 'Onshore Wind',
@@ -153,7 +151,7 @@
     const datasets = STACK_SOURCES.map((name, i) => ({
       label: name,
       data: valid.map(r => r.c[i + 1]?.v ?? null),
-      backgroundColor: withAlpha(PALETTE[name]),
+      backgroundColor: PALETTE[name],
       borderColor: PALETTE[name],
       borderWidth: 0.5,
       fill: true,
