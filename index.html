@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/nav.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     .mix-section { margin: 32px 0; }
 
@@ -133,6 +134,14 @@
       </div>
     </section>
 
+    <section style="margin:32px 0;">
+      <h2 style="font-size:1.3rem; margin-bottom:4px; color:#1E90FF;">Carbon Intensity of British Electricity</h2>
+      <p style="font-size:1rem; color:var(--muted); margin-bottom:16px;">gCO2/kWh — annual average since 1998</p>
+      <div style="position:relative; height:320px;">
+        <canvas id="carbon-chart"></canvas>
+      </div>
+    </section>
+
     <h2 style="margin: 32px 0 16px; font-size:1.3rem;">Latest Blogs</h2>
 
     <div class="blog-grid">
@@ -167,6 +176,7 @@
   const CARBON_ID     = '14F5w8HVrzp5NClmUl0-TUBdF5j_VT2aEHsKFHIYg8aA';
   const GENERATION_ID = '1kIEWYvmo3pA4uiefPYDgEEDcxvrBWrcWt403JbrgLhY';
   const LOWCARBON_ID  = '1vJ9CsBl4VbzGVlF05YdlOS0f5L3wMw8ICZ--qpvegDc';
+  const HISTORY_ID    = '1U8ywTGM2IO6Wc4juDb6rMP0me2hd58HEenOSqGpYiNM';
 
   const PALETTE = {
     'Nuclear':       '#59d600',
@@ -201,11 +211,12 @@
     return isNaN(parseFloat(fromCell)) ? null : parseFloat(fromCell);
   }
 
-  const [mixResult, carbonResult, generationResult, lowcarbonResult] = await Promise.allSettled([
+  const [mixResult, carbonResult, generationResult, lowcarbonResult, historyResult] = await Promise.allSettled([
     fetchSheet(MIX_ID),
     fetchSheet(CARBON_ID),
     fetchSheet(GENERATION_ID),
     fetchSheet(LOWCARBON_ID),
+    fetchSheet(HISTORY_ID),
   ]);
 
   // ── Stat panels ─────────────────────────────────────────────
@@ -220,6 +231,96 @@
   if (lowcarbonResult.status === 'fulfilled') {
     const v = extractStat(lowcarbonResult.value);
     if (v !== null) document.getElementById('stat-lowcarbon').textContent = Math.round(v);
+  }
+
+  // ── Carbon intensity bar chart ───────────────────────────────
+  if (historyResult.status === 'fulfilled') {
+    const rows = historyResult.value.rows;
+
+    // Col A = year labels, Col B = dark bars, Col C = green bars (null where blank)
+    const years = rows.map(r => Math.round(r.c[0].v));
+    const colB  = rows.map(r => r.c[1]?.v ?? null);
+    const colC  = rows.map(r => r.c[2]?.v ?? null);
+
+    new Chart(document.getElementById('carbon-chart'), {
+      type: 'bar',
+      data: {
+        labels: years,
+        datasets: [
+          {
+            data: colB,
+            backgroundColor: '#222222',
+            borderWidth: 0,
+            categoryPercentage: 0.9,
+            barPercentage: 0.95,
+          },
+          {
+            data: colC,
+            backgroundColor: '#59d600',
+            borderWidth: 0,
+            categoryPercentage: 0.9,
+            barPercentage: 0.95,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: ctx => ctx[0].label,
+              label: ctx => ' ' + ctx.parsed.y + ' gCO2/kWh'
+            }
+          },
+          annotation: {
+            annotations: {
+              target: {
+                type: 'line',
+                yMin: 100,
+                yMax: 100,
+                borderColor: '#ef4444',
+                borderWidth: 2,
+                label: {
+                  display: true,
+                  content: '2030 target',
+                  position: 'end',
+                  yAdjust: -12,
+                  backgroundColor: 'transparent',
+                  color: '#ef4444',
+                  font: {
+                    family: "'Segoe UI', Arial, sans-serif",
+                    size: 12,
+                    weight: '600'
+                  },
+                  padding: 0
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
+              maxRotation: 0,
+              autoSkip: true,
+              maxTicksLimit: 10
+            },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
+              callback: v => v + ' gCO2'
+            },
+            grid: { color: '#f0f0f0' }
+          }
+        }
+      }
+    });
   }
 
   // ── Pie chart ────────────────────────────────────────────────

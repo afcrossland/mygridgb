@@ -81,8 +81,22 @@ const SIDEBAR_HTML = `
 </aside>`;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // On GitHub Pages the site lives under /<repo>/ rather than /.
+  // On a custom domain (or localhost) it lives at /, so BASE is empty.
+  const BASE = window.location.hostname.endsWith('github.io')
+    ? '/' + window.location.pathname.split('/')[1]
+    : '';
+
   // Inject header
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
+
+  // Prefix every internal link in the header with the base path
+  if (BASE) {
+    document.querySelectorAll('#site-header a[href^="/"]').forEach(a => {
+      a.setAttribute('href', BASE + a.getAttribute('href'));
+    });
+  }
+
   // Inject footer
   document.body.insertAdjacentHTML('beforeend', FOOTER_HTML);
 
