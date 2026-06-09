@@ -18,24 +18,9 @@
       border-bottom: 1px solid var(--border);
     }
     .about-section p { margin-bottom: 12px; line-height: 1.75; }
-    .data-source-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 12px;
-    }
-    .data-source-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px;
-      font-size: 14px;
-      line-height: 1.65;
-    }
-    .data-source-card h4 {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--brand);
-      margin-bottom: 6px;
+    .about-section ul {
+      margin: 8px 0 12px 20px;
+      line-height: 1.9;
     }
     .contact-box {
       background: var(--brand-bg);
@@ -79,49 +64,50 @@
 
     <div class="about-section">
       <h2>Welcome to MyGridGB</h2>
-      <p>The way that electricity is being generated in Great Britain changes every minute of every day. MyGridGB provides real-time information and analysis of energy generation and carbon emissions across Great Britain — making the story of Britain's energy transition easy to understand, whether you're a policymaker, researcher, student, or just curious about where your electricity comes from.</p>
-      <p>The platform tracks electricity production and consumption across all generating technologies, shows how much carbon is being emitted at any moment, and places it all in the context of Britain's decarbonisation targets.</p>
-      <p>MyGridGB also charts carbon emissions from electricity — of critical importance for a country with legally binding carbon reduction targets — and includes a <a href="../2030grid/index.html">Clean Power 2030 simulation</a> that models what the GB grid could look like under different combinations of power station technologies.</p>
+      <p>The way that electricity is being generated in Great Britain changes every minute of every day. Our power must respond to changing weather and to every flick of a switch on cold winter nights and long summer days. Power stations themselves are changing, with reducing numbers of coal power stations, new nuclear plants and growth in gas, wind, solar and biomass.</p>
+      <p>MyGridGB charts all of this change. It is a family of platforms which give real time information and analysis of energy and carbon emissions in Great Britain. I established MyGridGB to provide a source of unbiased information about these contentious issues and let you, the public, form your own opinions on our energy future based on the data given.</p>
+      <p>It provides analysis of the volumes of electricity being produced and consumed, and where that electricity comes from. It shows this in real time as well as using historical data. It uses data from Sheffield University and Elexon, the company responsible for managing the electricity and trading arrangements of England and Wales. Blogs by myself and guest authors also provide the latest insights.</p>
+      <p>The analysis is not limited to the volumes of electricity. MyGridGB also charts carbon emissions from electricity – of critical importance for a country with carbon reduction targets.</p>
+      <p>My <a href="../2030grid/index.html">Clean Power 2030 Plan</a> shows an alternative electricity mix. This alternative is a simulation of a different mix of power stations and energy which would meet our carbon objectives. It is simulated in real time on the website and includes a stimulus for solar and batteries on our homes – as I strongly believe that homes are the power stations of the future.</p>
     </div>
 
     <div class="about-section">
       <h2>Contact</h2>
       <div class="contact-box">
-        <p>For general enquiries: <a href="mailto:mygridapp@gmail.com">mygridapp@gmail.com</a></p>
-        <p>For media and academic enquiries: <a href="https://www.linkedin.com/in/afcrossland" target="_blank">LinkedIn — Dr Andrew Crossland</a></p>
+        <p>I love all the feedback I get through email, Twitter and Facebook. Please do direct your comments and queries to me, I try to answer them all. I also welcome guest contributions to my blog.</p>
+        <p>Please direct all media inquiries to <a href="mailto:mygridapp@gmail.com">mygridapp@gmail.com</a> or <a href="https://www.linkedin.com/in/afcrossland" target="_blank">LinkedIn</a>. Please use <a href="mailto:mygridapp@gmail.com">mygridapp@gmail.com</a> for comments and queries.</p>
       </div>
     </div>
 
     <div class="about-section">
       <h2>Carbon Targets</h2>
-      <p>The assumed 2030 carbon target used on this site is <strong>50–100 grams of CO₂ equivalent per kWh</strong>, based on analysis by the Committee on Climate Change. MyGridGB tracks progress against this in real time. The carbon intensity figures use life-cycle emissions estimates based on <a href="https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources" target="_blank">IPCC reference data</a>, capturing the full carbon cost of each generation type rather than combustion emissions alone.</p>
+      <p>I assume our 2030 carbon target to be <strong>50–100 grams of CO₂ equivalent per kWh</strong>. This value is taken from the <a href="https://www.theccc.org.uk/" target="_blank">Committee on Climate Change</a>.</p>
     </div>
 
     <div class="about-section">
-      <h2>Data Sources</h2>
-      <div class="data-source-grid">
-        <div class="data-source-card">
-          <h4>Generation &amp; Grid Data</h4>
-          <p>Electricity generation and transmission data comes from <a href="http://bmreports.com/" target="_blank">BM Reports</a> via Elexon — the electricity trading body for England and Wales. Data updates every 5 minutes. Note: as of November 2019, embedded wind estimates are no longer included in grid generation figures.</p>
-        </div>
-        <div class="data-source-card">
-          <h4>Solar Data</h4>
-          <p>Solar generation is provided by the <a href="https://www.solar.sheffield.ac.uk/pvlive/" target="_blank">Sheffield Solar PVLive</a> service at the University of Sheffield, aggregated from approximately 20,000 UK solar installations. Sheffield Solar also provides PV_Regional and PV_Forecast services to National Grid and the energy industry.</p>
-        </div>
-        <div class="data-source-card">
-          <h4>Carbon Intensity</h4>
-          <p>Carbon intensity is calculated using life-cycle emissions factors for each generating technology, based on IPCC median reference values. See the full table below.</p>
-        </div>
-        <div class="data-source-card">
-          <h4>2030 Grid Simulation</h4>
-          <p>The Clean Power 2030 plan simulator uses publicly available capacity assumptions to model what different combinations of generation technologies would produce and their associated carbon impact.</p>
-        </div>
-      </div>
+      <h2>Grid Data</h2>
+      <p>GB electricity is provided from a number of sources (gas, coal, nuclear etc). The amount that each produces is adjusted in real time in response to the amount of demand, the availability of equipment, maintenance, in response to weather etc. MyGridGB attempts to summarise the amount of generation from each source on a regular basis via Twitter and on this website.</p>
+      <p>Data about the generation of all sources of energy (except solar) are collected from <a href="http://bmreports.com/" target="_blank">BM Reports</a> via Elexon who work on balancing the supply for electricity with the demand for electricity. They report the total generation from different sources of electricity every 5 minutes. As of November 2019, I no longer include an estimate of embedded wind in the data.</p>
+    </div>
+
+    <div class="about-section">
+      <h2>Solar Data</h2>
+      <p>Solar generation is not presently measured and reported by BM Reports alongside other forms of generation. MyGridGB gets its solar outturn data from the <a href="https://www.solar.sheffield.ac.uk/pvlive/" target="_blank">Sheffield Solar Group</a> at the University of Sheffield.</p>
+      <p>Sheffield Solar has been analysing the performance of operational solar PV systems in the UK since 2010. They now provide National Grid with solar outturn data for their control room. National Grid need this as solar is embedded in the distribution network so its outturn data is not available to the system operator. Sheffield Solar's analysis combines generation data from around 20,000 systems with installed capacity data to give GB national solar outturn. They also provide PV_Regional, a regional PV outturn and short term PV forecast services (PV_Forecast). The regional forecast is used for understanding where pinch points may occur on the grid, while PV_Forecast is used by energy industry stakeholders to anticipate future demand, accounting for solar.</p>
+      <ul>
+        <li><a href="https://www.solar.sheffield.ac.uk/pvlive/" target="_blank">PV_Live</a></li>
+        <li><a href="https://www.solar.sheffield.ac.uk/pvregional/" target="_blank">PV_Regional</a></li>
+        <li><a href="https://www.solar.sheffield.ac.uk/pvforecast/" target="_blank">PV_Forecast</a></li>
+        <li><a href="https://www.sheffield.ac.uk/" target="_blank">The University of Sheffield</a></li>
+      </ul>
+      <p>The solar generation figure is an estimate, and one that will be refined by the University over time.</p>
     </div>
 
     <div class="about-section">
       <h2>Carbon Dioxide Equivalent Estimation</h2>
-      <p>Carbon intensity values are calculated using IPCC median life-cycle figures. These capture emissions across the full lifetime of each technology — manufacturing, operation and decommissioning — not just fuel combustion.</p>
+      <p>Carbon Dioxide equivalent is the combined effect of all greenhouse gases (not just CO₂) from different electricity generation sources over their lifetime. Where CO₂ figures are reported, values are taken from the Intergovernmental Panel on Climate Change (IPCC): <a href="https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources" target="_blank">Life-cycle greenhouse-gas emissions of energy sources</a>.</p>
+      <p>Note that other websites (Drax, NESO) use lower values for the carbon intensity of biomass — I apply IPCC/independent analysis in my figures.</p>
+      <p>Throughout I use the "median" figures from the following table:</p>
       <table class="carbon-table">
         <thead>
           <tr>
@@ -133,17 +119,17 @@
           <tr><td>Coal</td><td>820</td></tr>
           <tr><td>Gas</td><td>490</td></tr>
           <tr><td>Biomass</td><td>230</td></tr>
-          <tr><td>Imports — Belgium</td><td>230</td></tr>
-          <tr><td>Imports — Netherlands</td><td>483</td></tr>
-          <tr><td>Imports — Ireland</td><td>431</td></tr>
           <tr><td>Solar PV — Utility Scale</td><td>48</td></tr>
           <tr><td>Solar PV — Rooftop</td><td>41</td></tr>
           <tr><td>Hydropower</td><td>24</td></tr>
-          <tr><td>Storage</td><td>24</td></tr>
           <tr><td>Wind — Onshore</td><td>12</td></tr>
           <tr><td>Wind — Offshore</td><td>12</td></tr>
           <tr><td>Imports — France</td><td>12</td></tr>
           <tr><td>Imports — Norway</td><td>12</td></tr>
+          <tr><td>Imports — Belgium</td><td>230</td></tr>
+          <tr><td>Imports — Ireland</td><td>431</td></tr>
+          <tr><td>Imports — Netherlands</td><td>483</td></tr>
+          <tr><td>Storage</td><td>24</td></tr>
         </tbody>
       </table>
     </div>
@@ -155,7 +141,9 @@
 
     <div class="about-section">
       <h2>Funding</h2>
-      <p>MyGridGB is primarily self-funded and supported by donations. In December 2016 the site received support from the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute</a>, whose ongoing support we gratefully acknowledge. The Durham Energy Institute has no editorial influence over the content published on this site.</p>
+      <p>MyGridGB is mostly funded through my own pocket and via kind donations.</p>
+      <p>In December 2016, MyGridGB was awarded funding from the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute (DEI)</a>. As a PhD student, I was supported by the DEI and retain a position there as an Associate Fellow. The DEI have no influence on the material which I publish.</p>
+      <p>Durham Energy Institute draws on the expertise of world-leading researchers across Durham University with a membership spanning departments in Science, Social Science and Humanities. We emphasise a 'Science and Society' approach to energy which tackles the societal aspects of energy technology generating insights into how technology is shaped by, adopted by, and influences society. We also undertake research developing new energy technologies and solutions for the benefit of society including renewables generation (wind, solar, geothermal, bio-fuels) and integration, transmission and distribution, smart energy systems, carbon capture and storage, unconventional hydrocarbons, and nuclear fusion.</p>
     </div>
 
   </main>
