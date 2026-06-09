@@ -8,6 +8,70 @@
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/nav.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .mix-section { margin: 32px 0; }
+
+    .mix-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1565C0;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .mix-subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .mix-body {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .mix-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+
+    .mix-stat-label {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .mix-stat-value {
+      font-size: 2.8rem;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .mix-stat-unit {
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--muted);
+      vertical-align: baseline;
+      margin-left: 2px;
+    }
+
+    .mix-chart-wrap {
+      flex: 1;
+      max-width: 440px;
+    }
+
+    @media (max-width: 600px) {
+      .mix-body { flex-direction: column; }
+      .mix-stats { flex-direction: row; flex-wrap: wrap; gap: 20px; }
+      .mix-chart-wrap { max-width: 100%; width: 100%; }
+    }
+  </style>
 </head>
 <body>
 
@@ -31,11 +95,33 @@
       <a href="about/index.html">Read more about MyGridGB.</a>
     </p>
 
-    <section style="margin:32px 0;">
-      <h2 style="font-size:1.3rem; margin-bottom:4px; color:var(--green);">Current Electricity Mix</h2>
-      <p id="mix-ts" style="font-size:13px; color:var(--muted); margin-bottom:16px;">Loading&hellip;</p>
-      <div style="max-width:480px;">
-        <canvas id="mix-chart"></canvas>
+    <section class="mix-section">
+      <h2 class="mix-title">Britain's Present Electricity Mix</h2>
+      <p class="mix-subtitle">How is your electricity being generated? The pie chart below shows you how at this present time.</p>
+      <div class="mix-body">
+        <div class="mix-stats">
+          <div>
+            <div class="mix-stat-label">Low carbon</div>
+            <div class="mix-stat-value">
+              <span id="stat-lowcarbon">&mdash;</span><span class="mix-stat-unit">%</span>
+            </div>
+          </div>
+          <div>
+            <div class="mix-stat-label">Generation</div>
+            <div class="mix-stat-value">
+              <span id="stat-generation">&mdash;</span><span class="mix-stat-unit">GW</span>
+            </div>
+          </div>
+          <div>
+            <div class="mix-stat-label">Carbon intensity</div>
+            <div class="mix-stat-value">
+              <span id="stat-carbon">&mdash;</span><span class="mix-stat-unit">gCO2/kWh</span>
+            </div>
+          </div>
+        </div>
+        <div class="mix-chart-wrap">
+          <canvas id="mix-chart"></canvas>
+        </div>
       </div>
     </section>
 
@@ -67,83 +153,113 @@
 
 <script>
 (async () => {
-  const SHEET_ID = '1v8KovUBgNq6M_WcGiUQi-MdysmsiDKFIfAdg961D1LA';
-  const GID = '0';
-  const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+  const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
 
-  // Conventional colours for GB electricity sources
+  const MIX_ID        = '1v8KovUBgNq6M_WcGiUQi-MdysmsiDKFIfAdg961D1LA';
+  const CARBON_ID     = '14F5w8HVrzp5NClmUl0-TUBdF5j_VT2aEHsKFHIYg8aA';
+  const GENERATION_ID = '1kIEWYvmo3pA4uiefPYDgEEDcxvrBWrcWt403JbrgLhY';
+  const LOWCARBON_ID  = '1vJ9CsBl4VbzGVlF05YdlOS0f5L3wMw8ICZ--qpvegDc';
+
   const PALETTE = {
-    'Nuclear':  '#F59E0B',
-    'Biomass':  '#92400E',
-    'Wind*':    '#3B82F6',
-    'Wind':     '#3B82F6',
-    'Solar':    '#EAB308',
-    'Coal':     '#374151',
-    'Gas':      '#EA580C',
-    'Storage':  '#8B5CF6',
-    'Hydro':    '#0891B2',
-    'Imports':  '#6B7280',
+    'Nuclear':  '#4CAF50',
+    'Biomass':  '#6D4C41',
+    'Wind*':    '#F44336',
+    'Wind':     '#F44336',
+    'Solar':    '#FFD600',
+    'Coal':     '#212121',
+    'Gas':      '#29B6F6',
+    'Storage':  '#FF9800',
+    'Hydro':    '#1565C0',
+    'Imports':  '#9C27B0',
   };
 
-  const tsEl = document.getElementById('mix-ts');
-
-  try {
-    const resp = await fetch(GVIZ);
+  async function fetchSheet(id) {
+    const resp = await fetch(SHEET(id));
     const text = await resp.text();
     const start = text.indexOf('(');
     const end = text.lastIndexOf(')');
-    const { table } = JSON.parse(text.slice(start + 1, end));
+    return JSON.parse(text.slice(start + 1, end)).table;
+  }
 
-    // Column 1 label holds the live timestamp from the sheet
-    if (tsEl) tsEl.textContent = table.cols[1]?.label ?? '';
+  // Returns the single numeric value from a stat sheet.
+  // Tries cols[1].label first (value embedded in column header),
+  // then first data cell as a fallback.
+  function extractStat(table) {
+    const fromHeader = parseFloat(table.cols?.[1]?.label);
+    if (!isNaN(fromHeader)) return fromHeader;
+    const fromCell = table.rows?.[0]?.c?.[0]?.v;
+    return isNaN(parseFloat(fromCell)) ? null : parseFloat(fromCell);
+  }
 
-    const labels = [], values = [], bgColors = [];
-    table.rows.forEach(row => {
-      const fullLabel = row.c?.[0]?.v;
-      const val = row.c?.[1]?.v;
-      if (!fullLabel || !val || val <= 0) return;
-      const source = fullLabel.split(',')[0].trim();
-      labels.push(fullLabel);
-      values.push(val);
-      bgColors.push(PALETTE[source] ?? '#9CA3AF');
-    });
+  const [mixResult, carbonResult, generationResult, lowcarbonResult] = await Promise.allSettled([
+    fetchSheet(MIX_ID),
+    fetchSheet(CARBON_ID),
+    fetchSheet(GENERATION_ID),
+    fetchSheet(LOWCARBON_ID),
+  ]);
 
-    new Chart(document.getElementById('mix-chart'), {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{
-          data: values,
-          backgroundColor: bgColors,
-          borderColor: '#fff',
-          borderWidth: 2,
-          hoverOffset: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
-              padding: 14,
-              usePointStyle: true,
-              pointStyleWidth: 10
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => ' ' + ctx.label
-            }
+  // ── Stat panels ─────────────────────────────────────────────
+  if (carbonResult.status === 'fulfilled') {
+    const v = extractStat(carbonResult.value);
+    if (v !== null) document.getElementById('stat-carbon').textContent = Math.round(v);
+  }
+  if (generationResult.status === 'fulfilled') {
+    const v = extractStat(generationResult.value);
+    if (v !== null) document.getElementById('stat-generation').textContent = v.toFixed(1);
+  }
+  if (lowcarbonResult.status === 'fulfilled') {
+    const v = extractStat(lowcarbonResult.value);
+    if (v !== null) document.getElementById('stat-lowcarbon').textContent = Math.round(v);
+  }
+
+  // ── Pie chart ────────────────────────────────────────────────
+  if (mixResult.status !== 'fulfilled') return;
+  const { cols, rows } = mixResult.value;
+
+  const labels = [], values = [], bgColors = [];
+  rows.forEach(row => {
+    const fullLabel = row.c?.[0]?.v;
+    const val = row.c?.[1]?.v;
+    if (!fullLabel || !val || val <= 0) return;
+    const source = fullLabel.split(',')[0].trim();
+    labels.push(fullLabel);
+    values.push(val);
+    bgColors.push(PALETTE[source] ?? '#9CA3AF');
+  });
+
+  new Chart(document.getElementById('mix-chart'), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: bgColors,
+        borderColor: '#fff',
+        borderWidth: 2,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+            padding: 14,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            pointStyleWidth: 10
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.label
           }
         }
       }
-    });
-  } catch (err) {
-    if (tsEl) tsEl.textContent = 'Chart currently unavailable.';
-    console.error('Mix chart error:', err);
-  }
+    }
+  });
 })();
 </script>
 
