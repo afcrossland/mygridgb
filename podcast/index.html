@@ -3,19 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Podcasts — MyGridGB</title>
+  <title>MyGridGB in the Media — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <style>
+    .media-section {
+      margin-bottom: 40px;
+    }
+    .media-section h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--brand-bg);
+    }
+    .media-section p {
+      color: var(--muted);
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+    .media-embed {
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .media-embed iframe {
+      display: block;
+      width: 100%;
+      border: none;
+    }
+    .platform-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .platform-links a {
+      display: inline-block;
+      background: var(--brand-bg);
+      color: var(--brand);
+      border: 1px solid var(--brand);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .platform-links a:hover {
+      background: var(--brand);
+      color: #fff;
+      text-decoration: none;
+    }
+    .bbc-box {
+      background: #f5f5f5;
+      border: 1px solid var(--border);
+      border-left: 4px solid #bb1919;
+      border-radius: 0 6px 6px 0;
+      padding: 20px;
+    }
+    .bbc-box h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .bbc-box a {
+      display: inline-block;
+      margin-top: 10px;
+      background: #bb1919;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .bbc-box a:hover { opacity: .85; text-decoration: none; }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
-    <h1 class="page-title">Podcasts</h1>
-    <p class="page-intro">Listen to podcasts about the decarbonisation of British electricity.</p>
-    
-    <div class="embed-area">
-      <p>Chart embed to be wired up — paste your Infogram embed code here.</p>
+    <h1 class="page-title">MyGridGB in the Media</h1>
+    <p class="page-intro">Podcasts, radio appearances, and media coverage of MyGridGB and the decarbonisation of British electricity.</p>
+
+    <!-- Renewable Energy Podcast -->
+    <div class="media-section">
+      <h2>The Renewable Energy Podcast</h2>
+      <p>The MyGridGB Low Carbon Energy Podcast — conversations about the future of energy, the decarbonisation of the grid, and what it means for people and the planet.</p>
+      <div class="media-embed">
+        <iframe src="https://open.spotify.com/embed/show/4p3LCNAXUiqdv1GZ1yYl0b?utm_source=generator"
+                height="352"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"></iframe>
+      </div>
+      <div class="platform-links">
+        <a href="https://open.spotify.com/show/4p3LCNAXUiqdv1GZ1yYl0b" target="_blank">Spotify</a>
+        <a href="https://podcasts.apple.com/us/podcast/the-renewable-energy-podcast/id1617773498" target="_blank">Apple Podcasts</a>
+        <a href="https://music.amazon.com/podcasts/4735ca90-e7d7-433c-a7eb-52bfe71d9ca2/the-renewable-energy-podcast" target="_blank">Amazon Music</a>
+        <a href="https://anchor.fm/s/50662d1c/podcast/rss" target="_blank">RSS Feed</a>
+      </div>
     </div>
+
+    <!-- Energy Mix Podcast -->
+    <div class="media-section">
+      <h2>The Energy Mix Podcast</h2>
+      <p>The Energy Mix covers energy news across multiple technology sectors, exploring the latest developments in the global energy transition.</p>
+      <!-- Paste the Energy Mix podcast embed code below -->
+      <div class="media-embed" style="background:#f5f5f5; border:1px solid var(--border); border-radius:8px; padding:32px; text-align:center; color:var(--muted); font-style:italic;">
+        Embed code coming soon — paste your Energy Mix player embed here.
+      </div>
+    </div>
+
+    <!-- BBC Radio 4 -->
+    <div class="media-section">
+      <h2>BBC Radio 4</h2>
+      <p>Dr Andrew Crossland appeared on BBC Radio 4 to discuss the decarbonisation of the British electricity grid and the role of renewable energy.</p>
+      <div class="bbc-box">
+        <h3>BBC Radio 4 — Programme m0024fjw</h3>
+        <p style="font-size:14px; color:var(--muted);">Listen to the full programme on BBC Sounds.</p>
+        <a href="https://www.bbc.co.uk/programmes/m0024fjw" target="_blank">Listen on BBC Sounds →</a>
+      </div>
+    </div>
+
   </main>
   <div id="sidebar-placeholder"></div>
 </div>

@@ -3,18 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>About — MyGridGB</title>
+  <title>About MyGridGB — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <style>
+    .about-section { margin-bottom: 32px; }
+    .about-section h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--brand-bg);
+    }
+    .about-section p { margin-bottom: 12px; line-height: 1.7; }
+    .data-source-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .data-source-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .data-source-card h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .contact-box {
+      background: var(--brand-bg);
+      border-left: 4px solid var(--brand);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 18px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">About MyGridGB</h1>
-    <p class="page-intro">MyGridGB is the independent resource charting the decarbonisation of British electricity in real time.</p>
-    <p style="margin-bottom:16px"><!-- Paste your About content here --></p>
-    <h2 id="solar-petition" style="margin:24px 0 8px;font-size:1.1rem;">Solar Petition</h2>
-    <p>MyGridGB ran a petition for solar on all new homes in the UK. The petition didn't work, but that's democracy. <a href="https://www.mygridgb.co.uk/solar-petition/" target="_blank">Read the justification here.</a></p>
+
+    <div class="about-section">
+      <h2>Welcome to MyGridGB</h2>
+      <p>MyGridGB provides real-time information and analysis of energy and carbon emissions in Great Britain. The site was created to make the story of Britain's energy transition easy to understand — whether you're a policymaker, researcher, student, or just curious about where your electricity comes from.</p>
+      <p>The platform tracks electricity production and consumption across all generating technologies, shows how much carbon is being emitted at any moment, and places it all in the context of Britain's decarbonisation targets. You can come back any time to see how the grid is changing.</p>
+      <p>MyGridGB also includes a <a href="../2030grid/index.html">Clean Power 2030 simulation</a> that models what the GB grid could look like under different combinations of power station technologies.</p>
+    </div>
+
+    <div class="about-section">
+      <h2>Contact</h2>
+      <div class="contact-box">
+        <p>For general enquiries: <a href="mailto:mygridapp@gmail.com">mygridapp@gmail.com</a></p>
+        <p>For media and academic enquiries: <a href="https://www.linkedin.com/in/afcrossland" target="_blank">LinkedIn — Dr Andrew Crossland</a></p>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <h2>Carbon Targets</h2>
+      <p>The UK Committee on Climate Change has set a target of <strong>50–100 grams of CO₂ equivalent per kWh</strong> for British electricity by 2030. MyGridGB tracks progress against this in real time. The carbon intensity figures shown on this site use life-cycle emissions estimates based on <a href="https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources" target="_blank">IPCC reference data</a>.</p>
+    </div>
+
+    <div class="about-section">
+      <h2>Data Sources</h2>
+      <div class="data-source-grid">
+        <div class="data-source-card">
+          <h4>Generation &amp; Grid Data</h4>
+          <p>Electricity generation and transmission data comes from <a href="http://bmreports.com/" target="_blank">BM Reports</a> via Elexon — the electricity trading body for England and Wales. Data updates every 5 minutes.</p>
+        </div>
+        <div class="data-source-card">
+          <h4>Solar Data</h4>
+          <p>Solar generation is provided by the <a href="https://www.solar.sheffield.ac.uk/pvlive/" target="_blank">Sheffield Solar PVLive</a> service at the <a href="https://www.sheffield.ac.uk/" target="_blank">University of Sheffield</a>, aggregated from approximately 20,000 UK solar installations. Regional and forecast data also available via Sheffield Solar.</p>
+        </div>
+        <div class="data-source-card">
+          <h4>Carbon Intensity</h4>
+          <p>Carbon intensity is calculated using life-cycle emissions factors for each generating technology, based on IPCC reference values. This captures the full carbon cost of each generation type, not just combustion emissions.</p>
+        </div>
+        <div class="data-source-card">
+          <h4>2030 Grid Simulation</h4>
+          <p>The Clean Power 2030 plan simulator uses publicly available capacity assumptions to model what different combinations of generation technologies would produce and their associated carbon impact.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <h2 id="solar-petition">Solar Petition</h2>
+      <p>MyGridGB ran a petition calling for solar panels on all new homes built in the UK. The petition did not reach its target, but the case for rooftop solar in new builds remains strong. <a href="https://www.mygridgb.co.uk/solar-petition/" target="_blank">Read the full justification.</a></p>
+    </div>
+
+    <div class="about-section">
+      <h2>Funding</h2>
+      <p>MyGridGB is primarily self-funded. In 2016 the site received support from the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute</a>, whose ongoing support we gratefully acknowledge.</p>
+    </div>
+
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
