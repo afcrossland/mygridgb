@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
 </head>
 <body>
 <div class="page-wrap">
@@ -15,10 +16,17 @@
     <p class="page-intro">British electricity generation over the last 28 days. Data sources: MyGridGB, Elexon Portal, Sheffield University.</p>
     <div class="share-box"><strong>Share:</strong> <a href="https://infogram.com/british-electricity-over-last-28-days-1g0n2ozdd3xnp4y?live" target="_blank">https://infogram.com/british-electricity-over-last-28-days-1g0n2ozdd3xnp4y?live</a></div>
 
-    <h2 style="font-size:1.4rem; font-weight:700; color:#1E90FF; margin:24px 0 12px;">Hourly electricity generation</h2>
+    <!-- Treemap -->
+    <h2 style="font-size:1.4rem; font-weight:700; color:#1E90FF; margin:24px 0 8px;">Generation mix share</h2>
+    <p style="color:var(--muted); margin-bottom:16px;">The share of electricity generation between different types of power stations over the last 28 days.</p>
+    <div style="position:relative; height:420px;">
+      <canvas id="treemap-chart"></canvas>
+    </div>
+
+    <!-- Stacked area -->
+    <h2 style="font-size:1.4rem; font-weight:700; color:#1E90FF; margin:32px 0 12px;">Hourly electricity generation</h2>
     <p style="color:var(--muted); margin-bottom:8px;">The chart below shows you the typical make up of our electricity over a 24 hour period. This is based on data from the last 28 days.</p>
     <p style="color:var(--muted); margin-bottom:20px;">Electricity generation in Great Britain, every hour for the last 28 days. Note the solar peaks and the way that generally we have long periods of strong wind followed by periods of low wind.</p>
-
     <div style="position:relative; height:400px;">
       <canvas id="gen-chart"></canvas>
     </div>
@@ -28,20 +36,28 @@
 
 <script>
 (async () => {
-  const SHEET_ID = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
-  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+  const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
 
-  const SOURCES = [
-    { label: 'Nuclear',       color: '#59d600' },
-    { label: 'Biomass',       color: '#824e1a' },
-    { label: 'Large Hydro',   color: '#001cf4' },
-    { label: 'Onshore Wind',  color: '#ed2a2a' },
-    { label: 'Offshore Wind', color: '#ed7474' },
-    { label: 'Solar',         color: '#ede310' },
-    { label: 'Imports',       color: '#7100e2' },
-    { label: 'Coal',          color: '#3d3d3d' },
-    { label: 'Gas',           color: '#2f82d6' },
-    { label: 'Storage',       color: '#f96c00' },
+  const TREEMAP_ID = '1nh3oCqRrDg0pyhByZt9Ssga11mV4ptTybTzBIjmTmZw';
+  const STACK_ID   = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
+
+  const PALETTE = {
+    'Nuclear':       '#59d600',
+    'Biomass':       '#824e1a',
+    'Large Hydro':   '#001cf4',
+    'Hydro':         '#001cf4',
+    'Onshore Wind':  '#ed2a2a',
+    'Offshore Wind': '#ed7474',
+    'Solar':         '#ede310',
+    'Imports':       '#7100e2',
+    'Coal':          '#3d3d3d',
+    'Gas':           '#2f82d6',
+    'Storage':       '#f96c00',
+  };
+
+  const STACK_SOURCES = [
+    'Nuclear', 'Biomass', 'Large Hydro', 'Onshore Wind',
+    'Offshore Wind', 'Solar', 'Imports', 'Coal', 'Gas', 'Storage',
   ];
 
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -55,27 +71,87 @@
     return d.getDate() + ' ' + MONTHS[d.getMonth()];
   }
 
-  try {
-    const resp = await fetch(URL);
-    const text = await resp.text();
-    const start = text.indexOf('('), end = text.lastIndexOf(')');
-    const { rows } = JSON.parse(text.slice(start + 1, end)).table;
+  async function fetchTable(id) {
+    const r = await fetch(SHEET(id));
+    const t = await r.text();
+    return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
+  }
 
-    // Drop rows where all generation values are null
+  const [tmResult, stackResult] = await Promise.allSettled([
+    fetchTable(TREEMAP_ID),
+    fetchTable(STACK_ID),
+  ]);
+
+  // ── Treemap ─────────────────────────────────────────────────
+  if (tmResult.status === 'fulfilled') {
+    const rows = tmResult.value.rows;
+
+    const treeItems = rows
+      .filter(r => r.c[1]?.v > 0)
+      .map(r => {
+        const label  = r.c[0].v;                     // "Gas, 23.0%"
+        const source = label.split(',')[0].trim();    // "Gas"
+        return { label, source, value: r.c[1].v };
+      });
+
+    new Chart(document.getElementById('treemap-chart'), {
+      type: 'treemap',
+      data: {
+        datasets: [{
+          tree: treeItems,
+          key: 'value',
+          backgroundColor(ctx) {
+            if (ctx.type !== 'data') return 'transparent';
+            return PALETTE[ctx.raw._data.source] ?? '#9CA3AF';
+          },
+          borderWidth: 2,
+          borderColor: '#fff',
+          labels: {
+            display: 'auto',
+            formatter(ctx) {
+              return ctx.raw._data.label;
+            },
+            color: '#fff',
+            font: {
+              family: "'Segoe UI', Arial, sans-serif",
+              size: 13,
+              weight: '600',
+            },
+            padding: 6,
+          },
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: ctx => ctx[0]?.raw?._data?.label ?? '',
+              label: ctx => ` ${ctx.raw._data.value.toFixed(2)} GW avg`,
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Stacked area ─────────────────────────────────────────────
+  if (stackResult.status === 'fulfilled') {
+    const rows = stackResult.value.rows;
     const valid = rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
 
-    // X-axis labels — one per row, formatted as "12 May"
     const labels = valid.map(r => {
       const d = parseGDate(r.c[0].v);
       return d ? fmtDate(d) : '';
     });
 
-    // Build one dataset per generation source (cols 1–10)
-    const datasets = SOURCES.map((src, i) => ({
-      label: src.label,
+    const datasets = STACK_SOURCES.map((name, i) => ({
+      label: name,
       data: valid.map(r => r.c[i + 1]?.v ?? null),
-      backgroundColor: src.color,
-      borderColor: src.color,
+      backgroundColor: PALETTE[name],
+      borderColor: PALETTE[name],
       borderWidth: 0.5,
       fill: true,
       pointRadius: 0,
@@ -116,7 +192,6 @@
               maxRotation: 90,
               minRotation: 90,
               autoSkip: false,
-              // Only label the first data point of each new day
               callback: (val, idx) => labels[idx] !== labels[idx - 1] ? labels[idx] : ''
             },
             grid: { display: false }
@@ -139,8 +214,6 @@
         }
       }
     });
-  } catch (err) {
-    console.error('Generation chart error:', err);
   }
 })();
 </script>
