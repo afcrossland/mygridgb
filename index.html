@@ -10,75 +10,81 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
-    .mix-section { margin: 32px 0; }
+    /* ── Stat strip ── */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 28px 0 32px;
+    }
 
+    .stat-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 22px;
+      transition: border-color .2s;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-num {
+      font-size: 2.6rem;
+      font-weight: 300;
+      line-height: 1;
+      color: var(--text);
+      transition: color .3s;
+    }
+
+    .stat-unit {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 3px;
+    }
+
+    /* Carbon intensity traffic light */
+    .stat-card--low  { border-color: #2d8c5a; }
+    .stat-card--mid  { border-color: #f59e0b; }
+    .stat-card--high { border-color: #ef4444; }
+    .stat-card--low  .stat-num { color: #1a5c3a; }
+    .stat-card--mid  .stat-num { color: #d97706; }
+    .stat-card--high .stat-num { color: #dc2626; }
+
+    /* ── Pie chart ── */
+    .pie-wrap {
+      max-width: 420px;
+      margin: 0 auto 40px;
+    }
+
+    /* ── Section headings ── */
     .mix-title {
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 1.8rem;
-      font-weight: 700;
+      font-weight: 400;
       color: #1a5c3a;
       text-align: center;
       margin-bottom: 6px;
     }
 
     .mix-subtitle {
-      font-family: 'Segoe UI', Arial, sans-serif;
       text-align: center;
       color: var(--muted);
       font-size: 1rem;
-      margin-bottom: 24px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-bottom: 0;
     }
 
-    .mix-body {
-      display: flex;
-      gap: 32px;
-      align-items: center;
+    @media (max-width: 680px) {
+      .stat-strip { grid-template-columns: repeat(2, 1fr); }
     }
-
-    .mix-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-      min-width: 160px;
-      flex-shrink: 0;
-    }
-
-    .mix-stat-label {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-
-    .mix-stat-value {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 2.8rem;
-      font-weight: 300;
-      line-height: 1;
-      color: var(--text);
-    }
-
-    .mix-stat-unit {
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: var(--muted);
-      vertical-align: baseline;
-      margin-left: 3px;
-    }
-
-    .mix-chart-wrap {
-      flex: 1;
-      max-width: 440px;
-    }
-
-    @media (max-width: 600px) {
-      .mix-body { flex-direction: column; }
-      .mix-stats { flex-direction: row; flex-wrap: wrap; gap: 20px; }
-      .mix-chart-wrap { max-width: 100%; width: 100%; }
+    @media (max-width: 360px) {
+      .stat-strip { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -104,33 +110,33 @@
       <a href="about/index.html">Read more about MyGridGB.</a>
     </p>
 
-    <section class="mix-section">
+    <section>
       <h2 class="mix-title">Britain's Present Electricity Mix</h2>
-      <p class="mix-subtitle">How is your electricity being generated? The pie chart below shows you how at this present time.</p>
-      <div class="mix-body">
-        <div class="mix-stats">
-          <div>
-            <div class="mix-stat-label">Low carbon</div>
-            <div class="mix-stat-value">
-              <span id="stat-lowcarbon">&mdash;</span><span class="mix-stat-unit">%</span>
-            </div>
-          </div>
-          <div>
-            <div class="mix-stat-label">Generation</div>
-            <div class="mix-stat-value">
-              <span id="stat-generation">&mdash;</span><span class="mix-stat-unit">GW</span>
-            </div>
-          </div>
-          <div>
-            <div class="mix-stat-label">Carbon intensity</div>
-            <div class="mix-stat-value">
-              <span id="stat-carbon">&mdash;</span><span class="mix-stat-unit">gCO2/kWh</span>
-            </div>
-          </div>
+      <p class="mix-subtitle" style="margin-bottom:4px;">How is your electricity being generated right now?</p>
+
+      <!-- Four stat cards -->
+      <div class="stat-strip">
+        <div class="stat-card">
+          <div class="stat-label">Low Carbon</div>
+          <div class="stat-num"><span id="stat-lowcarbon">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
-        <div class="mix-chart-wrap">
-          <canvas id="mix-chart"></canvas>
+        <div class="stat-card">
+          <div class="stat-label">Renewables</div>
+          <div class="stat-num"><span id="stat-renewables">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">Generation</div>
+          <div class="stat-num"><span id="stat-generation">&mdash;</span><span class="stat-unit">GW</span></div>
+        </div>
+        <div class="stat-card" id="carbon-card">
+          <div class="stat-label">Carbon Intensity</div>
+          <div class="stat-num"><span id="stat-carbon">&mdash;</span><span class="stat-unit">gCO₂/kWh</span></div>
+        </div>
+      </div>
+
+      <!-- Pie chart centred -->
+      <div class="pie-wrap">
+        <canvas id="mix-chart"></canvas>
       </div>
     </section>
 
@@ -159,7 +165,7 @@
       </div>
     </div>
 
-    <div style="margin-top:32px; padding:16px; background:#e8f5e9; border-radius:6px; font-size:14px;">
+    <div style="margin-top:32px; padding:16px; background:var(--brand-bg); border-radius:6px; font-size:14px;">
       MyGridGB ran a petition for solar on all new homes in the UK. The petition didn't work, but that's democracy.
       <a href="about/index.html#solar-petition">Read the justification here.</a>
     </div>
@@ -172,11 +178,8 @@
 (async () => {
   const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
 
-  const MIX_ID        = '1v8KovUBgNq6M_WcGiUQi-MdysmsiDKFIfAdg961D1LA';
-  const CARBON_ID     = '14F5w8HVrzp5NClmUl0-TUBdF5j_VT2aEHsKFHIYg8aA';
-  const GENERATION_ID = '1kIEWYvmo3pA4uiefPYDgEEDcxvrBWrcWt403JbrgLhY';
-  const LOWCARBON_ID  = '1vJ9CsBl4VbzGVlF05YdlOS0f5L3wMw8ICZ--qpvegDc';
-  const HISTORY_ID    = '1U8ywTGM2IO6Wc4juDb6rMP0me2hd58HEenOSqGpYiNM';
+  const MIX_ID     = '1v8KovUBgNq6M_WcGiUQi-MdysmsiDKFIfAdg961D1LA';
+  const HISTORY_ID = '1U8ywTGM2IO6Wc4juDb6rMP0me2hd58HEenOSqGpYiNM';
 
   const PALETTE = {
     'Nuclear':       '#59d600',
@@ -193,51 +196,118 @@
     'Imports':       '#7100e2',
   };
 
+  // IPCC median life-cycle carbon factors (gCO2eq./kWh)
+  const CARBON_FACTORS = {
+    'Nuclear':       12,
+    'Biomass':       230,
+    'Wind':          12,
+    'Wind*':         12,
+    'Embedded Wind': 12,
+    'Solar':         44,
+    'Coal':          820,
+    'Gas':           490,
+    'Storage':       24,
+    'Large Hydro':   24,
+    'Hydro':         24,
+    'Imports':       300,
+  };
+
+  // Low carbon = everything except Coal, Gas, Imports
+  const LOW_CARBON = new Set(['Nuclear','Biomass','Wind','Wind*','Embedded Wind','Solar','Large Hydro','Hydro','Storage']);
+  // Renewables = Wind + Solar + Hydro only (no Biomass per user definition)
+  const RENEWABLE  = new Set(['Wind','Wind*','Embedded Wind','Solar','Large Hydro','Hydro']);
+
   async function fetchSheet(id) {
     const resp = await fetch(SHEET(id));
     const text = await resp.text();
-    const start = text.indexOf('(');
-    const end = text.lastIndexOf(')');
-    return JSON.parse(text.slice(start + 1, end)).table;
+    return JSON.parse(text.slice(text.indexOf('(') + 1, text.lastIndexOf(')'))).table;
   }
 
-  // Returns the single numeric value from a stat sheet.
-  // Tries cols[1].label first (value embedded in column header),
-  // then first data cell as a fallback.
-  function extractStat(table) {
-    const fromHeader = parseFloat(table.cols?.[1]?.label);
-    if (!isNaN(fromHeader)) return fromHeader;
-    const fromCell = table.rows?.[0]?.c?.[0]?.v;
-    return isNaN(parseFloat(fromCell)) ? null : parseFloat(fromCell);
-  }
-
-  const [mixResult, carbonResult, generationResult, lowcarbonResult, historyResult] = await Promise.allSettled([
+  const [mixResult, historyResult] = await Promise.allSettled([
     fetchSheet(MIX_ID),
-    fetchSheet(CARBON_ID),
-    fetchSheet(GENERATION_ID),
-    fetchSheet(LOWCARBON_ID),
     fetchSheet(HISTORY_ID),
   ]);
 
-  // ── Stat panels ─────────────────────────────────────────────
-  if (carbonResult.status === 'fulfilled') {
-    const v = extractStat(carbonResult.value);
-    if (v !== null) document.getElementById('stat-carbon').textContent = Math.round(v);
-  }
-  if (generationResult.status === 'fulfilled') {
-    const v = extractStat(generationResult.value);
-    if (v !== null) document.getElementById('stat-generation').textContent = v.toFixed(1);
-  }
-  if (lowcarbonResult.status === 'fulfilled') {
-    const v = extractStat(lowcarbonResult.value);
-    if (v !== null) document.getElementById('stat-lowcarbon').textContent = Math.round(v);
+  // ── Stats + pie from mix sheet ───────────────────────────────
+  if (mixResult.status === 'fulfilled') {
+    const { rows } = mixResult.value;
+
+    const labels = [], values = [], bgColors = [];
+    let totalGW = 0, lowCarbonGW = 0, renewableGW = 0, carbonWeighted = 0;
+
+    rows.forEach(row => {
+      const fullLabel = row.c?.[0]?.v;
+      const val = row.c?.[1]?.v;
+      if (!fullLabel || !val || val <= 0) return;
+      const source = fullLabel.split(',')[0].trim();
+
+      labels.push(fullLabel);
+      values.push(val);
+      bgColors.push(PALETTE[source] ?? '#9CA3AF');
+
+      totalGW       += val;
+      if (LOW_CARBON.has(source)) lowCarbonGW  += val;
+      if (RENEWABLE.has(source))  renewableGW  += val;
+      carbonWeighted += val * (CARBON_FACTORS[source] ?? 300);
+    });
+
+    if (totalGW > 0) {
+      const lowCarbonPct   = Math.round(lowCarbonGW  / totalGW * 100);
+      const renewablesPct  = Math.round(renewableGW  / totalGW * 100);
+      const carbonIntensity = Math.round(carbonWeighted / totalGW);
+
+      document.getElementById('stat-lowcarbon').textContent  = lowCarbonPct;
+      document.getElementById('stat-renewables').textContent = renewablesPct;
+      document.getElementById('stat-generation').textContent = totalGW.toFixed(1);
+      document.getElementById('stat-carbon').textContent     = carbonIntensity;
+
+      // Traffic light on carbon intensity card
+      const card = document.getElementById('carbon-card');
+      card.classList.add(
+        carbonIntensity < 100 ? 'stat-card--low' :
+        carbonIntensity < 250 ? 'stat-card--mid' : 'stat-card--high'
+      );
+    }
+
+    new Chart(document.getElementById('mix-chart'), {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: bgColors,
+          borderColor: '#fff',
+          borderWidth: 2,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { family: "'DM Sans', sans-serif", size: 13 },
+              padding: 14,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 10,
+              boxHeight: 10
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ' ' + ctx.label
+            }
+          }
+        }
+      }
+    });
   }
 
   // ── Carbon intensity bar chart ───────────────────────────────
   if (historyResult.status === 'fulfilled') {
     const rows = historyResult.value.rows;
-
-    // Col A = year labels, Col B = dark bars, Col C = green bars (null where blank)
     const years = rows.map(r => Math.round(r.c[0].v));
     const colB  = rows.map(r => r.c[1]?.v ?? null);
     const colC  = rows.map(r => r.c[2]?.v ?? null);
@@ -247,20 +317,8 @@
       data: {
         labels: years,
         datasets: [
-          {
-            data: colB,
-            backgroundColor: '#222222',
-            borderWidth: 0,
-            categoryPercentage: 0.9,
-            barPercentage: 0.95,
-          },
-          {
-            data: colC,
-            backgroundColor: '#59d600',
-            borderWidth: 0,
-            categoryPercentage: 0.9,
-            barPercentage: 0.95,
-          }
+          { data: colB, backgroundColor: '#222222', borderWidth: 0, categoryPercentage: 0.9, barPercentage: 0.95 },
+          { data: colC, backgroundColor: '#59d600', borderWidth: 0, categoryPercentage: 0.9, barPercentage: 0.95 }
         ]
       },
       options: {
@@ -271,30 +329,18 @@
           tooltip: {
             callbacks: {
               title: ctx => ctx[0].label,
-              label: ctx => ' ' + Math.round(ctx.parsed.y) + ' gCO2eq./kWh'
+              label: ctx => ' ' + Math.round(ctx.parsed.y) + ' gCO₂eq./kWh'
             }
           },
           annotation: {
             annotations: {
               target: {
-                type: 'line',
-                yMin: 100,
-                yMax: 100,
-                borderColor: '#ef4444',
-                borderWidth: 2,
+                type: 'line', yMin: 100, yMax: 100,
+                borderColor: '#ef4444', borderWidth: 2,
                 label: {
-                  display: true,
-                  content: '2030 Target',
-                  position: 'end',
-                  yAdjust: -14,
-                  backgroundColor: 'transparent',
-                  color: '#ef4444',
-                  font: {
-                    family: "'Segoe UI', Arial, sans-serif",
-                    size: 13,
-                    weight: '600'
-                  },
-                  padding: 0
+                  display: true, content: '2030 Target', position: 'end',
+                  yAdjust: -14, backgroundColor: 'transparent', color: '#ef4444',
+                  font: { family: "'DM Sans', sans-serif", size: 13, weight: '600' }, padding: 0
                 }
               }
             }
@@ -302,89 +348,19 @@
         },
         scales: {
           x: {
-            title: {
-              display: true,
-              text: 'Year',
-              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
-              color: '#555'
-            },
-            ticks: {
-              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
-              maxRotation: 45,
-              minRotation: 45,
-              autoSkip: false
-            },
+            ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, maxRotation: 45, minRotation: 45, autoSkip: false },
             grid: { display: false }
           },
           y: {
-            beginAtZero: true,
-            max: 550,
-            title: {
-              display: true,
-              text: 'Carbon Intensity, gCO2eq./kWh',
-              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
-              color: '#555'
-            },
-            ticks: {
-              font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
-              stepSize: 50
-            },
+            beginAtZero: true, max: 550,
+            title: { display: true, text: 'Carbon Intensity, gCO₂eq./kWh', font: { family: "'DM Sans', sans-serif", size: 12 }, color: '#555' },
+            ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, stepSize: 50 },
             grid: { color: '#eeeeee' }
           }
         }
       }
     });
   }
-
-  // ── Pie chart ────────────────────────────────────────────────
-  if (mixResult.status !== 'fulfilled') return;
-  const { cols, rows } = mixResult.value;
-
-  const labels = [], values = [], bgColors = [];
-  rows.forEach(row => {
-    const fullLabel = row.c?.[0]?.v;
-    const val = row.c?.[1]?.v;
-    if (!fullLabel || !val || val <= 0) return;
-    const source = fullLabel.split(',')[0].trim();
-    labels.push(fullLabel);
-    values.push(val);
-    bgColors.push(PALETTE[source] ?? '#9CA3AF');
-  });
-
-  new Chart(document.getElementById('mix-chart'), {
-    type: 'pie',
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: bgColors,
-        borderColor: '#fff',
-        borderWidth: 2,
-        hoverOffset: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            font: { family: "'Segoe UI', Arial, sans-serif", size: 13 },
-            padding: 14,
-            usePointStyle: true,
-            pointStyle: 'circle',
-            boxWidth: 10,
-            boxHeight: 10
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' ' + ctx.label
-          }
-        }
-      }
-    }
-  });
 })();
 </script>
 
