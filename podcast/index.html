@@ -77,6 +77,42 @@
       font-size: 13px;
     }
     .bbc-box a:hover { opacity: .85; text-decoration: none; }
+    .press-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .press-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: box-shadow .2s;
+    }
+    .press-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .press-card .pub {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--brand);
+    }
+    .press-card h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .press-card h4 a { color: var(--text); }
+    .press-card h4 a:hover { color: var(--brand); text-decoration: none; }
+    .press-card .desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -107,9 +143,14 @@
     <div class="media-section">
       <h2>The Energy Mix Podcast</h2>
       <p>The Energy Mix covers energy news across multiple technology sectors, exploring the latest developments in the global energy transition.</p>
-      <!-- Paste the Energy Mix podcast embed code below -->
-      <div class="media-embed" style="background:#f5f5f5; border:1px solid var(--border); border-radius:8px; padding:32px; text-align:center; color:var(--muted); font-style:italic;">
-        Embed code coming soon — paste your Energy Mix player embed here.
+      <div class="media-embed">
+        <iframe src="https://open.spotify.com/embed/show/6I7lZL6mROoXLGPMSNrsye?utm_source=generator"
+                height="352"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"></iframe>
+      </div>
+      <div class="platform-links">
+        <a href="https://open.spotify.com/show/6I7lZL6mROoXLGPMSNrsye" target="_blank">Spotify</a>
       </div>
     </div>
 
@@ -121,6 +162,39 @@
         <h3>BBC Radio 4 — Programme m0024fjw</h3>
         <p style="font-size:14px; color:var(--muted);">Listen to the full programme on BBC Sounds.</p>
         <a href="https://www.bbc.co.uk/programmes/m0024fjw" target="_blank">Listen on BBC Sounds →</a>
+      </div>
+    </div>
+
+    <!-- Press & Coverage -->
+    <div class="media-section">
+      <h2>Press &amp; Coverage</h2>
+      <p>Places that have cited or featured MyGridGB. Know of another one? <a href="mailto:mygridapp@gmail.com">Let us know.</a></p>
+      <div class="press-grid">
+
+        <div class="press-card">
+          <div class="pub">Blue &amp; Green Tomorrow</div>
+          <h4><a href="https://blueandgreentomorrow.com/features/adventures-grid-watching-5-ways-great-britains-electricity-mix-surprised-2016/" target="_blank">Adventures in Grid Watching: 5 ways Great Britain's Electricity Mix surprised in 2016</a></h4>
+          <p class="desc">Feature article using MyGridGB data to review the year's key shifts in the GB electricity mix.</p>
+        </div>
+
+        <div class="press-card">
+          <div class="pub">Blue &amp; Green Tomorrow</div>
+          <h4><a href="https://blueandgreentomorrow.com/tag/mygridgb/" target="_blank">All MyGridGB coverage</a></h4>
+          <p class="desc">Full archive of articles referencing MyGridGB on Blue &amp; Green Tomorrow.</p>
+        </div>
+
+        <div class="press-card">
+          <div class="pub">BBC Radio 4</div>
+          <h4><a href="https://www.bbc.co.uk/programmes/m0024fjw" target="_blank">BBC Radio 4 — Programme m0024fjw</a></h4>
+          <p class="desc">Dr Andrew Crossland appeared on BBC Radio 4 to discuss the decarbonisation of British electricity.</p>
+        </div>
+
+        <div class="press-card">
+          <div class="pub">Future of Utilities</div>
+          <h4><a href="https://futureofutilities.com/sponsors/mygridgb/" target="_blank">MyGridGB — Future of Utilities</a></h4>
+          <p class="desc">MyGridGB featured as a resource and partner on the Future of Utilities platform.</p>
+        </div>
+
       </div>
     </div>
 

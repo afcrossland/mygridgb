@@ -19,6 +19,11 @@
     <div style="position:relative; height:520px;">
       <canvas id="history-chart"></canvas>
     </div>
+    <h2 style="font-size:1.3rem; font-weight:700; color:#1E90FF; margin:40px 0 8px;">Annual carbon emissions</h2>
+    <p style="color:var(--muted); margin-bottom:16px;">Megatons of CO₂ equivalent from British electricity generation per year. 2026 is a partial year.</p>
+    <div style="position:relative; height:300px;">
+      <canvas id="carbon-emissions-chart"></canvas>
+    </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
@@ -110,6 +115,69 @@
     });
   } catch (err) {
     console.error('History chart error:', err);
+  }
+})();
+
+(async () => {
+  const SHEET_ID = '1wg4sY1wskCJtosHtozDqxyudXBDR53LHgQP0Q5Hu_8g';
+  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+
+  try {
+    const resp = await fetch(URL);
+    const text = await resp.text();
+    const start = text.indexOf('('), end = text.lastIndexOf(')');
+    const { rows } = JSON.parse(text.slice(start + 1, end)).table;
+
+    const labels  = rows.map(r => String(r.c[1]?.v ?? '').match(/(\d{4})/)?.[1] ?? '');
+    const values  = rows.map(r => parseFloat(r.c[0]?.v ?? 0));
+    const partial = rows.map(r => String(r.c[1]?.v ?? '').includes('so far'));
+    const colors  = rows.map((_, i) => partial[i] ? '#90CAF9' : '#2f82d6');
+
+    new Chart(document.getElementById('carbon-emissions-chart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderWidth: 0,
+          categoryPercentage: 0.7,
+          barPercentage: 0.9,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: ctx => ctx[0].label,
+              label: ctx => ` ${ctx.parsed.y.toFixed(1)} MT CO₂`
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { family: "'Segoe UI', Arial, sans-serif", size: 11 } },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'MT CO₂',
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+              color: '#555'
+            },
+            ticks: { font: { family: "'Segoe UI', Arial, sans-serif", size: 11 } },
+            grid: { color: '#eeeeee' }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Emissions chart error:', err);
   }
 })();
 </script>
