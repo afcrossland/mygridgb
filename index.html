@@ -7,6 +7,7 @@
   <meta name="description" content="The independent resource charting in real time the decarbonisation of British electricity.">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -29,6 +30,14 @@
       to see how Britain is tracking against carbon targets.
       <a href="about/index.html">Read more about MyGridGB.</a>
     </p>
+
+    <section style="margin:32px 0;">
+      <h2 style="font-size:1.3rem; margin-bottom:4px; color:var(--green);">Current Electricity Mix</h2>
+      <p id="mix-ts" style="font-size:13px; color:var(--muted); margin-bottom:16px;">Loading&hellip;</p>
+      <div style="max-width:480px;">
+        <canvas id="mix-chart"></canvas>
+      </div>
+    </section>
 
     <h2 style="margin: 32px 0 16px; font-size:1.3rem;">Latest Blogs</h2>
 
@@ -55,6 +64,88 @@
 
   <div id="sidebar-placeholder"></div>
 </div>
+
+<script>
+(async () => {
+  const SHEET_ID = '1v8KovUBgNq6M_WcGiUQi-MdysmsiDKFIfAdg961D1LA';
+  const GID = '0';
+  const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+  // Conventional colours for GB electricity sources
+  const PALETTE = {
+    'Nuclear':  '#F59E0B',
+    'Biomass':  '#92400E',
+    'Wind*':    '#3B82F6',
+    'Wind':     '#3B82F6',
+    'Solar':    '#EAB308',
+    'Coal':     '#374151',
+    'Gas':      '#EA580C',
+    'Storage':  '#8B5CF6',
+    'Hydro':    '#0891B2',
+    'Imports':  '#6B7280',
+  };
+
+  const tsEl = document.getElementById('mix-ts');
+
+  try {
+    const resp = await fetch(GVIZ);
+    const text = await resp.text();
+    const start = text.indexOf('(');
+    const end = text.lastIndexOf(')');
+    const { table } = JSON.parse(text.slice(start + 1, end));
+
+    // Column 1 label holds the live timestamp from the sheet
+    if (tsEl) tsEl.textContent = table.cols[1]?.label ?? '';
+
+    const labels = [], values = [], bgColors = [];
+    table.rows.forEach(row => {
+      const fullLabel = row.c?.[0]?.v;
+      const val = row.c?.[1]?.v;
+      if (!fullLabel || !val || val <= 0) return;
+      const source = fullLabel.split(',')[0].trim();
+      labels.push(fullLabel);
+      values.push(val);
+      bgColors.push(PALETTE[source] ?? '#9CA3AF');
+    });
+
+    new Chart(document.getElementById('mix-chart'), {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: bgColors,
+          borderColor: '#fff',
+          borderWidth: 2,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
+              padding: 14,
+              usePointStyle: true,
+              pointStyleWidth: 10
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ' ' + ctx.label
+            }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    if (tsEl) tsEl.textContent = 'Chart currently unavailable.';
+    console.error('Mix chart error:', err);
+  }
+})();
+</script>
 
 </body>
 </html>
