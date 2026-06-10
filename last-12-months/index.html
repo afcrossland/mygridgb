@@ -12,10 +12,18 @@
     .filter-bar {
       display: flex;
       gap: 8px;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
+    }
+    .filter-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      align-self: center;
+      margin-right: 4px;
+      white-space: nowrap;
     }
     .filter-btn {
-      padding: 7px 20px;
+      padding: 6px 18px;
       border-radius: 20px;
       border: 1px solid var(--border);
       background: var(--surface);
@@ -36,7 +44,7 @@
       border-color: var(--brand);
     }
     .chart-section {
-      margin-bottom: 40px;
+      margin-bottom: 44px;
     }
     .chart-section h2 {
       font-family: 'DM Serif Display', Georgia, serif;
@@ -47,9 +55,24 @@
     }
     .chart-section p {
       color: var(--muted);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 14px;
       line-height: 1.65;
+    }
+    .columns-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .columns-header h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #1a4d7a;
+      margin: 0;
     }
   </style>
 </head>
@@ -57,25 +80,36 @@
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Last 12 Months</h1>
-    <p class="page-intro">Monthly average electricity generation by fuel type and carbon intensity. Use the time window buttons to zoom in on recent months or zoom out for a longer view — seasonal patterns in wind, solar and demand become clear across the full range.</p>
+    <p class="page-intro">Monthly average electricity generation by fuel type and carbon intensity. The treemap summarises the mix for a chosen recent window; the column charts let you zoom out up to three years to reveal longer seasonal patterns.</p>
 
-    <div class="filter-bar" id="filter-bar">
-      <button class="filter-btn" data-months="3">3 months</button>
-      <button class="filter-btn" data-months="6">6 months</button>
-      <button class="filter-btn active" data-months="12">12 months</button>
-    </div>
-
+    <!-- ── Treemap ─────────────────────────────────────── -->
     <div class="chart-section">
       <h2>Generation mix share</h2>
-      <p>Average contribution of each fuel type to the electricity mix over the selected period. Tile size reflects share of total generation — the balance between gas, nuclear, wind and solar shifts significantly across seasons and weather.</p>
+      <p>Average contribution of each fuel type over the selected period. Tile size reflects share of total generation — the balance between gas, nuclear, wind and solar shifts significantly with season and weather.</p>
+      <div class="filter-bar" id="treemap-filter">
+        <span class="filter-bar-label">Show:</span>
+        <button class="filter-btn" data-months="3">3 months</button>
+        <button class="filter-btn" data-months="6">6 months</button>
+        <button class="filter-btn active" data-months="12">12 months</button>
+      </div>
       <div style="position:relative; height:360px;">
         <canvas id="treemap-chart"></canvas>
       </div>
     </div>
 
-    <div class="chart-section">
-      <h2>Monthly generation</h2>
-      <p>Average power output (GW) by fuel type for each month. Winter months typically see higher overall demand and more wind; summer months bring solar peaks but lower total generation. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
+    <!-- ── Column charts shared filter ───────────────── -->
+    <div class="columns-header">
+      <h2>Monthly generation &amp; carbon intensity</h2>
+      <div class="filter-bar" id="column-filter" style="margin-bottom:0">
+        <span class="filter-bar-label">Show:</span>
+        <button class="filter-btn active" data-months="12">12 months</button>
+        <button class="filter-btn" data-months="24">24 months</button>
+        <button class="filter-btn" data-months="36">36 months</button>
+      </div>
+    </div>
+
+    <div class="chart-section" style="margin-top:12px;">
+      <p>Average power output (GW) by fuel type per month. Winter months typically see higher total demand and more wind; summer brings solar peaks. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
       <div style="position:relative; height:420px;">
         <canvas id="gen-chart"></canvas>
       </div>
@@ -83,7 +117,7 @@
 
     <div class="chart-section">
       <h2>Monthly carbon intensity</h2>
-      <p>Average carbon intensity of British electricity (gCO₂eq/kWh) for each month. Carbon intensity falls when wind and solar output is high, and rises when gas fills a larger share of demand. Comparing months highlights the interplay between weather, season and grid emissions.</p>
+      <p>Average carbon intensity of British electricity (gCO₂eq/kWh) for each month. Carbon intensity falls when wind and solar output is high and rises when gas fills a larger share of demand.</p>
       <div style="position:relative; height:320px;">
         <canvas id="carbon-chart"></canvas>
       </div>
@@ -123,15 +157,17 @@
 
   const FONT = "'DM Sans', 'Segoe UI', Arial, sans-serif";
 
-  async function fetchTable(id) {
-    const r = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`);
+  async function fetchSheet(id, sheetName) {
+    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+    const r = await fetch(url);
     const t = await r.text();
     return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
   }
 
+  // Fetch the full 36-month tab for both sheets once
   const [genResult, carbonResult] = await Promise.allSettled([
-    fetchTable(GEN_ID),
-    fetchTable(CARBON_ID),
+    fetchSheet(GEN_ID,    'Last 3 years'),
+    fetchSheet(CARBON_ID, 'Last 3 years'),
   ]);
 
   const genRows    = genResult.status    === 'fulfilled' ? genResult.value.rows    : [];
@@ -153,7 +189,7 @@
       .map(([label, total]) => ({ label, source: label, value: total / n }));
   }
 
-  // ── Treemap ────────────────────────────────────────────────────
+  // ── Treemap ──────────────────────────────────────────────────────
   const treemapChart = new Chart(document.getElementById('treemap-chart'), {
     type: 'treemap',
     data: {
@@ -193,7 +229,7 @@
     }
   });
 
-  // ── Generation chart ───────────────────────────────────────────
+  // ── Generation chart ─────────────────────────────────────────────
   const genInit = tail(genRows, 12);
   const genChart = new Chart(document.getElementById('gen-chart'), {
     type: 'bar',
@@ -250,7 +286,7 @@
     }
   });
 
-  // ── Carbon chart ───────────────────────────────────────────────
+  // ── Carbon chart ─────────────────────────────────────────────────
   const carbonInit = tail(carbonRows, 12);
   const carbonChart = new Chart(document.getElementById('carbon-chart'), {
     type: 'bar',
@@ -295,8 +331,24 @@
     }
   });
 
-  // ── Filter buttons ─────────────────────────────────────────────
-  function updateCharts(months) {
+  // ── Treemap filter (3 / 6 / 12 months) ──────────────────────────
+  document.getElementById('treemap-filter').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('#treemap-filter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const months = parseInt(btn.dataset.months, 10);
+    treemapChart.data.datasets[0].tree = buildTreeItems(tail(genRows, months));
+    treemapChart.update();
+  });
+
+  // ── Column charts filter (12 / 24 / 36 months) ──────────────────
+  document.getElementById('column-filter').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('#column-filter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const months = parseInt(btn.dataset.months, 10);
     const fg = tail(genRows, months);
     const fc = tail(carbonRows, months);
 
@@ -306,20 +358,9 @@
     });
     genChart.update();
 
-    treemapChart.data.datasets[0].tree = buildTreeItems(fg);
-    treemapChart.update();
-
     carbonChart.data.labels = fc.map(r => r.c[0].v);
     carbonChart.data.datasets[0].data = fc.map(r => r.c[1]?.v ?? 0);
     carbonChart.update();
-  }
-
-  document.getElementById('filter-bar').addEventListener('click', e => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    updateCharts(parseInt(btn.dataset.months, 10));
   });
 })();
 </script>
