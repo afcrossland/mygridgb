@@ -53,14 +53,14 @@ const SIDEBAR_HTML = `
   <div class="bottom-card">
     <div class="bottom-card-label">Supported by</div>
     <a href="https://www.dur.ac.uk/dei/" target="_blank">
-      <img src="http://www.mygridgb.co.uk/wp-content/uploads/2016/12/unnamed-300x152.jpg" alt="Durham Energy Institute">
+      <img src="/images/dei.webp" alt="Durham Energy Institute">
     </a>
     <p>MyGridGB is kindly supported by the Durham Energy Institute.</p>
   </div>
   <div class="bottom-card">
     <div class="bottom-card-label">Book</div>
     <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">
-      <img src="https://www.mygridgb.co.uk/wp-content/uploads/2021/10/BookCover-194x300.jpg" alt="Decarbonising Electricity Made Simple" style="max-height:160px;width:auto">
+      <img src="/images/9780367203320.jpg" alt="Decarbonising Electricity Made Simple" style="max-height:160px;width:auto">
     </a>
     <p>Decarbonising Electricity Made Simple — <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">buy on Amazon</a></p>
   </div>
