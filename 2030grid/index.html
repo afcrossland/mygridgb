@@ -25,7 +25,7 @@
     /* ── Comparison stat strip ── */
     .compare-strip {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       margin: 28px 0 36px;
     }
@@ -166,6 +166,9 @@
     .manifesto-body ul { margin: 0 0 14px 20px; font-size: 14px; line-height: 1.9; color: var(--text); }
     .manifesto-body a { color: var(--brand); }
 
+    @media (max-width: 900px) {
+      .compare-strip { grid-template-columns: repeat(3, 1fr); }
+    }
     @media (max-width: 760px) {
       .compare-strip { grid-template-columns: repeat(2, 1fr); }
       .compare-mix   { grid-template-columns: 1fr; }
@@ -303,22 +306,35 @@
     const actualRow    = rows[0];
     const manifestoRow = rows[1];
 
+    const THERM_EFF = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
+
     function calcStats(row) {
       let total = 0, lowCarbon = 0, renewable = 0, gasGWh = 0, carbonWeighted = 0;
+      let thermalInput = 0, thermalLoss = 0;
       MIX_SOURCES.forEach(src => {
         const v = row.c[src.col]?.v ?? 0;
-        total         += v;
+        total          += v;
         carbonWeighted += v * src.carbon;
-        if (src.lowCarbon)  lowCarbon  += v;
-        if (src.renewable)  renewable  += v;
+        if (src.lowCarbon)  lowCarbon += v;
+        if (src.renewable)  renewable += v;
         if (src.label === 'Gas') gasGWh = v;
+        if (THERM_EFF[src.label] && v > 0) {
+          thermalInput += v / THERM_EFF[src.label];
+          thermalLoss  += v / THERM_EFF[src.label] - v;
+        }
       });
+      const directGW = total - Object.keys(THERM_EFF).reduce((s, k) => {
+        const src = MIX_SOURCES.find(m => m.label === k);
+        return s + (src ? (row.c[src.col]?.v ?? 0) : 0);
+      }, 0);
+      const totalInput = thermalInput + directGW;
       return {
         total,
-        ci:       total > 0 ? Math.round(carbonWeighted / total) : 0,
-        lcPct:    total > 0 ? Math.round(lowCarbon / total * 100) : 0,
-        renPct:   total > 0 ? Math.round(renewable / total * 100) : 0,
-        gasPct:   total > 0 ? Math.round(gasGWh / total * 100) : 0,
+        ci:           total > 0 ? Math.round(carbonWeighted / total) : 0,
+        lcPct:        total > 0 ? Math.round(lowCarbon / total * 100) : 0,
+        renPct:       total > 0 ? Math.round(renewable / total * 100) : 0,
+        gasPct:       total > 0 ? Math.round(gasGWh / total * 100) : 0,
+        thermalLossPct: totalInput > 0 ? Math.round(thermalLoss / totalInput * 100) : 0,
       };
     }
 
@@ -336,6 +352,8 @@
         now: actual.renPct, after: manifesto.renPct, nowGood: actual.renPct > 50 },
       { label: 'Gas',              suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
         now: actual.gasPct, after: manifesto.gasPct, nowGood: false },
+      { label: 'Thermal Losses',   suffix: '<span class="compare-val-sfx">%</span>', unit: '% of input energy',
+        now: actual.thermalLossPct, after: manifesto.thermalLossPct, nowGood: false },
     ];
 
     metrics.forEach(m => {
