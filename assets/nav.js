@@ -14,7 +14,7 @@ const NAV_HTML = `
           <ul>
             <li><a href="/last-28-days/index.html">Last 28 Days</a></li>
             <li><a href="/last-12-months/index.html">Last 12 Months</a></li>
-            <li><a href="/historicaldata/index.html">Electricity since 2012</a></li>
+            <li><a href="/historicaldata/index.html">Generation History</a></li>
             <li><a href="/carbon-tracker/index.html">Carbon Tracker</a></li>
             <li><a href="/gas-tracker/index.html">Gas Tracker</a></li>
             <li><a href="/coal-tracker/index.html">Coal Tracker</a></li>

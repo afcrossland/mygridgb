@@ -59,21 +59,7 @@
       font-size: 14px;
       line-height: 1.65;
     }
-    .columns-header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
-    .columns-header h2 {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 1.4rem;
-      font-weight: 400;
-      color: #1a4d7a;
-      margin: 0;
-    }
+
   </style>
 </head>
 <body>
@@ -98,9 +84,9 @@
     </div>
 
     <!-- ── Column charts shared filter ───────────────── -->
-    <div class="columns-header">
-      <h2>Monthly generation &amp; carbon intensity</h2>
-      <div class="filter-bar" id="column-filter" style="margin-bottom:0">
+    <div>
+      <h2 style="font-family:'DM Serif Display',Georgia,serif; font-size:1.4rem; font-weight:400; color:#1a4d7a; margin-bottom:10px;">Monthly generation &amp; carbon intensity</h2>
+      <div class="filter-bar" id="column-filter">
         <span class="filter-bar-label">Show:</span>
         <button class="filter-btn active" data-months="12">12 months</button>
         <button class="filter-btn" data-months="24">24 months</button>
@@ -108,7 +94,7 @@
       </div>
     </div>
 
-    <div class="chart-section" style="margin-top:12px;">
+    <div class="chart-section">
       <p>Average power output (GW) by fuel type per month. Winter months typically see higher total demand and more wind; summer brings solar peaks. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
       <div style="position:relative; height:420px;">
         <canvas id="gen-chart"></canvas>

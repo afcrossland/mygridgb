@@ -6,18 +6,491 @@
   <title>The 2030 Grid — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .section-h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #1a4d7a;
+      margin: 40px 0 8px;
+    }
+    .section-p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    /* ── Comparison stat strip ── */
+    .compare-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 28px 0 36px;
+    }
+    .compare-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+    }
+    .compare-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .compare-values {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .compare-val {
+      font-size: 2rem;
+      font-weight: 300;
+      line-height: 1;
+    }
+    .compare-val--now      { color: #dc2626; }
+    .compare-val--now-ok   { color: #d97706; }
+    .compare-val--manifesto { color: #15803d; }
+    .compare-arrow-sym {
+      font-size: 1rem;
+      color: var(--muted);
+      opacity: .45;
+      align-self: center;
+    }
+    .compare-unit {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* ── Mix comparison layout ── */
+    .compare-mix {
+      display: grid;
+      grid-template-columns: 1fr 32px 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 44px;
+    }
+    .compare-arrow-col {
+      font-size: 1.8rem;
+      color: var(--muted);
+      opacity: .3;
+      text-align: center;
+      padding-top: 110px;
+    }
+    .compare-panel-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      margin-bottom: 16px;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .compare-panel-title--now {
+      color: #1a4d7a;
+      background: var(--brand-bg);
+    }
+    .compare-panel-title--manifesto {
+      color: #15803d;
+      background: #dcfce7;
+    }
+    .pie-col {
+      position: relative;
+      width: 100%;
+      max-width: 220px;
+      margin: 0 auto 20px;
+    }
+
+    /* ── Fuel list (reused from homepage) ── */
+    .fuel-list { display: flex; flex-direction: column; gap: 8px; }
+    .fuel-row {
+      display: grid;
+      grid-template-columns: 10px auto auto 1fr 38px;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .fuel-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .fuel-name { font-weight: 500; color: var(--text); }
+    .fuel-gw   { font-size: 12px; color: var(--muted); text-align: right; white-space: nowrap; }
+    .fuel-bar-wrap { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .fuel-bar { height: 100%; border-radius: 3px; }
+    .fuel-pct { font-size: 11px; font-weight: 600; color: var(--muted); text-align: right; }
+
+    /* ── How it works ── */
+    .manifesto-details {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 40px;
+      overflow: hidden;
+    }
+    .manifesto-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 22px;
+      cursor: pointer;
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: #1a4d7a;
+      background: var(--surface);
+      user-select: none;
+      list-style: none;
+    }
+    .manifesto-summary::-webkit-details-marker { display: none; }
+    .manifesto-summary .toggle-icon {
+      font-size: 0.7rem;
+      transition: transform .2s;
+      opacity: .5;
+    }
+    details[open] .toggle-icon { transform: rotate(90deg); }
+    .manifesto-body {
+      padding: 20px 22px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .manifesto-body p { font-size: 14px; line-height: 1.75; color: var(--text); margin-bottom: 12px; }
+    .manifesto-body ul { margin: 0 0 14px 20px; font-size: 14px; line-height: 1.9; color: var(--text); }
+    .manifesto-body a { color: var(--brand); }
+
+    @media (max-width: 760px) {
+      .compare-strip { grid-template-columns: repeat(2, 1fr); }
+      .compare-mix   { grid-template-columns: 1fr; }
+      .compare-arrow-col { display: none; }
+    }
+    @media (max-width: 400px) {
+      .compare-strip { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">The 2030 Grid</h1>
-    <p class="page-intro">What will Britain's electricity grid look like by 2030?</p>
-    
-    <div class="embed-area">
-      <p>Chart embed to be wired up — paste your Infogram embed code here.</p>
+    <p class="page-intro">A simulation of what Britain's electricity could look like in 2030 — running in real time against today's actual weather and demand data. This is my manifesto for a net-zero electricity system, going beyond government and NESO targets.</p>
+
+    <!-- Comparison stat strip (populated by JS) -->
+    <div class="compare-strip" id="compare-strip"></div>
+
+    <!-- Side-by-side mix comparison -->
+    <div class="compare-mix">
+      <div>
+        <div class="compare-panel-title compare-panel-title--now">Today's Grid</div>
+        <div class="pie-col"><canvas id="pie-actual"></canvas></div>
+        <div class="fuel-list" id="fuel-actual"></div>
+      </div>
+      <div class="compare-arrow-col">→</div>
+      <div>
+        <div class="compare-panel-title compare-panel-title--manifesto">2030 Manifesto</div>
+        <div class="pie-col"><canvas id="pie-manifesto"></canvas></div>
+        <div class="fuel-list" id="fuel-manifesto"></div>
+      </div>
     </div>
+
+    <!-- Timeseries -->
+    <h2 class="section-h2">The 2030 Manifesto in action</h2>
+    <p class="section-p">The simulation runs the manifesto mix against real-time weather and demand data, showing how an expanded fleet of wind, solar, nuclear and storage would actually perform. Gas almost disappears; storage charges during sunny and windy periods and discharges at night; curtailment rises when renewables generate more than demand and storage can absorb.</p>
+    <div style="position:relative; height:420px;">
+      <canvas id="timeseries-chart"></canvas>
+    </div>
+
+    <!-- Curtailment -->
+    <h2 class="section-h2">Renewable curtailment</h2>
+    <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed — switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 manifesto.</p>
+    <div style="position:relative; height:160px; max-width:640px;">
+      <canvas id="curtailment-chart"></canvas>
+    </div>
+
+    <!-- How it works -->
+    <details class="manifesto-details">
+      <summary class="manifesto-summary">
+        <span class="toggle-icon">▶</span>
+        How the manifesto works
+      </summary>
+      <div class="manifesto-body">
+        <p>To decarbonise electricity I've made the following changes to the electricity mix:</p>
+        <ul>
+          <li>3.2 GW of new nuclear power stations (i.e. Hinkley C)</li>
+          <li>3× the amount of wind generation</li>
+          <li>3× the amount of solar generation (10 million solar homes)</li>
+          <li>1.5× more biomass capacity, dispatched only when wind and solar are low</li>
+          <li>No coal</li>
+          <li>100 GWh of electricity storage — approximately 6× more than Dinorwig and Cruachan combined</li>
+        </ul>
+        <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full — then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
+        <p>The assumptions are sufficient to show whether enough low carbon electricity can be generated when it is needed. They are not a complete optimisation of cost or carbon reduction. Demand profiles are not changed.</p>
+        <p>The manifesto is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
+      </div>
+    </details>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
+
+<script>
+(async () => {
+  const MIX_ID        = '1u35y6W2NqBTa5knVrqsYybjIGTPCwjBrIqg0rIZKLes';
+  const TIMESERIES_ID = '1ctbznBuW040HtFabgrTu4qDo2TfbsqPZvDiU8rglNRc';
+  const CURTAIL_ID    = '12Rw_OnA3qKUvMuzcMhfvW0UyAYXxx8HrcHxxk9VidYA';
+
+  const FONT = "'DM Sans', 'Segoe UI', Arial, sans-serif";
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Sources as they appear in Sheet A (mix comparison)
+  const MIX_SOURCES = [
+    { label: 'Nuclear',     col: 1, color: '#59d600', carbon: 12,  lowCarbon: true,  renewable: false },
+    { label: 'Biomass',     col: 2, color: '#824e1a', carbon: 230, lowCarbon: true,  renewable: false },
+    { label: 'Wind',        col: 3, color: '#ed2a2a', carbon: 12,  lowCarbon: true,  renewable: true  },
+    { label: 'Solar',       col: 4, color: '#ede310', carbon: 44,  lowCarbon: true,  renewable: true  },
+    { label: 'Gas',         col: 5, color: '#2f82d6', carbon: 490, lowCarbon: false, renewable: false },
+    { label: 'Storage',     col: 6, color: '#f96c00', carbon: 24,  lowCarbon: true,  renewable: false },
+    { label: 'Large Hydro', col: 7, color: '#001cf4', carbon: 24,  lowCarbon: true,  renewable: true  },
+    { label: 'Imports',     col: 8, color: '#7100e2', carbon: 300, lowCarbon: false, renewable: false },
+    { label: 'Coal',        col: 9, color: '#3d3d3d', carbon: 820, lowCarbon: false, renewable: false },
+  ];
+
+  // Sources as they appear in Sheet C (timeseries)
+  const TIME_SOURCES = [
+    { label: 'Nuclear',     col: 1, color: '#59d600' },
+    { label: 'Large Hydro', col: 2, color: '#001cf4' },
+    { label: 'Solar',       col: 3, color: '#ede310' },
+    { label: 'Wind',        col: 4, color: '#ed2a2a' },
+    { label: 'Biomass',     col: 5, color: '#824e1a' },
+    { label: 'Storage',     col: 6, color: '#f96c00' },
+    { label: 'Imports',     col: 7, color: '#7100e2' },
+    { label: 'Gas',         col: 8, color: '#2f82d6' },
+  ];
+
+  async function fetchTable(id, gid) {
+    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=${gid ?? 0}`;
+    const r = await fetch(url);
+    const t = await r.text();
+    return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
+  }
+
+  function parseGDate(v) {
+    const m = String(v).match(/Date\((\d+),(\d+),(\d+)/);
+    return m ? new Date(+m[1], +m[2], +m[3]) : null;
+  }
+
+  function fmtDate(d) {
+    return d.getDate() + ' ' + MONTHS[d.getMonth()];
+  }
+
+  const [mixResult, tsResult, curtailResult] = await Promise.allSettled([
+    fetchTable(MIX_ID),
+    fetchTable(TIMESERIES_ID),
+    fetchTable(CURTAIL_ID),
+  ]);
+
+  // ── Mix comparison ────────────────────────────────────────────────
+  if (mixResult.status === 'fulfilled') {
+    const rows = mixResult.value.rows;
+    const actualRow    = rows[0];
+    const manifestoRow = rows[1];
+
+    function calcStats(row) {
+      let total = 0, lowCarbon = 0, renewable = 0, gasGWh = 0, carbonWeighted = 0;
+      MIX_SOURCES.forEach(src => {
+        const v = row.c[src.col]?.v ?? 0;
+        total         += v;
+        carbonWeighted += v * src.carbon;
+        if (src.lowCarbon)  lowCarbon  += v;
+        if (src.renewable)  renewable  += v;
+        if (src.label === 'Gas') gasGWh = v;
+      });
+      return {
+        total,
+        ci:       total > 0 ? Math.round(carbonWeighted / total) : 0,
+        lcPct:    total > 0 ? Math.round(lowCarbon / total * 100) : 0,
+        renPct:   total > 0 ? Math.round(renewable / total * 100) : 0,
+        gasPct:   total > 0 ? Math.round(gasGWh / total * 100) : 0,
+      };
+    }
+
+    const actual    = calcStats(actualRow);
+    const manifesto = calcStats(manifestoRow);
+
+    // Comparison strip
+    const stripEl = document.getElementById('compare-strip');
+    const metrics = [
+      { label: 'Carbon Intensity', unit: 'gCO₂/kWh',
+        now: actual.ci,    after: manifesto.ci,    nowGood: false },
+      { label: 'Low Carbon',       unit: '% of generation',
+        now: actual.lcPct, after: manifesto.lcPct, nowGood: actual.lcPct > 60 },
+      { label: 'Renewables',       unit: '% of generation',
+        now: actual.renPct, after: manifesto.renPct, nowGood: actual.renPct > 50 },
+      { label: 'Gas',              unit: '% of generation',
+        now: actual.gasPct, after: manifesto.gasPct, nowGood: false },
+    ];
+
+    metrics.forEach(m => {
+      const nowCls = m.nowGood ? 'compare-val--now-ok' : 'compare-val--now';
+      stripEl.insertAdjacentHTML('beforeend', `
+        <div class="compare-card">
+          <div class="compare-card-label">${m.label}</div>
+          <div class="compare-values">
+            <span class="compare-val ${nowCls}">${m.now}</span>
+            <span class="compare-arrow-sym">→</span>
+            <span class="compare-val compare-val--manifesto">${m.after}</span>
+          </div>
+          <div class="compare-unit">${m.unit}</div>
+        </div>`);
+    });
+
+    // Helper: build sorted fuel list + pie data from a row
+    function buildMixData(row) {
+      const entries = MIX_SOURCES
+        .map(src => ({ label: src.label, color: src.color, value: row.c[src.col]?.v ?? 0 }))
+        .filter(e => e.value > 0)
+        .sort((a, b) => b.value - a.value);
+      const total = entries.reduce((s, e) => s + e.value, 0);
+      return { entries, total };
+    }
+
+    function buildPie(canvasId, listId, row) {
+      const { entries, total } = buildMixData(row);
+
+      new Chart(document.getElementById(canvasId), {
+        type: 'pie',
+        data: {
+          labels: entries.map(e => e.label),
+          datasets: [{ data: entries.map(e => e.value), backgroundColor: entries.map(e => e.color), borderColor: '#fff', borderWidth: 2, hoverOffset: 6 }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${Math.round(ctx.parsed / total * 100)}%` } }
+          }
+        }
+      });
+
+      const listEl = document.getElementById(listId);
+      entries.forEach(({ label, color, value }) => {
+        const pct = total > 0 ? Math.round(value / total * 100) : 0;
+        listEl.insertAdjacentHTML('beforeend', `
+          <div class="fuel-row">
+            <span class="fuel-dot" style="background:${color}"></span>
+            <span class="fuel-gw">${(value / 1000).toFixed(1)} TWh</span>
+            <span class="fuel-name">${label}</span>
+            <div class="fuel-bar-wrap"><div class="fuel-bar" style="width:${pct}%;background:${color}"></div></div>
+            <span class="fuel-pct">${pct}%</span>
+          </div>`);
+      });
+    }
+
+    buildPie('pie-actual',    'fuel-actual',    actualRow);
+    buildPie('pie-manifesto', 'fuel-manifesto', manifestoRow);
+  }
+
+  // ── Timeseries ────────────────────────────────────────────────────
+  if (tsResult.status === 'fulfilled') {
+    const rows = tsResult.value.rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
+
+    const labels = rows.map(r => {
+      const d = parseGDate(r.c[0].v);
+      return d ? fmtDate(d) : '';
+    });
+
+    const datasets = TIME_SOURCES.map(src => ({
+      label: src.label,
+      data: rows.map(r => r.c[src.col]?.v ?? null),
+      backgroundColor: src.color,
+      borderColor: src.color,
+      borderWidth: 0.5,
+      fill: true,
+      pointRadius: 0,
+      tension: 0.2,
+    }));
+
+    new Chart(document.getElementById('timeseries-chart'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { font: { family: FONT, size: 12 }, padding: 14, usePointStyle: true, pointStyle: 'circle', boxWidth: 10, boxHeight: 10 }
+          },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(2) + ' GW' : '—'}` } }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: {
+              font: { family: FONT, size: 10 },
+              maxRotation: 90, minRotation: 90, autoSkip: false,
+              callback: (_, idx) => labels[idx] !== labels[idx - 1] ? labels[idx] : ''
+            },
+            grid: { display: false }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            title: { display: true, text: 'Power, GW', font: { family: FONT, size: 12 }, color: '#555' },
+            ticks: { font: { family: FONT, size: 11 } },
+            grid: { color: '#eeeeee' }
+          }
+        }
+      }
+    });
+  }
+
+  // ── Curtailment ───────────────────────────────────────────────────
+  if (curtailResult.status === 'fulfilled') {
+    const rows = curtailResult.value.rows;
+    const labels = rows.map(r => r.c[0].v);
+
+    new Chart(document.getElementById('curtailment-chart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Delivered direct',  data: rows.map(r => r.c[1]?.v ?? 0), backgroundColor: '#59d600' },
+          { label: 'Via storage',       data: rows.map(r => r.c[2]?.v ?? 0), backgroundColor: '#f96c00' },
+          { label: 'Curtailed',         data: rows.map(r => r.c[3]?.v ?? 0), backgroundColor: '#e2e8f0' },
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: { font: { family: FONT, size: 12 }, padding: 14, usePointStyle: true, pointStyle: 'circle', boxWidth: 10, boxHeight: 10 }
+          },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${(ctx.parsed.x * 100).toFixed(1)}%` } }
+        },
+        scales: {
+          x: {
+            stacked: true, min: 0, max: 1,
+            ticks: { font: { family: FONT, size: 11 }, callback: v => Math.round(v * 100) + '%' },
+            grid: { color: '#eeeeee' }
+          },
+          y: {
+            stacked: true,
+            ticks: { font: { family: FONT, size: 12 } },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
