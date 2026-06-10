@@ -109,4 +109,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (toggle && nav) {
     toggle.addEventListener('click', () => nav.classList.toggle('open'));
   }
+
+  // Mobile dropdown toggles — tap the parent link to expand/collapse
+  document.querySelectorAll('#main-nav > ul > li > a').forEach(a => {
+    if (a.nextElementSibling && a.nextElementSibling.tagName === 'UL') {
+      a.addEventListener('click', e => {
+        if (window.getComputedStyle(toggle).display !== 'none') {
+          e.preventDefault();
+          a.parentElement.classList.toggle('open');
+        }
+      });
+    }
+  });
 });
