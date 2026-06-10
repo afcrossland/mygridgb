@@ -292,8 +292,8 @@
     </section>
 
     <section style="margin:32px 0;">
-      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">From fuel to your socket</h2>
-      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Not all fuel energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. Once electricity reaches the grid, a further 6% is lost in transmission. The diagram below traces every unit of energy from input fuel to delivered electricity, in real time.</p>
+      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">From fuel to power</h2>
+      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. Once electricity reaches the grid, a further 6% is lost in transmission. The diagram below traces every unit of energy from input fuel to delivered electricity, in real time.</p>
       <div id="sankey-chart" style="height:500px; width:100%;"></div>
     </section>
 
@@ -519,123 +519,103 @@
         }
       }
     });
-  }
 
-  // ── Sankey: fuel → conversion losses → electricity → delivered ─
-  if (mixResult.status === 'fulfilled' && totalGW > 0) {
-    // Efficiencies
-    const EFF = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
-    const GRID_LOSS = 0.06;
+    // ── Sankey: runs non-blocking after Plotly loads ──────────
+    if (totalGW > 0) {
+      const EFF       = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
+      const GRID_LOSS = 0.06;
 
-    // Aggregate wind variants into a single value
-    const gw = {
-      Gas:        gwBySource['Gas']        || 0,
-      Nuclear:    gwBySource['Nuclear']    || 0,
-      Biomass:    gwBySource['Biomass']    || 0,
-      Coal:       gwBySource['Coal']       || 0,
-      Wind:       (gwBySource['Wind'] || 0) + (gwBySource['Wind*'] || 0) + (gwBySource['Embedded Wind'] || 0),
-      Solar:      gwBySource['Solar']      || 0,
-      'Large Hydro': (gwBySource['Large Hydro'] || 0) + (gwBySource['Hydro'] || 0),
-      Storage:    gwBySource['Storage']    || 0,
-      Imports:    gwBySource['Imports']    || 0,
-    };
+      const gw = {
+        Gas:           gwBySource['Gas']        || 0,
+        Nuclear:       gwBySource['Nuclear']    || 0,
+        Biomass:       gwBySource['Biomass']    || 0,
+        Coal:          gwBySource['Coal']       || 0,
+        Wind:          (gwBySource['Wind'] || 0) + (gwBySource['Wind*'] || 0) + (gwBySource['Embedded Wind'] || 0),
+        Solar:         gwBySource['Solar']      || 0,
+        'Large Hydro': (gwBySource['Large Hydro'] || 0) + (gwBySource['Hydro'] || 0),
+        Storage:       gwBySource['Storage']    || 0,
+        Imports:       gwBySource['Imports']    || 0,
+      };
 
-    // Node colours (semi-transparent for Plotly fills)
-    const COL = {
-      Gas:         'rgba(47,130,214,0.85)',
-      Nuclear:     'rgba(89,214,0,0.85)',
-      Biomass:     'rgba(130,78,26,0.85)',
-      Coal:        'rgba(61,61,61,0.85)',
-      Wind:        'rgba(237,42,42,0.85)',
-      Solar:       'rgba(220,210,0,0.85)',
-      'Large Hydro': 'rgba(0,28,244,0.85)',
-      Storage:     'rgba(249,108,0,0.85)',
-      Imports:     'rgba(113,0,226,0.85)',
-      Loss:        'rgba(248,113,113,0.75)',
-      Grid:        'rgba(26,77,122,0.85)',
-      GridLoss:    'rgba(180,190,200,0.85)',
-      Delivered:   'rgba(26,77,122,0.95)',
-    };
+      const COL = {
+        Gas: 'rgba(47,130,214,0.85)',    Nuclear: 'rgba(89,214,0,0.85)',
+        Biomass: 'rgba(130,78,26,0.85)', Coal: 'rgba(61,61,61,0.85)',
+        Wind: 'rgba(237,42,42,0.85)',    Solar: 'rgba(220,210,0,0.85)',
+        'Large Hydro': 'rgba(0,28,244,0.85)', Storage: 'rgba(249,108,0,0.85)',
+        Imports: 'rgba(113,0,226,0.85)', Loss: 'rgba(248,113,113,0.75)',
+        Grid: 'rgba(26,77,122,0.85)',    GridLoss: 'rgba(180,190,200,0.85)',
+        Delivered: 'rgba(26,77,122,0.95)',
+      };
 
-    const nodeLabels = [], nodeColors = [];
-    const lSrc = [], lTgt = [], lVal = [], lCol = [];
+      const nodeLabels = [], nodeColors = [], lSrc = [], lTgt = [], lVal = [], lCol = [];
+      let nIdx = 0;
+      const addNode = (label, color) => { nodeLabels.push(label); nodeColors.push(color); return nIdx++; };
+      const addLink = (s, t, v, c)   => { if (v > 0.001) { lSrc.push(s); lTgt.push(t); lVal.push(+v.toFixed(3)); lCol.push(c); } };
 
-    let idx = 0;
-    function addNode(label, color) { nodeLabels.push(label); nodeColors.push(color); return idx++; }
-    function addLink(s, t, v, c) { if (v > 0.001) { lSrc.push(s); lTgt.push(t); lVal.push(+v.toFixed(3)); lCol.push(c); } }
+      const fuelNode = {}, lossNode = {};
+      ['Gas','Nuclear','Biomass','Coal'].forEach(n => {
+        if (gw[n] > 0) {
+          fuelNode[n] = addNode(n + ' fuel', COL[n]);
+          lossNode[n] = addNode(n + ' heat losses', COL.Loss);
+        }
+      });
 
-    // Thermal fuel input nodes + loss nodes
-    const thermalSources = ['Gas','Nuclear','Biomass','Coal'];
-    const fuelNode = {}, lossNode = {};
-    thermalSources.forEach(name => {
-      if (gw[name] > 0) {
-        fuelNode[name] = addNode(name + ' fuel', COL[name]);
-        lossNode[name] = addNode(name + ' heat losses', COL.Loss);
-      }
-    });
+      const directNode = {};
+      ['Wind','Solar','Large Hydro','Storage','Imports'].forEach(n => {
+        if (gw[n] > 0) directNode[n] = addNode(n, COL[n]);
+      });
 
-    // Direct generator nodes
-    const directSources = ['Wind','Solar','Large Hydro','Storage','Imports'];
-    const directNode = {};
-    directSources.forEach(name => {
-      if (gw[name] > 0) directNode[name] = addNode(name, COL[name]);
-    });
+      const gridNode  = addNode('Electricity grid', COL.Grid);
+      const lossGNode = addNode('Grid losses (6%)',  COL.GridLoss);
+      const delNode   = addNode('Delivered',         COL.Delivered);
 
-    // Grid + outputs
-    const gridNode  = addNode('Electricity grid', COL.Grid);
-    const lossGNode = addNode('Grid losses (6%)',  COL.GridLoss);
-    const delNode   = addNode('Delivered',         COL.Delivered);
+      ['Gas','Nuclear','Biomass','Coal'].forEach(n => {
+        if (!gw[n]) return;
+        const heat = gw[n] / EFF[n] - gw[n];
+        addLink(fuelNode[n], lossNode[n], heat,    COL.Loss.replace('0.75','0.18'));
+        addLink(fuelNode[n], gridNode,    gw[n],   COL[n].replace('0.85','0.25'));
+      });
+      ['Wind','Solar','Large Hydro','Storage','Imports'].forEach(n => {
+        if (gw[n] > 0) addLink(directNode[n], gridNode, gw[n], COL[n].replace('0.85','0.25'));
+      });
+      addLink(gridNode, lossGNode, totalGW * GRID_LOSS,       'rgba(160,175,190,0.25)');
+      addLink(gridNode, delNode,   totalGW * (1 - GRID_LOSS), 'rgba(26,77,122,0.22)');
 
-    // Thermal links
-    thermalSources.forEach(name => {
-      if (gw[name] <= 0) return;
-      const eff        = EFF[name];
-      const fuelInput  = gw[name] / eff;
-      const heatLoss   = fuelInput - gw[name];
-      const linkAlpha  = COL[name].replace('0.85', '0.25');
-      addLink(fuelNode[name], lossNode[name], heatLoss,  COL.Loss.replace('0.75', '0.18'));
-      addLink(fuelNode[name], gridNode,       gw[name],  linkAlpha);
-    });
+      // Capture data for the closure before async load
+      const sankeyData = { nodeLabels, nodeColors, lSrc, lTgt, lVal, lCol };
 
-    // Direct links
-    directSources.forEach(name => {
-      if (gw[name] <= 0) return;
-      addLink(directNode[name], gridNode, gw[name], COL[name].replace('0.85', '0.25'));
-    });
-
-    // Grid outputs
-    addLink(gridNode, lossGNode, totalGW * GRID_LOSS,        'rgba(160,175,190,0.25)');
-    addLink(gridNode, delNode,   totalGW * (1 - GRID_LOSS),  'rgba(26,77,122,0.22)');
-
-    // Load Plotly dynamically so it doesn't block initial paint
-    await new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.plot.ly/plotly-2.27.0.min.js';
-      s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
-
-    Plotly.newPlot('sankey-chart', [{
-      type: 'sankey',
-      orientation: 'h',
-      arrangement: 'snap',
-      node: {
-        pad: 16, thickness: 20,
-        line: { color: '#fff', width: 0.5 },
-        label: nodeLabels,
-        color: nodeColors,
-        hovertemplate: '<b>%{label}</b><br>%{value:.2f} GW<extra></extra>',
-      },
-      link: {
-        source: lSrc, target: lTgt, value: lVal, color: lCol,
-        hovertemplate: '%{source.label} → %{target.label}<br><b>%{value:.2f} GW</b><extra></extra>',
-      },
-    }], {
-      font: { family: "'DM Sans','Segoe UI',Arial,sans-serif", size: 11.5, color: '#0F172A' },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor:  'rgba(0,0,0,0)',
-      margin: { l: 10, r: 10, t: 10, b: 10 },
-    }, { responsive: true, displayModeBar: false });
+      new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.plot.ly/plotly-2.27.0.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      }).then(() => {
+        Plotly.newPlot('sankey-chart', [{
+          type: 'sankey',
+          orientation: 'h',
+          arrangement: 'snap',
+          node: {
+            pad: 16, thickness: 20,
+            line: { color: '#fff', width: 0.5 },
+            label: sankeyData.nodeLabels, color: sankeyData.nodeColors,
+            hovertemplate: '<b>%{label}</b><br>%{value:.2f} GW<extra></extra>',
+          },
+          link: {
+            source: sankeyData.lSrc, target: sankeyData.lTgt,
+            value: sankeyData.lVal,  color: sankeyData.lCol,
+            hovertemplate: '%{source.label} → %{target.label}<br><b>%{value:.2f} GW</b><extra></extra>',
+          },
+        }], {
+          font: { family: "'DM Sans','Segoe UI',Arial,sans-serif", size: 11.5, color: '#0F172A' },
+          paper_bgcolor: 'rgba(0,0,0,0)',
+          plot_bgcolor:  'rgba(0,0,0,0)',
+          margin: { l: 10, r: 10, t: 10, b: 10 },
+        }, { responsive: true, displayModeBar: false });
+      }).catch(() => {
+        const el = document.getElementById('sankey-chart');
+        if (el) el.style.display = 'none';
+      });
+    }
   }
 
   // ── Carbon intensity bar chart ───────────────────────────────

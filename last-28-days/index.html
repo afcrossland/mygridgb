@@ -151,7 +151,7 @@
     const datasets = STACK_SOURCES.map((name, i) => ({
       label: name,
       data: valid.map(r => r.c[i + 1]?.v ?? null),
-      backgroundColor: PALETTE[name],
+      backgroundColor: PALETTE[name] + 'b3',
       borderColor: PALETTE[name],
       borderWidth: 0.5,
       fill: true,

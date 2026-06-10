@@ -67,6 +67,12 @@
       color: var(--muted);
       margin-top: 5px;
     }
+    .compare-val-sfx {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: .65;
+      letter-spacing: -.01em;
+    }
 
     /* ── Mix comparison layout ── */
     .compare-mix {
@@ -179,6 +185,28 @@
     <!-- Comparison stat strip (populated by JS) -->
     <div class="compare-strip" id="compare-strip"></div>
 
+    <!-- How it works (collapsed by default) -->
+    <details class="manifesto-details" style="margin-bottom:36px;">
+      <summary class="manifesto-summary">
+        <span class="toggle-icon">▶</span>
+        How the manifesto works
+      </summary>
+      <div class="manifesto-body">
+        <p>To decarbonise electricity I've made the following changes to the electricity mix:</p>
+        <ul>
+          <li>3.2 GW of new nuclear power stations (i.e. Hinkley C)</li>
+          <li>3× the amount of wind generation</li>
+          <li>3× the amount of solar generation (10 million solar homes)</li>
+          <li>1.5× more biomass capacity, dispatched only when wind and solar are low</li>
+          <li>No coal</li>
+          <li>100 GWh of electricity storage — approximately 6× more than Dinorwig and Cruachan combined</li>
+        </ul>
+        <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full — then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
+        <p>The assumptions are sufficient to show whether enough low carbon electricity can be generated when it is needed. They are not a complete optimisation of cost or carbon reduction. Demand profiles are not changed.</p>
+        <p>The manifesto is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
+      </div>
+    </details>
+
     <!-- Side-by-side mix comparison -->
     <div class="compare-mix">
       <div>
@@ -204,31 +232,10 @@
     <!-- Curtailment -->
     <h2 class="section-h2">Renewable curtailment</h2>
     <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed — switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 manifesto.</p>
-    <div style="position:relative; height:160px; max-width:640px;">
+    <div style="position:relative; height:160px;">
       <canvas id="curtailment-chart"></canvas>
     </div>
 
-    <!-- How it works -->
-    <details class="manifesto-details">
-      <summary class="manifesto-summary">
-        <span class="toggle-icon">▶</span>
-        How the manifesto works
-      </summary>
-      <div class="manifesto-body">
-        <p>To decarbonise electricity I've made the following changes to the electricity mix:</p>
-        <ul>
-          <li>3.2 GW of new nuclear power stations (i.e. Hinkley C)</li>
-          <li>3× the amount of wind generation</li>
-          <li>3× the amount of solar generation (10 million solar homes)</li>
-          <li>1.5× more biomass capacity, dispatched only when wind and solar are low</li>
-          <li>No coal</li>
-          <li>100 GWh of electricity storage — approximately 6× more than Dinorwig and Cruachan combined</li>
-        </ul>
-        <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full — then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
-        <p>The assumptions are sufficient to show whether enough low carbon electricity can be generated when it is needed. They are not a complete optimisation of cost or carbon reduction. Demand profiles are not changed.</p>
-        <p>The manifesto is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
-      </div>
-    </details>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
@@ -321,13 +328,13 @@
     // Comparison strip
     const stripEl = document.getElementById('compare-strip');
     const metrics = [
-      { label: 'Carbon Intensity', unit: 'gCO₂/kWh',
+      { label: 'Carbon Intensity', suffix: '<span class="compare-val-sfx"> g/kWh</span>', unit: 'gCO₂eq/kWh',
         now: actual.ci,    after: manifesto.ci,    nowGood: false },
-      { label: 'Low Carbon',       unit: '% of generation',
+      { label: 'Low Carbon',       suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
         now: actual.lcPct, after: manifesto.lcPct, nowGood: actual.lcPct > 60 },
-      { label: 'Renewables',       unit: '% of generation',
+      { label: 'Renewables',       suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
         now: actual.renPct, after: manifesto.renPct, nowGood: actual.renPct > 50 },
-      { label: 'Gas',              unit: '% of generation',
+      { label: 'Gas',              suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
         now: actual.gasPct, after: manifesto.gasPct, nowGood: false },
     ];
 
@@ -337,9 +344,9 @@
         <div class="compare-card">
           <div class="compare-card-label">${m.label}</div>
           <div class="compare-values">
-            <span class="compare-val ${nowCls}">${m.now}</span>
+            <span class="compare-val ${nowCls}">${m.now}${m.suffix}</span>
             <span class="compare-arrow-sym">→</span>
-            <span class="compare-val compare-val--manifesto">${m.after}</span>
+            <span class="compare-val compare-val--manifesto">${m.after}${m.suffix}</span>
           </div>
           <div class="compare-unit">${m.unit}</div>
         </div>`);
