@@ -137,22 +137,37 @@
     const dataRows = rows.slice(1);
     const months = dataRows.map(r => r.c[0]?.v ?? '');
 
-    // Palette: older years lighter, most recent bold brand colour
-    const palette = [
-      '#c8ddf0','#aacce8','#8cbade','#6ea8d4','#5096ca',
-      '#3584c0','#1a6faa','#155d8e','#104c74','#1a4d7a',
+    // Distinct categorical palette (tab10) + alternating dash styles for separability
+    const COLORS = [
+      '#7f7f7f','#8c564b','#9467bd','#d62728',
+      '#2ca02c','#ff7f0e','#17becf','#bcbd22',
+      '#e377c2','#1a4d7a',
     ];
-    const maxYear = Math.max(...years.map(Number));
+    const DASHES = [[6,3],[6,3],[6,3],[6,3],[6,3],[],[],[],[],[]];
 
-    const datasets = years.map((year, yi) => ({
-      label: year,
-      data: dataRows.map(r => r.c[yi + 1]?.v ?? null),
-      borderColor: Number(year) === maxYear ? '#1a4d7a' : palette[yi],
-      borderWidth: Number(year) === maxYear ? 2.5 : 1.5,
-      pointRadius: 0,
-      tension: 0.3,
-      fill: false,
-    }));
+    const maxYear = Math.max(...years.map(Number));
+    const currentYear  = new Date().getFullYear();
+    const currentMonth = new Date().getMonth(); // 0 = Jan
+
+    const datasets = years.map((year, yi) => {
+      let data = dataRows.map(r => r.c[yi + 1]?.v ?? null);
+      // Null out future months for the current calendar year
+      if (Number(year) === currentYear) {
+        data = data.map((v, mi) => mi <= currentMonth ? v : null);
+      }
+      const isMostRecent = Number(year) === maxYear;
+      return {
+        label: year,
+        data,
+        borderColor: COLORS[yi % COLORS.length],
+        borderWidth: isMostRecent ? 2.5 : 1.5,
+        borderDash: DASHES[yi % DASHES.length],
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        spanGaps: false,
+      };
+    });
 
     new Chart(document.getElementById('line-chart'), {
       type: 'line',
