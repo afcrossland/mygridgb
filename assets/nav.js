@@ -25,7 +25,6 @@ const NAV_HTML = `
           <a href="/map/index.html">Resources ▾</a>
           <ul>
             <li><a href="/map/index.html">UK Renewable Energy Map</a></li>
-            <li><a href="/waste-heat-map/index.html">Waste Heat Map</a></li>
             <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
             <li><a href="/educational-resources/index.html">Educational Resources</a></li>
           </ul>
