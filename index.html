@@ -13,7 +13,7 @@
     /* ── Stat strip ── */
     .stat-strip {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       margin: 28px 0 32px;
     }
@@ -49,11 +49,11 @@
       margin-left: 3px;
     }
 
-    /* Carbon intensity traffic light */
-    .stat-card--low  { border-color: #2d7ab8; }
+    /* Stat card traffic light */
+    .stat-card--low  { border-color: #16a34a; }
     .stat-card--mid  { border-color: #f59e0b; }
     .stat-card--high { border-color: #ef4444; }
-    .stat-card--low  .stat-num { color: #1a4d7a; }
+    .stat-card--low  .stat-num { color: #15803d; }
     .stat-card--mid  .stat-num { color: #d97706; }
     .stat-card--high .stat-num { color: #dc2626; }
 
@@ -221,7 +221,10 @@
       .mix-layout { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 680px) {
+    @media (max-width: 900px) {
+      .stat-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 560px) {
       .stat-strip { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 360px) {
@@ -255,19 +258,23 @@
       <h2 class="mix-title">Britain's Present Electricity Mix</h2>
       <p class="mix-subtitle" style="margin-bottom:4px;">How is your electricity being generated right now?</p>
 
-      <!-- Four stat cards -->
+      <!-- Five stat cards -->
       <div class="stat-strip">
-        <div class="stat-card">
+        <div class="stat-card" id="lowcarbon-card">
           <div class="stat-label">Low Carbon</div>
           <div class="stat-num"><span id="stat-lowcarbon">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="renewables-card">
           <div class="stat-label">Renewables</div>
           <div class="stat-num"><span id="stat-renewables">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="generation-card">
           <div class="stat-label">Generation</div>
           <div class="stat-num"><span id="stat-generation">&mdash;</span><span class="stat-unit">GW</span></div>
+        </div>
+        <div class="stat-card" id="independence-card">
+          <div class="stat-label">Energy Independence</div>
+          <div class="stat-num"><span id="stat-independence">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
         <div class="stat-card" id="carbon-card">
           <div class="stat-label">Carbon Intensity</div>
@@ -286,7 +293,7 @@
 
     <section style="margin:32px 0; text-align:center;">
       <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">Decarbonising British Electricity</h2>
-      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Is Britain's electricity decarbonising? The chart below shows the fall (and rise) of the carbon intensity of British electricity since 1998.</p>
+      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">The carbon intensity of British electricity has fallen dramatically since 1998, driven by the closure of coal plants and growth in wind, solar and nuclear. The chart tracks this progress — and how far there is still to go to meet the 2030 clean power target of 50–100 gCO₂eq/kWh.</p>
       <div style="position:relative; height:400px;">
         <canvas id="carbon-chart"></canvas>
       </div>
@@ -411,6 +418,9 @@
 
     const labels = [], values = [], bgColors = [];
     let totalGW = 0, lowCarbonGW = 0, renewableGW = 0, carbonWeighted = 0;
+    // Fuel GW for energy independence: domestic fuel independence penalised by
+    // 80% for gas/biomass/nuclear (imported fuel), 100% for direct imports
+    let importDependentGW = 0;
 
     rows.forEach(row => {
       const fullLabel = row.c?.[0]?.v;
@@ -426,24 +436,35 @@
       if (LOW_CARBON.has(source)) lowCarbonGW  += val;
       if (RENEWABLE.has(source))  renewableGW  += val;
       carbonWeighted += val * (CARBON_FACTORS[source] ?? 300);
+
+      // Energy independence: gas/biomass/nuclear use ~80% imported fuel; imports are 100% foreign
+      if (source === 'Imports')                               importDependentGW += val;
+      else if (['Gas','Biomass','Nuclear'].includes(source))  importDependentGW += val * 0.8;
     });
 
     if (totalGW > 0) {
-      const lowCarbonPct   = Math.round(lowCarbonGW  / totalGW * 100);
-      const renewablesPct  = Math.round(renewableGW  / totalGW * 100);
+      const lowCarbonPct    = Math.round(lowCarbonGW  / totalGW * 100);
+      const renewablesPct   = Math.round(renewableGW  / totalGW * 100);
       const carbonIntensity = Math.round(carbonWeighted / totalGW);
+      const energyIndPct    = Math.max(0, Math.round((totalGW - importDependentGW) / totalGW * 100));
 
-      document.getElementById('stat-lowcarbon').textContent  = lowCarbonPct;
-      document.getElementById('stat-renewables').textContent = renewablesPct;
-      document.getElementById('stat-generation').textContent = totalGW.toFixed(1);
-      document.getElementById('stat-carbon').textContent     = carbonIntensity;
+      document.getElementById('stat-lowcarbon').textContent    = lowCarbonPct;
+      document.getElementById('stat-renewables').textContent   = renewablesPct;
+      document.getElementById('stat-generation').textContent   = totalGW.toFixed(1);
+      document.getElementById('stat-independence').textContent = energyIndPct;
+      document.getElementById('stat-carbon').textContent       = carbonIntensity;
 
-      // Traffic light on carbon intensity card
-      const card = document.getElementById('carbon-card');
-      card.classList.add(
-        carbonIntensity < 100 ? 'stat-card--low' :
-        carbonIntensity < 250 ? 'stat-card--mid' : 'stat-card--high'
-      );
+      // Colour each card
+      document.getElementById('lowcarbon-card').classList.add(
+        lowCarbonPct > 80 ? 'stat-card--low' : lowCarbonPct > 60 ? 'stat-card--mid' : 'stat-card--high');
+      document.getElementById('renewables-card').classList.add(
+        renewablesPct > 60 ? 'stat-card--low' : renewablesPct > 40 ? 'stat-card--mid' : 'stat-card--high');
+      document.getElementById('generation-card').classList.add(
+        totalGW > 40 ? 'stat-card--high' : totalGW > 30 ? 'stat-card--mid' : 'stat-card--low');
+      document.getElementById('independence-card').classList.add(
+        energyIndPct > 60 ? 'stat-card--low' : energyIndPct > 40 ? 'stat-card--mid' : 'stat-card--high');
+      document.getElementById('carbon-card').classList.add(
+        carbonIntensity < 100 ? 'stat-card--low' : carbonIntensity < 250 ? 'stat-card--mid' : 'stat-card--high');
     }
 
     // Sort entries by GW descending for the fuel list

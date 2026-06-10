@@ -6,18 +6,323 @@
   <title>Last 12 Months — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
+  <style>
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .filter-btn {
+      padding: 7px 20px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: 'DM Sans', system-ui, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .filter-btn:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+    .filter-btn.active {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+    .chart-section {
+      margin-bottom: 40px;
+    }
+    .chart-section h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #1a4d7a;
+      margin-bottom: 6px;
+    }
+    .chart-section p {
+      color: var(--muted);
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Last 12 Months</h1>
-    <p class="page-intro">British electricity generation over the last 12 months.</p>
-    
-    <div class="embed-area">
-      <p>Chart embed to be wired up — paste your Infogram embed code here.</p>
+    <p class="page-intro">Monthly average electricity generation by fuel type and carbon intensity. Use the time window buttons to zoom in on recent months or zoom out for a longer view — seasonal patterns in wind, solar and demand become clear across the full range.</p>
+
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn" data-months="3">3 months</button>
+      <button class="filter-btn" data-months="6">6 months</button>
+      <button class="filter-btn active" data-months="12">12 months</button>
+    </div>
+
+    <div class="chart-section">
+      <h2>Generation mix share</h2>
+      <p>Average contribution of each fuel type to the electricity mix over the selected period. Tile size reflects share of total generation — the balance between gas, nuclear, wind and solar shifts significantly across seasons and weather.</p>
+      <div style="position:relative; height:360px;">
+        <canvas id="treemap-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <h2>Monthly generation</h2>
+      <p>Average power output (GW) by fuel type for each month. Winter months typically see higher overall demand and more wind; summer months bring solar peaks but lower total generation. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
+      <div style="position:relative; height:420px;">
+        <canvas id="gen-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-section">
+      <h2>Monthly carbon intensity</h2>
+      <p>Average carbon intensity of British electricity (gCO₂eq/kWh) for each month. Carbon intensity falls when wind and solar output is high, and rises when gas fills a larger share of demand. Comparing months highlights the interplay between weather, season and grid emissions.</p>
+      <div style="position:relative; height:320px;">
+        <canvas id="carbon-chart"></canvas>
+      </div>
     </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
+
+<script>
+(async () => {
+  const GEN_ID    = '1XmfoB1pj75UMhM9d2r2KbA0P-TAjUddyY0iAuFmgCVw';
+  const CARBON_ID = '1M7mmIpZuKLk2GyRSfsRhQgTQiZoGnLI3P5HRiQWxGoc';
+
+  const PALETTE = {
+    'Nuclear':     '#59d600',
+    'Biomass':     '#824e1a',
+    'Wind':        '#ed2a2a',
+    'Solar':       '#ede310',
+    'Coal':        '#3d3d3d',
+    'Gas':         '#2f82d6',
+    'Storage':     '#f96c00',
+    'Large Hydro': '#001cf4',
+    'Imports':     '#7100e2',
+  };
+
+  const SOURCES = [
+    { label: 'Nuclear',     col: 1 },
+    { label: 'Biomass',     col: 2 },
+    { label: 'Wind',        col: 3 },
+    { label: 'Solar',       col: 4 },
+    { label: 'Coal',        col: 5 },
+    { label: 'Gas',         col: 6 },
+    { label: 'Storage',     col: 7 },
+    { label: 'Large Hydro', col: 8 },
+    { label: 'Imports',     col: 9 },
+  ];
+
+  const FONT = "'DM Sans', 'Segoe UI', Arial, sans-serif";
+
+  async function fetchTable(id) {
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`);
+    const t = await r.text();
+    return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
+  }
+
+  const [genResult, carbonResult] = await Promise.allSettled([
+    fetchTable(GEN_ID),
+    fetchTable(CARBON_ID),
+  ]);
+
+  const genRows    = genResult.status    === 'fulfilled' ? genResult.value.rows    : [];
+  const carbonRows = carbonResult.status === 'fulfilled' ? carbonResult.value.rows : [];
+
+  function tail(rows, n) {
+    return rows.slice(-Math.min(n, rows.length));
+  }
+
+  function buildTreeItems(rows) {
+    const sums = {};
+    SOURCES.forEach(src => { sums[src.label] = 0; });
+    rows.forEach(r => SOURCES.forEach(src => {
+      sums[src.label] += r.c[src.col]?.v ?? 0;
+    }));
+    const n = rows.length || 1;
+    return Object.entries(sums)
+      .filter(([, v]) => v > 0)
+      .map(([label, total]) => ({ label, source: label, value: total / n }));
+  }
+
+  // ── Treemap ────────────────────────────────────────────────────
+  const treemapChart = new Chart(document.getElementById('treemap-chart'), {
+    type: 'treemap',
+    data: {
+      datasets: [{
+        tree: buildTreeItems(tail(genRows, 12)),
+        key: 'value',
+        backgroundColor(ctx) {
+          if (ctx.type !== 'data') return 'transparent';
+          return PALETTE[ctx.raw._data.source] ?? '#9CA3AF';
+        },
+        borderWidth: 2,
+        borderColor: '#fff',
+        labels: {
+          display: 'auto',
+          formatter(ctx) {
+            const d = ctx.raw._data;
+            return [d.source, d.value.toFixed(1) + ' GW'];
+          },
+          color: '#fff',
+          font: { family: FONT, size: 13, weight: '600' },
+          padding: 6,
+        },
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: ctx => ctx[0]?.raw?._data?.source ?? '',
+            label: ctx => ` ${ctx.raw._data.value.toFixed(2)} GW avg`,
+          }
+        }
+      }
+    }
+  });
+
+  // ── Generation chart ───────────────────────────────────────────
+  const genInit = tail(genRows, 12);
+  const genChart = new Chart(document.getElementById('gen-chart'), {
+    type: 'bar',
+    data: {
+      labels: genInit.map(r => r.c[0].v),
+      datasets: SOURCES.map(src => ({
+        label: src.label,
+        data: genInit.map(r => r.c[src.col]?.v ?? 0),
+        backgroundColor: PALETTE[src.label],
+        borderWidth: 0,
+      })),
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: { family: FONT, size: 12 },
+            padding: 16,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            boxWidth: 10,
+            boxHeight: 10,
+          }
+        },
+        tooltip: {
+          mode: 'index',
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} GW`
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { font: { family: FONT, size: 11 } },
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Power, GW',
+            font: { family: FONT, size: 12 },
+            color: '#555'
+          },
+          ticks: { font: { family: FONT, size: 11 } },
+          grid: { color: '#eeeeee' }
+        }
+      }
+    }
+  });
+
+  // ── Carbon chart ───────────────────────────────────────────────
+  const carbonInit = tail(carbonRows, 12);
+  const carbonChart = new Chart(document.getElementById('carbon-chart'), {
+    type: 'bar',
+    data: {
+      labels: carbonInit.map(r => r.c[0].v),
+      datasets: [{
+        data: carbonInit.map(r => r.c[1]?.v ?? 0),
+        backgroundColor: '#3d3d3d',
+        borderWidth: 0,
+        categoryPercentage: 0.75,
+        barPercentage: 0.85,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.parsed.y.toFixed(1)} gCO₂eq/kWh`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { font: { family: FONT, size: 11 } },
+          grid: { display: false }
+        },
+        y: {
+          beginAtZero: false,
+          title: {
+            display: true,
+            text: 'gCO₂eq/kWh',
+            font: { family: FONT, size: 12 },
+            color: '#555'
+          },
+          ticks: { font: { family: FONT, size: 11 } },
+          grid: { color: '#eeeeee' }
+        }
+      }
+    }
+  });
+
+  // ── Filter buttons ─────────────────────────────────────────────
+  function updateCharts(months) {
+    const fg = tail(genRows, months);
+    const fc = tail(carbonRows, months);
+
+    genChart.data.labels = fg.map(r => r.c[0].v);
+    SOURCES.forEach((src, i) => {
+      genChart.data.datasets[i].data = fg.map(r => r.c[src.col]?.v ?? 0);
+    });
+    genChart.update();
+
+    treemapChart.data.datasets[0].tree = buildTreeItems(fg);
+    treemapChart.update();
+
+    carbonChart.data.labels = fc.map(r => r.c[0].v);
+    carbonChart.data.datasets[0].data = fc.map(r => r.c[1]?.v ?? 0);
+    carbonChart.update();
+  }
+
+  document.getElementById('filter-bar').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateCharts(parseInt(btn.dataset.months, 10));
+  });
+})();
+</script>
+
 </body>
 </html>

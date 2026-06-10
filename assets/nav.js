@@ -22,11 +22,12 @@ const NAV_HTML = `
         </li>
         <li><a href="/2030grid/index.html">The 2030 Grid</a></li>
         <li>
-          <a href="/map/index.html">Maps ▾</a>
+          <a href="/map/index.html">Resources ▾</a>
           <ul>
             <li><a href="/map/index.html">UK Renewable Energy Map</a></li>
             <li><a href="/waste-heat-map/index.html">Waste Heat Map</a></li>
             <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
+            <li><a href="/educational-resources/index.html">Educational Resources</a></li>
           </ul>
         </li>
         <li><a href="/blog/index.html">Blog</a></li>
@@ -36,7 +37,6 @@ const NAV_HTML = `
           <ul>
             <li><a href="/about/index.html">About MyGridGB</a></li>
             <li><a href="/about-me/index.html">About Me</a></li>
-            <li><a href="/educational-resources/index.html">Educational Resources</a></li>
           </ul>
         </li>
       </ul>
@@ -67,9 +67,10 @@ const SIDEBAR_HTML = `
     <p>Decarbonising Electricity Made Simple — <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">buy on Amazon</a></p>
   </div>
   <div class="bottom-card">
-    <div class="bottom-card-label">Follow</div>
-    <p style="margin-bottom:12px">Keep up with the latest GB electricity data and analysis.</p>
+    <div class="bottom-card-label">Connect</div>
+    <p style="margin-bottom:12px">Follow for the latest GB electricity data and analysis, or connect on LinkedIn.</p>
     <a href="https://twitter.com/intent/follow?screen_name=mygridgb" target="_blank" class="follow-btn">Follow @mygridgb on X</a>
+    <a href="https://www.linkedin.com/in/afcrossland" target="_blank" class="follow-btn" style="background:#0a66c2">Connect on LinkedIn</a>
   </div>
 </div>`;
 
