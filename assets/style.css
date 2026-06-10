@@ -4,18 +4,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --brand:        #1a5c3a;
-  --brand-dark:   #145030;
-  --brand-bg:     #d4ede0;
-  --green:        #2d8c5a;
-  --green-light:  #4fbe85;
-  --green-bg:     #d4ede0;
+  --brand:        #1a4d7a;
+  --brand-dark:   #143d61;
+  --brand-bg:     #d4e8f5;
+  --green:        #2d7ab8;
+  --green-light:  #4faadb;
+  --green-bg:     #d4e8f5;
   --text:         #0F172A;
   --muted:        #64748B;
   --border:       #EBEBEB;
   --bg:           #FAFAFA;
   --surface:      #FFFFFF;
-  --nav-bg:       #0d2b1a;
+  --nav-bg:       #0d1f35;
   --sidebar-width: 260px;
   --nav-height:   60px;
   --radius:       10px;
@@ -67,7 +67,7 @@ a:hover { color: var(--brand-dark); text-decoration: underline; }
 
 #site-header .logo:hover { text-decoration: none; color: #fff; }
 
-.logo-accent { color: #4fbe85; }
+.logo-accent { color: #4faadb; }
 
 /* ===== NAV ===== */
 nav { flex: 1; }
@@ -268,7 +268,7 @@ nav ul ul li a:hover {
 
 /* ===== HOME PAGE ===== */
 .home-hero {
-  background: linear-gradient(135deg, #2d8c5a 0%, #1a5c3a 100%);
+  background: linear-gradient(135deg, #2d7ab8 0%, #1a4d7a 100%);
   color: #fff;
   padding: 52px 36px;
   border-radius: 8px;
