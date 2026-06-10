@@ -13,7 +13,7 @@
     /* ── Stat strip ── */
     .stat-strip {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 16px;
       margin: 28px 0 32px;
     }
@@ -22,6 +22,7 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 20px 22px;
+      text-align: center;
       transition: border-color .2s;
     }
 
@@ -221,7 +222,7 @@
       .mix-layout { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
       .stat-strip { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 560px) {
@@ -279,6 +280,10 @@
         <div class="stat-card" id="carbon-card">
           <div class="stat-label">Carbon Intensity</div>
           <div class="stat-num"><span id="stat-carbon">&mdash;</span><span class="stat-unit">gCO₂/kWh</span></div>
+        </div>
+        <div class="stat-card" id="thermal-card">
+          <div class="stat-label">Thermal Losses</div>
+          <div class="stat-num"><span id="stat-thermal">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
       </div>
 
@@ -454,11 +459,23 @@
       const carbonIntensity = Math.round(carbonWeighted / totalGW);
       const energyIndPct    = Math.max(0, Math.round((totalGW - importDependentGW) / totalGW * 100));
 
+      // Thermal losses: same EFF assumptions as Sankey
+      const THERM_EFF = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
+      let thermalInput = 0, thermalLoss = 0;
+      Object.entries(THERM_EFF).forEach(([src, eff]) => {
+        const gw = gwBySource[src] || 0;
+        if (gw > 0) { thermalInput += gw / eff; thermalLoss += gw / eff - gw; }
+      });
+      const directGW = totalGW - Object.keys(THERM_EFF).reduce((s, k) => s + (gwBySource[k] || 0), 0);
+      const totalInputEnergy = thermalInput + directGW;
+      const thermalLossPct = totalInputEnergy > 0 ? Math.round(thermalLoss / totalInputEnergy * 100) : 0;
+
       document.getElementById('stat-lowcarbon').textContent    = lowCarbonPct;
       document.getElementById('stat-renewables').textContent   = renewablesPct;
       document.getElementById('stat-generation').textContent   = totalGW.toFixed(1);
       document.getElementById('stat-independence').textContent = energyIndPct;
       document.getElementById('stat-carbon').textContent       = carbonIntensity;
+      document.getElementById('stat-thermal').textContent      = thermalLossPct;
 
       // Colour each card
       document.getElementById('lowcarbon-card').classList.add(
@@ -471,6 +488,8 @@
         energyIndPct > 60 ? 'stat-card--low' : energyIndPct > 40 ? 'stat-card--mid' : 'stat-card--high');
       document.getElementById('carbon-card').classList.add(
         carbonIntensity < 100 ? 'stat-card--low' : carbonIntensity < 250 ? 'stat-card--mid' : 'stat-card--high');
+      document.getElementById('thermal-card').classList.add(
+        thermalLossPct < 20 ? 'stat-card--low' : thermalLossPct < 35 ? 'stat-card--mid' : 'stat-card--high');
     }
 
     // Sort entries by GW descending for the fuel list
