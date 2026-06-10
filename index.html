@@ -543,46 +543,65 @@
         Wind: 'rgba(237,42,42,0.85)',    Solar: 'rgba(220,210,0,0.85)',
         'Large Hydro': 'rgba(0,28,244,0.85)', Storage: 'rgba(249,108,0,0.85)',
         Imports: 'rgba(113,0,226,0.85)', Loss: 'rgba(248,113,113,0.75)',
-        Grid: 'rgba(26,77,122,0.85)',    GridLoss: 'rgba(180,190,200,0.85)',
-        Delivered: 'rgba(26,77,122,0.95)',
+        Grid: 'rgba(26,77,122,0.85)',    Delivered: 'rgba(26,77,122,0.95)',
       };
 
-      const nodeLabels = [], nodeColors = [], lSrc = [], lTgt = [], lVal = [], lCol = [];
+      const nodeLabels = [], nodeColors = [], nodeX = [], nodeY = [];
+      const lSrc = [], lTgt = [], lVal = [], lCol = [];
       let nIdx = 0;
-      const addNode = (label, color) => { nodeLabels.push(label); nodeColors.push(color); return nIdx++; };
-      const addLink = (s, t, v, c)   => { if (v > 0.001) { lSrc.push(s); lTgt.push(t); lVal.push(+v.toFixed(3)); lCol.push(c); } };
+      const addNode = (label, color, x, y) => {
+        nodeLabels.push(label); nodeColors.push(color);
+        nodeX.push(x); nodeY.push(y);
+        return nIdx++;
+      };
+      const addLink = (s, t, v, c) => {
+        if (v > 0.001) { lSrc.push(s); lTgt.push(t); lVal.push(+v.toFixed(3)); lCol.push(c); }
+      };
 
-      const fuelNode = {}, lossNode = {};
-      ['Gas','Nuclear','Biomass','Coal'].forEach(n => {
-        if (gw[n] > 0) {
-          fuelNode[n] = addNode(n + ' fuel', COL[n]);
-          lossNode[n] = addNode(n + ' heat losses', COL.Loss);
-        }
+      const thermalFuels  = ['Gas','Nuclear','Biomass','Coal'].filter(n => gw[n] > 0);
+      const directSources = ['Wind','Solar','Large Hydro','Storage','Imports'].filter(n => gw[n] > 0);
+      const allLeft = [...thermalFuels, ...directSources];
+      const N = allLeft.length;
+      const leftY = allLeft.map((_, i) => N === 1 ? 0.45 : 0.05 + (i / (N - 1)) * 0.85);
+
+      // Left column: fuel inputs
+      const fuelNodeIdx = {};
+      thermalFuels.forEach((n, i) => {
+        fuelNodeIdx[n] = addNode(n + ' fuel', COL[n], 0.01, leftY[i]);
       });
 
-      const directNode = {};
-      ['Wind','Solar','Large Hydro','Storage','Imports'].forEach(n => {
-        if (gw[n] > 0) directNode[n] = addNode(n, COL[n]);
+      // Middle column: single thermal losses node + electricity grid
+      let thermalLossTotal = 0;
+      thermalFuels.forEach(n => { thermalLossTotal += gw[n] / EFF[n] - gw[n]; });
+      const hasThermal = thermalLossTotal > 0.001;
+      const thermalLossNode = hasThermal ? addNode('Thermal losses', COL.Loss, 0.40, 0.10) : -1;
+
+      // Left column: direct sources (below thermal fuels)
+      const directNodeIdx = {};
+      directSources.forEach((n, i) => {
+        directNodeIdx[n] = addNode(n, COL[n], 0.01, leftY[thermalFuels.length + i]);
       });
 
-      const gridNode  = addNode('Electricity grid', COL.Grid);
-      const lossGNode = addNode('Grid losses (6%)',  COL.GridLoss);
-      const delNode   = addNode('Delivered',         COL.Delivered);
+      const gridNode = addNode('Electricity grid', COL.Grid,      0.40, 0.72);
+      const lossNode = addNode('Losses',            COL.Loss,      0.75, 0.10);
+      const delNode  = addNode('Delivered',         COL.Delivered, 0.99, 0.72);
 
-      ['Gas','Nuclear','Biomass','Coal'].forEach(n => {
-        if (!gw[n]) return;
+      // Links: fuels → thermal losses + grid
+      thermalFuels.forEach(n => {
         const heat = gw[n] / EFF[n] - gw[n];
-        addLink(fuelNode[n], lossNode[n], heat,    COL.Loss.replace('0.75','0.18'));
-        addLink(fuelNode[n], gridNode,    gw[n],   COL[n].replace('0.85','0.25'));
+        if (hasThermal) addLink(fuelNodeIdx[n], thermalLossNode, heat,  COL.Loss.replace('0.75','0.18'));
+        addLink(fuelNodeIdx[n], gridNode, gw[n], COL[n].replace('0.85','0.25'));
       });
-      ['Wind','Solar','Large Hydro','Storage','Imports'].forEach(n => {
-        if (gw[n] > 0) addLink(directNode[n], gridNode, gw[n], COL[n].replace('0.85','0.25'));
+      // Links: direct sources → grid
+      directSources.forEach(n => {
+        addLink(directNodeIdx[n], gridNode, gw[n], COL[n].replace('0.85','0.25'));
       });
-      addLink(gridNode, lossGNode, totalGW * GRID_LOSS,       'rgba(160,175,190,0.25)');
-      addLink(gridNode, delNode,   totalGW * (1 - GRID_LOSS), 'rgba(26,77,122,0.22)');
+      // Links: thermal losses + grid losses → single losses node
+      if (hasThermal) addLink(thermalLossNode, lossNode, thermalLossTotal, COL.Loss.replace('0.75','0.18'));
+      addLink(gridNode, lossNode, totalGW * GRID_LOSS,       'rgba(160,175,190,0.25)');
+      addLink(gridNode, delNode,  totalGW * (1 - GRID_LOSS), 'rgba(26,77,122,0.22)');
 
-      // Capture data for the closure before async load
-      const sankeyData = { nodeLabels, nodeColors, lSrc, lTgt, lVal, lCol };
+      const sankeyData = { nodeLabels, nodeColors, nodeX, nodeY, lSrc, lTgt, lVal, lCol };
 
       new Promise((res, rej) => {
         const s = document.createElement('script');
@@ -593,11 +612,12 @@
         Plotly.newPlot('sankey-chart', [{
           type: 'sankey',
           orientation: 'h',
-          arrangement: 'snap',
+          arrangement: 'fixed',
           node: {
-            pad: 16, thickness: 20,
+            pad: 14, thickness: 20,
             line: { color: '#fff', width: 0.5 },
             label: sankeyData.nodeLabels, color: sankeyData.nodeColors,
+            x: sankeyData.nodeX, y: sankeyData.nodeY,
             hovertemplate: '<b>%{label}</b><br>%{value:.2f} GW<extra></extra>',
           },
           link: {
