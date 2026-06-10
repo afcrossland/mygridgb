@@ -15,9 +15,6 @@ const NAV_HTML = `
             <li><a href="/last-28-days/index.html">Last 28 Days</a></li>
             <li><a href="/last-12-months/index.html">Last 12 Months</a></li>
             <li><a href="/historicaldata/index.html">Generation History</a></li>
-            <li><a href="/carbon-tracker/index.html">Carbon Tracker</a></li>
-            <li><a href="/gas-tracker/index.html">Gas Tracker</a></li>
-            <li><a href="/coal-tracker/index.html">Coal Tracker</a></li>
           </ul>
         </li>
         <li><a href="/2030grid/index.html">The 2030 Grid</a></li>
@@ -29,7 +26,7 @@ const NAV_HTML = `
             <li><a href="/educational-resources/index.html">Educational Resources</a></li>
           </ul>
         </li>
-        <li><a href="/blog/index.html">Blog</a></li>
+
         <li><a href="/podcast/index.html">In the Media</a></li>
         <li>
           <a href="/about/index.html">About ▾</a>
