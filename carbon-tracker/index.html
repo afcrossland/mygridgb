@@ -6,18 +6,201 @@
   <title>Carbon Tracker — MyGridGB</title>
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .chart-section {
+      margin-bottom: 48px;
+    }
+    .chart-section h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #1a4d7a;
+      margin-bottom: 6px;
+    }
+    .chart-section p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Carbon Tracker</h1>
-    <p class="page-intro">Tracking carbon emissions from British electricity generation.</p>
-    
-    <div class="embed-area">
-      <p>Chart embed to be wired up — paste your Infogram embed code here.</p>
+    <p class="page-intro">Tracking how many hours each year the GB grid runs at or below the government's 2030 clean power target carbon intensity. The more hours at the target, the closer we are to a decarbonised grid.</p>
+
+    <!-- Bar chart: annual hours at target -->
+    <div class="chart-section">
+      <h2>Hours at the 2030 target per year</h2>
+      <p>Total hours in each calendar year when GB electricity carbon intensity met the 2030 target. The count rises as more wind, solar and nuclear displace gas — years with higher renewable output typically score more hours. The most recent year may be incomplete.</p>
+      <div style="position:relative; height:380px;">
+        <canvas id="bar-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Line chart: cumulative hours by month -->
+    <div class="chart-section">
+      <h2>Cumulative hours at the 2030 target — by year</h2>
+      <p>How the cumulative count of hours at the target builds through the year, compared across years since 2016. Steeper lines indicate periods of low-carbon generation — typically high wind and solar months. Comparing years shows how the grid is improving over time.</p>
+      <div style="position:relative; height:420px;">
+        <canvas id="line-chart"></canvas>
+      </div>
     </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
+
+<script>
+(async () => {
+  const BAR_ID  = '1w2bX1YwhPYUOkxayfJtmNIG_SvCj8UDXxzTy5pxZEqM';
+  const LINE_ID = '1ItQ1pZ2JU0itdmcFveTqAtyg0mEyTAR5q54TatkS9D0';
+  const FONT    = "'DM Sans','Segoe UI',Arial,sans-serif";
+
+  async function fetchSheet(id) {
+    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
+    const r = await fetch(url);
+    const t = await r.text();
+    return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
+  }
+
+  const [barResult, lineResult] = await Promise.allSettled([
+    fetchSheet(BAR_ID),
+    fetchSheet(LINE_ID),
+  ]);
+
+  // ── Bar chart ────────────────────────────────────────────────────
+  if (barResult.status === 'fulfilled') {
+    const rows   = barResult.value.rows;
+    const labels = rows.map(r => String(Math.round(r.c[0].v)));
+    const values = rows.map(r => r.c[1]?.v ?? 0);
+    const maxYear = Math.max(...labels.map(Number));
+
+    new Chart(document.getElementById('bar-chart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: labels.map(y =>
+            Number(y) === maxYear ? 'rgba(26,77,122,0.45)' : 'rgba(26,77,122,0.85)'
+          ),
+          borderWidth: 0,
+          categoryPercentage: 0.7,
+          barPercentage: 0.9,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: ctx => ctx[0].label,
+              label: ctx => ` ${ctx.parsed.y.toLocaleString()} hours at target`,
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { family: FONT, size: 12 } },
+            grid: { display: false },
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Hours at 2030 target',
+              font: { family: FONT, size: 12 },
+              color: '#555',
+            },
+            ticks: { font: { family: FONT, size: 11 } },
+            grid: { color: '#eeeeee' },
+          }
+        }
+      }
+    });
+  }
+
+  // ── Line chart ───────────────────────────────────────────────────
+  if (lineResult.status === 'fulfilled') {
+    const rows = lineResult.value.rows;
+
+    // Row 0 = header row: ['Date', 2016, 2017, ..., 2025]
+    const headerRow = rows[0].c.map(c => c?.v ?? '');
+    const years = headerRow.slice(1).map(v => String(Math.round(Number(v))));
+
+    // Rows 1-12 = Jan-Dec data
+    const dataRows = rows.slice(1);
+    const months = dataRows.map(r => r.c[0]?.v ?? '');
+
+    // Palette: older years lighter, most recent bold brand colour
+    const palette = [
+      '#c8ddf0','#aacce8','#8cbade','#6ea8d4','#5096ca',
+      '#3584c0','#1a6faa','#155d8e','#104c74','#1a4d7a',
+    ];
+    const maxYear = Math.max(...years.map(Number));
+
+    const datasets = years.map((year, yi) => ({
+      label: year,
+      data: dataRows.map(r => r.c[yi + 1]?.v ?? null),
+      borderColor: Number(year) === maxYear ? '#1a4d7a' : palette[yi],
+      borderWidth: Number(year) === maxYear ? 2.5 : 1.5,
+      pointRadius: 0,
+      tension: 0.3,
+      fill: false,
+    }));
+
+    new Chart(document.getElementById('line-chart'), {
+      type: 'line',
+      data: { labels: months, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: { family: FONT, size: 12 },
+              padding: 14,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 8,
+              boxHeight: 8,
+            }
+          },
+          tooltip: {
+            mode: 'index',
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString() ?? '—'} hrs`,
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { family: FONT, size: 12 } },
+            grid: { display: false },
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Cumulative hours at target',
+              font: { family: FONT, size: 12 },
+              color: '#555',
+            },
+            ticks: { font: { family: FONT, size: 11 } },
+            grid: { color: '#eeeeee' },
+          }
+        }
+      }
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
