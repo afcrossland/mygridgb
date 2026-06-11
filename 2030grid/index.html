@@ -235,10 +235,28 @@
         <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full — then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
         <p>The assumptions are sufficient to show whether enough low carbon electricity can be generated when it is needed. They are not a complete optimisation of cost or carbon reduction. Demand profiles are not changed.</p>
         <p>The 2030 Blueprint is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
-        <p><strong>How system cost (LCOE) is calculated:</strong> The System LCOE tile shows the average cost of generating one MWh of electricity delivered to the grid, weighted across all sources in the mix. Levelised Cost of Electricity figures are drawn from the DESNZ <em>Electricity Generation Costs 2025</em> report (central estimates, 2030 commissioning year, 2024 real prices). For gas, the 30% load factor estimate (£147/MWh, including fuel and carbon costs) is used — this reflects realistic mid-merit operation in a high-renewables system rather than baseload.</p>
-        <p>Under the 2030 Blueprint, a proportion of wind and solar generation must be curtailed when output exceeds both demand and available storage. Curtailed generation still incurs its full LCOE — the turbines and panels must be built and financed regardless of whether every MWh reaches consumers. The cost of curtailed generation is therefore included in the system total and spread across all electricity actually delivered, which raises the effective LCOE compared with a world where all generation is used. The formula is:</p>
-        <p style="font-family:monospace; background:var(--surface); padding:10px 14px; border-radius:6px; font-size:13px;">System LCOE = (Σ LCOE<sub>i</sub> × GWh<sub>delivered,i</sub> + LCOE<sub>wind</sub> × GWh<sub>curtailed,wind</sub> + LCOE<sub>solar</sub> × GWh<sub>curtailed,solar</sub>) ÷ GWh<sub>delivered,total</sub></p>
-        <p>LCOE values used: Wind (onshore/offshore blend) £80/MWh; Solar PV £60/MWh; Nuclear £140/MWh (based on Hinkley Point C strike price in 2024 prices — DESNZ 2025 did not publish nuclear LCOE due to commercial sensitivity); Gas CCGT £147/MWh; Biomass £120/MWh (approximate, based on CfD strike prices; not in DESNZ 2025); Large Hydro £60/MWh; Battery storage £90/MWh. Hover over the System LCOE tile to see the per-source cost breakdown.</p>
+        <div style="display:none">
+        <p><strong>How system cost (LCOE) is calculated</strong></p>
+        <p>The System LCOE tile shows the average cost of generating one megawatt-hour of electricity delivered to consumers, weighted across all sources in the mix. It answers the question: if you had to pay for every asset in today's (or tomorrow's) grid, what would each delivered MWh cost on average?</p>
+        <p>Levelised Cost of Electricity (LCOE) figures come from the DESNZ <em>Electricity Generation Costs 2025</em> report, central estimates for a 2030 commissioning year in 2024 real prices (Annex A). Values used:</p>
+        <ul>
+          <li><strong>Wind (onshore/offshore blend):</strong> £80/MWh</li>
+          <li><strong>Solar PV:</strong> £60/MWh</li>
+          <li><strong>Gas CCGT:</strong> load-factor dependent — see below</li>
+          <li><strong>Biomass:</strong> £120/MWh (approximate; based on CfD strike prices; not in DESNZ 2025)</li>
+          <li><strong>Large Hydro:</strong> £60/MWh (existing fleet estimate)</li>
+          <li><strong>Battery storage:</strong> £90/MWh (capital + O&M, per MWh dispatched)</li>
+          <li><strong>Imports:</strong> £100/MWh (approximate average interconnector cost)</li>
+          <li><strong>Nuclear:</strong> excluded — see below</li>
+        </ul>
+        <p><strong>Gas LCOE is load-factor dependent.</strong> A gas plant's fixed capital and fixed O&M costs are spread over however many hours it actually runs — so a plant running 5% of the time has a far higher cost per MWh than one running at 90%. The formula is calibrated from three DESNZ 2025 Annex A data points for a CCGT at 2030 commissioning:</p>
+        <p style="font-family:monospace; background:var(--surface); padding:10px 14px; border-radius:6px; font-size:13px;">LCOE<sub>gas</sub> = 16.74 / LF + 104 &nbsp;&nbsp;(£/MWh, LF = load factor 0–1)</p>
+        <p>The fixed term (16.74) represents annualised capital and fixed O&M. The variable term (£104/MWh) covers fuel (£58/MWh, based on the 5-year average UK NBP gas price of ~94p/therm for 2020–2024 — which includes the 2022 energy crisis spike), carbon (£41/MWh at prevailing ETS prices), and variable O&M (£5/MWh). In today's grid, gas typically runs at 15–35% load factor in a 28-day window, giving ~£150–200/MWh. In the Blueprint, gas falls to 4–6% load factor, driving its LCOE above £380/MWh — though it contributes only a small share of the total mix.</p>
+        <p><strong>Curtailment cost.</strong> The Blueprint mix simulation gives total generated output for wind and solar (pre-curtailment). Not all of this reaches consumers: a fraction is delivered directly, a fraction passes through storage, and the remainder is curtailed. The curtailment breakdown comes from a separate model sheet. Wind and solar turbines and panels must be built and financed regardless of what happens to each MWh, so the full generation cost is included in the numerator. Only electricity actually delivered to consumers appears in the denominator:</p>
+        <p style="font-family:monospace; background:var(--surface); padding:10px 14px; border-radius:6px; font-size:13px;">System LCOE = Σ(LCOE<sub>i</sub> × GWh<sub>generated,i</sub>) ÷ Σ(GWh<sub>delivered,i</sub>)<br><br>where for wind &amp; solar: GWh<sub>delivered</sub> = GWh<sub>generated</sub> × direct<sub>fraction</sub><br>and for all other sources: GWh<sub>delivered</sub> = GWh<sub>generated</sub></p>
+        <p>For example, if wind generates 28,000 GWh but only 71% reaches consumers directly (with 4% via storage and 25% curtailed), the cost is calculated on 28,000 GWh but only 20,000 GWh counts as delivered. The via-storage portion appears separately in the storage row.</p>
+        <p><strong>Nuclear is excluded</strong> from this comparison. Today's fleet is largely amortised — its effective running cost is well below £50/MWh — while new-build nuclear (Hinkley Point C) carries a strike price of around £140/MWh. Applying the same LCOE figure to both scenarios would either overstate today's cost or understate the Blueprint's. Excluding nuclear keeps the comparison honest; the LCOE tile reflects only the non-nuclear generating mix.</p>
+        </div>
       </div>
     </details>
 
@@ -330,10 +348,9 @@
 
   // ── LCOE per source (£/MWh, 2024 prices, DESNZ Electricity Generation Costs 2025) ──
   const LCOE_RATES = {
-    Nuclear:       140,  // HPC strike price proxy; not published in DESNZ 2025 (commercially confidential)
+    // Nuclear excluded from system LCOE: comparing amortised existing fleet with new-build HPC cost is misleading
     Wind:           80,  // Blend of onshore £58 + offshore £103; DESNZ 2025, 2030 commissioning
     Solar:          60,  // DESNZ 2025, 2030 commissioning
-    Gas:           147,  // 30% load factor, includes fuel + carbon; DESNZ 2025
     Biomass:       120,  // Approximate; based on CfD strike prices; not in DESNZ 2025
     'Large Hydro':  60,  // Existing fleet estimate
     Storage:        90,  // Approximate BESS capital + O&M
@@ -341,36 +358,65 @@
     Coal:          220,  // Historical + high ETS carbon costs
   };
 
+  // Gas LCOE is load-factor dependent — derived from DESNZ 2025 Annex A (2030 commissioning):
+  //   5% LF → £424/MWh, 30% LF → £147/MWh, 93% LF → £111/MWh
+  // Structure: fixed_capital/LF + variable (fuel+carbon) where variable ≈ £104/MWh
+  // Variable updated to reflect 5-yr avg UK NBP ~94p/therm (2020-2024, includes 2022 crisis):
+  //   fuel ~£58/MWh + carbon £41 + O&M £5 = £104 (vs DESNZ central £91 based on 75p/therm)
+  // Formula: LCOE = 16.74 / LF + 104  (fits DESNZ shape; variable scaled to 5-yr avg gas price)
+  const GAS_CAPACITY_GW = 35;  // approximate GB gas fleet (CCGT + OCGT)
+  const WINDOW_HOURS    = 28 * 24;
+
+  function gasLcoeFromRow(row) {
+    const src = MIX_SOURCES.find(s => s.label === 'Gas');
+    const gwh = src ? (row.c[src.col]?.v ?? 0) : 0;
+    if (gwh <= 0) return 160;  // fallback: ~30% LF with updated formula
+    const lf  = Math.max(0.01, gwh / (GAS_CAPACITY_GW * WINDOW_HOURS));
+    return Math.round(16.74 / lf + 104);
+  }
+
   function calcSystemLCOE(row, curtailRows, isBlueprint) {
     let totalCost = 0, totalGWh = 0;
     const breakdown = [];
+    const gasRate = gasLcoeFromRow(row);
+    const rates   = { ...LCOE_RATES, Gas: gasRate };
 
-    MIX_SOURCES.forEach(src => {
-      const gwh  = row.c[src.col]?.v ?? 0;
-      if (gwh <= 0) return;
-      const rate = LCOE_RATES[src.label] ?? 100;
-      totalCost += gwh * rate;
-      totalGWh  += gwh;
-      breakdown.push({ label: src.label, gwh, rate, curtailed: false });
-    });
-
+    // Build curtailment lookup: label → { directFrac, storageFrac, curtailFrac }
+    // Mix sheet Wind/Solar in Blueprint = total generated (pre-curtailment)
+    // directFrac gives the share actually delivered; multiply to get delivered GWh
+    const curtailMap = {};
     if (isBlueprint && curtailRows) {
       curtailRows.forEach(r => {
-        const label       = r.c[0]?.v;
-        const directFrac  = r.c[1]?.v ?? 0;
-        const storageFrac = r.c[2]?.v ?? 0;
-        const curtailFrac = r.c[3]?.v ?? 0;
-        const delivFrac   = directFrac + storageFrac;
-        if (delivFrac <= 0 || curtailFrac <= 0) return;
-        const src = MIX_SOURCES.find(s => s.label === label);
-        if (!src) return;
-        const delivGWh    = row.c[src.col]?.v ?? 0;
-        const curtailGWh  = delivGWh * curtailFrac / delivFrac;
-        const rate        = LCOE_RATES[label] ?? 80;
-        totalCost += curtailGWh * rate;
-        breakdown.push({ label: `${label} curtailed`, gwh: curtailGWh, rate, curtailed: true });
+        const label = r.c[0]?.v;
+        if (label) curtailMap[label] = {
+          directFrac:  r.c[1]?.v ?? 0,
+          storageFrac: r.c[2]?.v ?? 0,
+          curtailFrac: r.c[3]?.v ?? 0,
+        };
       });
     }
+
+    MIX_SOURCES.forEach(src => {
+      if (src.label === 'Nuclear') return;  // excluded: unfair to compare amortised fleet with new-build cost
+      const sheetGwh = row.c[src.col]?.v ?? 0;
+      if (sheetGwh <= 0) return;
+      const rate = rates[src.label] ?? 100;
+
+      const cd = curtailMap[src.label];
+      if (cd && cd.directFrac > 0) {
+        // Sheet value = total generated (pre-curtailment); direct delivery = total × directFrac
+        const totalGenerated  = sheetGwh;
+        const directDelivered = totalGenerated * cd.directFrac;
+        totalCost += totalGenerated * rate;   // pay for all generated, including curtailed
+        totalGWh  += directDelivered;         // denominator = direct delivery only
+        breakdown.push({ label: src.label, totalGwh: totalGenerated, gwh: directDelivered, rate, hasCurtail: true,
+                         storageFrac: cd.storageFrac, curtailFrac: cd.curtailFrac, directFrac: cd.directFrac });
+      } else {
+        totalCost += sheetGwh * rate;
+        totalGWh  += sheetGwh;
+        breakdown.push({ label: src.label, gwh: sheetGwh, rate, hasCurtail: false });
+      }
+    });
 
     const lcoe = totalGWh > 0 ? Math.round(totalCost / totalGWh) : 0;
     return { lcoe, breakdown, totalGWh };
@@ -380,11 +426,13 @@
     const { breakdown, totalGWh, lcoe } = result;
     const lines = [`${label}:`];
     breakdown.forEach(b => {
-      const sharePct = totalGWh > 0 ? Math.round(b.gwh / totalGWh * 100) : 0;
-      const contrib  = totalGWh > 0 ? Math.round(b.gwh * b.rate / totalGWh) : 0;
-      if (b.curtailed) {
-        lines.push(`  ${b.label}: +£${contrib}/MWh`);
+      const sharePct   = totalGWh > 0 ? Math.round(b.gwh / totalGWh * 100) : 0;
+      if (b.hasCurtail) {
+        const totalGen   = b.totalGwh;
+        const contrib    = totalGWh > 0 ? Math.round(totalGen * b.rate / totalGWh) : 0;
+        lines.push(`  ${b.label}: ${sharePct}% delivered + ${Math.round(b.storageFrac*100)}% storage + ${Math.round(b.curtailFrac*100)}% curtailed × £${b.rate} = £${contrib}/MWh`);
       } else {
+        const contrib = totalGWh > 0 ? Math.round(b.gwh * b.rate / totalGWh) : 0;
         lines.push(`  ${b.label}: ${sharePct}% × £${b.rate} = £${contrib}/MWh`);
       }
     });
