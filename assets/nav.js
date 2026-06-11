@@ -18,7 +18,7 @@ const NAV_HTML = `
             <li><a href="/carbon-tracker/index.html">Carbon Tracker</a></li>
           </ul>
         </li>
-        <li><a href="/2030grid/index.html">The 2030 Grid</a></li>
+        <li><a href="/2030grid/index.html">The 2030 Blueprint</a></li>
         <li>
           <a href="/map/index.html">Resources ▾</a>
           <ul>

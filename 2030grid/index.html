@@ -183,7 +183,7 @@
 <div class="page-wrap">
   <main>
     <h1 class="page-title">The 2030 Grid</h1>
-    <p class="page-intro">A simulation of what Britain's electricity could look like in 2030 — running in real time against today's actual weather and demand data. This is my manifesto for a net-zero electricity system, going beyond government and NESO targets.</p>
+    <p class="page-intro">A simulation of what Britain's electricity could look like in 2030 — running in real time against today's actual weather and demand data. This is the 2030 Blueprint: a scenario for a net-zero electricity system that goes beyond government and NESO targets.</p>
 
     <!-- Comparison stat strip (populated by JS) -->
     <div class="compare-strip" id="compare-strip"></div>
@@ -192,7 +192,7 @@
     <details class="manifesto-details" style="margin-bottom:36px;">
       <summary class="manifesto-summary">
         <span class="toggle-icon">▶</span>
-        How the manifesto works
+        How the 2030 Blueprint works
       </summary>
       <div class="manifesto-body">
         <p>To decarbonise electricity I've made the following changes to the electricity mix:</p>
@@ -206,11 +206,13 @@
         </ul>
         <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full — then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
         <p>The assumptions are sufficient to show whether enough low carbon electricity can be generated when it is needed. They are not a complete optimisation of cost or carbon reduction. Demand profiles are not changed.</p>
-        <p>The manifesto is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
+        <p>The 2030 Blueprint is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
       </div>
     </details>
 
     <!-- Side-by-side mix comparison -->
+    <h2 class="section-h2">Today vs the 2030 Blueprint</h2>
+    <p class="section-p">The right-hand pie shows a simulation of what the 2030 Blueprint electricity mix would have looked like over the last 28 days — using actual weather and demand data, but with the Blueprint's generating capacity in place. The left shows what actually happened.</p>
     <div class="compare-mix">
       <div>
         <div class="compare-panel-title compare-panel-title--now">Today's Grid</div>
@@ -219,22 +221,22 @@
       </div>
       <div class="compare-arrow-col">→</div>
       <div>
-        <div class="compare-panel-title compare-panel-title--manifesto">2030 Manifesto</div>
+        <div class="compare-panel-title compare-panel-title--manifesto">2030 Blueprint</div>
         <div class="pie-col"><canvas id="pie-manifesto"></canvas></div>
         <div class="fuel-list" id="fuel-manifesto"></div>
       </div>
     </div>
 
     <!-- Timeseries -->
-    <h2 class="section-h2">The 2030 Manifesto in action</h2>
-    <p class="section-p">The simulation runs the manifesto mix against real-time weather and demand data, showing how an expanded fleet of wind, solar, nuclear and storage would actually perform. Gas almost disappears; storage charges during sunny and windy periods and discharges at night; curtailment rises when renewables generate more than demand and storage can absorb.</p>
+    <h2 class="section-h2">The 2030 Blueprint in action</h2>
+    <p class="section-p">The simulation runs the 2030 Blueprint mix against real-time weather and demand data, showing how an expanded fleet of wind, solar, nuclear and storage would actually perform. Gas almost disappears; storage charges during sunny and windy periods and discharges at night; curtailment rises when renewables generate more than demand and storage can absorb.</p>
     <div style="position:relative; height:420px;">
       <canvas id="timeseries-chart"></canvas>
     </div>
 
     <!-- Curtailment -->
     <h2 class="section-h2">Renewable curtailment</h2>
-    <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed — switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 manifesto.</p>
+    <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed — switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 Blueprint.</p>
     <div style="position:relative; height:160px;">
       <canvas id="curtailment-chart"></canvas>
     </div>
