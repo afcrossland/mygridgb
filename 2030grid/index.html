@@ -25,7 +25,7 @@
     /* ── Comparison stat strip ── */
     .compare-strip {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       margin: 28px 0 36px;
     }
@@ -194,11 +194,8 @@
     .manifesto-body ul { margin: 0 0 14px 20px; font-size: 14px; line-height: 1.9; color: var(--text); }
     .manifesto-body a { color: var(--brand); }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 900px) {
       .compare-strip { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 600px) {
-      .compare-strip { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 760px) {
       .compare-strip { grid-template-columns: repeat(2, 1fr); }
