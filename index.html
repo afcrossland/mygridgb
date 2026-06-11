@@ -343,6 +343,14 @@
       </div>
     </section>
 
+    <section style="margin:32px 0;">
+      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:6px;">The last 7 days</h2>
+      <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Hourly electricity generation over the past week. Watch renewables rise and fall with the weather while gas fills the gaps.</p>
+      <div style="position:relative; height:300px;">
+        <canvas id="week-chart"></canvas>
+      </div>
+    </section>
+
     <h2 style="margin: 32px 0 16px; font-size:1.3rem;">Latest Blogs</h2>
 
     <div class="blog-grid">
@@ -743,6 +751,85 @@
 
   tick();
   setInterval(tick, 1000);
+})();
+
+// ── Last 7 days stacked area ─────────────────────────────────────
+(async () => {
+  const STACK_ID = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
+  const FONT = "'DM Sans','Segoe UI',Arial,sans-serif";
+
+  const PALETTE = {
+    'Nuclear':       '#59d600', 'Biomass':       '#824e1a',
+    'Large Hydro':   '#001cf4', 'Onshore Wind':  '#0d9e6e',
+    'Offshore Wind': '#0b7a56', 'Solar':         '#ede310',
+    'Imports':       '#7100e2', 'Coal':          '#3d3d3d',
+    'Gas':           '#2f82d6', 'Storage':       '#f96c00',
+  };
+  const STACK_SOURCES = [
+    'Nuclear','Biomass','Large Hydro','Onshore Wind',
+    'Offshore Wind','Solar','Imports','Coal','Gas','Storage',
+  ];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function parseGDate(s) {
+    const m = String(s).match(/Date\((\d+),(\d+),(\d+)\)/);
+    return m ? new Date(+m[1], +m[2], +m[3]) : null;
+  }
+  function fmtDate(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${STACK_ID}/gviz/tq?tqx=out:json&gid=0`;
+    const t = await (await fetch(url)).text();
+    const allRows = JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table.rows;
+    const valid = allRows.filter(r => r.c.slice(1).some(c => c && c.v != null));
+    const rows = valid.slice(-168); // last 7 days (168 hours)
+
+    const labels = rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
+    const datasets = STACK_SOURCES.map((name, i) => ({
+      label: name,
+      data: rows.map(r => r.c[i + 1]?.v ?? null),
+      backgroundColor: PALETTE[name],
+      borderColor: PALETTE[name],
+      borderWidth: 0.5,
+      fill: true,
+      pointRadius: 0,
+      tension: 0.2,
+    }));
+
+    new Chart(document.getElementById('week-chart'), {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index',
+            callbacks: { label: ctx => ctx.parsed.y != null ? ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} GW` : null }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: {
+              font: { family: FONT, size: 10 },
+              maxTicksLimit: 14,
+              maxRotation: 0,
+            },
+            grid: { display: false }
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            title: { display: true, text: 'GW', font: { family: FONT, size: 11 }, color: '#555' },
+            ticks: { font: { family: FONT, size: 10 } },
+            grid: { color: '#eeeeee' }
+          }
+        }
+      }
+    });
+  } catch (e) { console.error('Week chart error:', e); }
 })();
 </script>
 
