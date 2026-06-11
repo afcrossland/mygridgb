@@ -67,13 +67,13 @@
   const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
   const SOURCES = [
-    { label: 'Nuclear',     color: '#59d600', col: 1 },
+    { label: 'Nuclear',     color: '#4ade80', col: 1 },
     { label: 'Biomass',     color: '#824e1a', col: 2 },
     { label: 'Wind',        color: '#0d9e6e', col: 3 },
-    { label: 'Solar',       color: '#ede310', col: 4 },
-    { label: 'Large Hydro', color: '#001cf4', col: 5 },
-    { label: 'Coal',        color: '#3d3d3d', col: 6 },
-    { label: 'Gas',         color: '#2f82d6', col: 7 },
+    { label: 'Solar',       color: '#f59e0b', col: 4 },
+    { label: 'Large Hydro', color: '#3b82f6', col: 5 },
+    { label: 'Coal',        color: '#111827', col: 6 },
+    { label: 'Gas',         color: '#6b7280', col: 7 },
     { label: 'Imports',     color: '#7100e2', col: 8 },
   ];
 
@@ -157,13 +157,13 @@
   const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
 
   const SOURCES = [
-    { label: 'Nuclear',     color: '#59d600', col: 1 },
+    { label: 'Nuclear',     color: '#4ade80', col: 1 },
     { label: 'Biomass',     color: '#824e1a', col: 2 },
     { label: 'Wind',        color: '#0d9e6e', col: 3 },
-    { label: 'Solar',       color: '#ede310', col: 4 },
-    { label: 'Large Hydro', color: '#001cf4', col: 5 },
-    { label: 'Coal',        color: '#3d3d3d', col: 6 },
-    { label: 'Gas',         color: '#2f82d6', col: 7 },
+    { label: 'Solar',       color: '#f59e0b', col: 4 },
+    { label: 'Large Hydro', color: '#3b82f6', col: 5 },
+    { label: 'Coal',        color: '#111827', col: 6 },
+    { label: 'Gas',         color: '#6b7280', col: 7 },
     { label: 'Imports',     color: '#7100e2', col: 8 },
   ];
 
@@ -254,7 +254,7 @@
     const labels  = rows.map(r => String(r.c[1]?.v ?? '').match(/(\d{4})/)?.[1] ?? '');
     const values  = rows.map(r => parseFloat(r.c[0]?.v ?? 0));
     const partial = rows.map(r => String(r.c[1]?.v ?? '').includes('so far'));
-    const colors  = rows.map((_, i) => partial[i] ? '#9E9E9E' : '#3d3d3d');
+    const colors  = rows.map((_, i) => partial[i] ? '#9E9E9E' : '#111827');
 
     new Chart(document.getElementById('carbon-emissions-chart'), {
       type: 'bar',

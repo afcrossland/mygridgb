@@ -255,27 +255,27 @@
 
   // Sources as they appear in Sheet A (mix comparison)
   const MIX_SOURCES = [
-    { label: 'Nuclear',     col: 1, color: '#59d600', carbon: 12,  lowCarbon: true,  renewable: false },
+    { label: 'Nuclear',     col: 1, color: '#4ade80', carbon: 12,  lowCarbon: true,  renewable: false },
     { label: 'Biomass',     col: 2, color: '#824e1a', carbon: 230, lowCarbon: true,  renewable: false },
     { label: 'Wind',        col: 3, color: '#0d9e6e', carbon: 12,  lowCarbon: true,  renewable: true  },
-    { label: 'Solar',       col: 4, color: '#ede310', carbon: 44,  lowCarbon: true,  renewable: true  },
-    { label: 'Gas',         col: 5, color: '#2f82d6', carbon: 490, lowCarbon: false, renewable: false },
+    { label: 'Solar',       col: 4, color: '#f59e0b', carbon: 44,  lowCarbon: true,  renewable: true  },
+    { label: 'Gas',         col: 5, color: '#6b7280', carbon: 490, lowCarbon: false, renewable: false },
     { label: 'Storage',     col: 6, color: '#f96c00', carbon: 24,  lowCarbon: true,  renewable: false },
-    { label: 'Large Hydro', col: 7, color: '#001cf4', carbon: 24,  lowCarbon: true,  renewable: true  },
+    { label: 'Large Hydro', col: 7, color: '#3b82f6', carbon: 24,  lowCarbon: true,  renewable: true  },
     { label: 'Imports',     col: 8, color: '#7100e2', carbon: 300, lowCarbon: false, renewable: false },
-    { label: 'Coal',        col: 9, color: '#3d3d3d', carbon: 820, lowCarbon: false, renewable: false },
+    { label: 'Coal',        col: 9, color: '#111827', carbon: 820, lowCarbon: false, renewable: false },
   ];
 
   // Sources as they appear in Sheet C (timeseries)
   const TIME_SOURCES = [
-    { label: 'Nuclear',     col: 1, color: '#59d600' },
-    { label: 'Large Hydro', col: 2, color: '#001cf4' },
-    { label: 'Solar',       col: 3, color: '#ede310' },
+    { label: 'Nuclear',     col: 1, color: '#4ade80' },
+    { label: 'Large Hydro', col: 2, color: '#3b82f6' },
+    { label: 'Solar',       col: 3, color: '#f59e0b' },
     { label: 'Wind',        col: 4, color: '#0d9e6e' },
     { label: 'Biomass',     col: 5, color: '#824e1a' },
     { label: 'Storage',     col: 6, color: '#f96c00' },
     { label: 'Imports',     col: 7, color: '#7100e2' },
-    { label: 'Gas',         col: 8, color: '#2f82d6' },
+    { label: 'Gas',         col: 8, color: '#6b7280' },
   ];
 
   async function fetchTable(id, gid) {
@@ -483,7 +483,7 @@
       data: {
         labels,
         datasets: [
-          { label: 'Delivered direct',  data: rows.map(r => r.c[1]?.v ?? 0), backgroundColor: '#59d600' },
+          { label: 'Delivered direct',  data: rows.map(r => r.c[1]?.v ?? 0), backgroundColor: '#4ade80' },
           { label: 'Via storage',       data: rows.map(r => r.c[2]?.v ?? 0), backgroundColor: '#f96c00' },
           { label: 'Curtailed',         data: rows.map(r => r.c[3]?.v ?? 0), backgroundColor: '#e2e8f0' },
         ]

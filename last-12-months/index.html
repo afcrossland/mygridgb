@@ -118,14 +118,14 @@
   const CARBON_ID = '1M7mmIpZuKLk2GyRSfsRhQgTQiZoGnLI3P5HRiQWxGoc';
 
   const PALETTE = {
-    'Nuclear':     '#59d600',
+    'Nuclear':     '#4ade80',
     'Biomass':     '#824e1a',
     'Wind':        '#0d9e6e',
-    'Solar':       '#ede310',
-    'Coal':        '#3d3d3d',
-    'Gas':         '#2f82d6',
+    'Solar':       '#f59e0b',
+    'Coal':        '#111827',
+    'Gas':         '#6b7280',
     'Storage':     '#f96c00',
-    'Large Hydro': '#001cf4',
+    'Large Hydro': '#3b82f6',
     'Imports':     '#7100e2',
   };
 
@@ -280,7 +280,7 @@
       labels: carbonInit.map(r => r.c[0].v),
       datasets: [{
         data: carbonInit.map(r => r.c[1]?.v ?? 0),
-        backgroundColor: '#3d3d3d',
+        backgroundColor: '#111827',
         borderWidth: 0,
         categoryPercentage: 0.75,
         barPercentage: 0.85,
