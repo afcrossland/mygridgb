@@ -461,9 +461,10 @@
         now: actual.gasPct, after: manifesto.gasPct, nowGood: false },
       { label: 'Thermal Losses',   suffix: '<span class="compare-val-sfx">%</span>', unit: '% of input energy',
         now: actual.thermalLossPct, after: manifesto.thermalLossPct, nowGood: false },
-      { label: 'System LCOE', prefix: '£', suffix: '<span class="compare-val-sfx"> /MWh</span>',
-        unit: '£/MWh delivered • hover for breakdown',
-        now: actualLcoe.lcoe, after: manifestoLcoe.lcoe, nowGood: false, tip: lcoeTip },
+      // System LCOE tile — hidden for now; keep calc code above
+      // { label: 'System LCOE', prefix: '£', suffix: '<span class="compare-val-sfx"> /MWh</span>',
+      //   unit: '£/MWh delivered • hover for breakdown',
+      //   now: actualLcoe.lcoe, after: manifestoLcoe.lcoe, nowGood: false, tip: lcoeTip },
     ];
 
     metrics.forEach(m => {
