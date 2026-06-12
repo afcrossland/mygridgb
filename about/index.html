@@ -139,6 +139,39 @@
       <p>MyGridGB ran a petition calling for solar panels on all new homes built in the UK. The petition did not reach its target, but the case for rooftop solar in new builds remains strong.</p>
     </div>
 
+    <div class="about-section" id="lcoe-methodology">
+      <h2>System Cost (LCOE) Methodology</h2>
+      <p>The <a href="../2030grid/index.html">2030 Blueprint</a> page shows the average cost of generating one megawatt-hour of electricity delivered to consumers — a System Levelised Cost of Electricity (LCOE). This answers: if you had to pay for every asset in today's (or tomorrow's) grid, what would each delivered MWh cost on average?</p>
+      <p>LCOE figures are drawn from the DESNZ <em>Electricity Generation Costs 2025</em> report, central estimates for a 2030 commissioning year in 2024 real prices (Annex A).</p>
+      <table class="carbon-table">
+        <thead>
+          <tr>
+            <th>Technology</th>
+            <th>LCOE (£/MWh)</th>
+            <th>Source / Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Wind (onshore/offshore blend)</td><td style="text-align:right">80</td><td>DESNZ 2025; onshore £58, offshore £103; 2030 commissioning</td></tr>
+          <tr><td>Solar PV</td><td style="text-align:right">60</td><td>DESNZ 2025; 2030 commissioning</td></tr>
+          <tr><td>Gas CCGT</td><td style="text-align:right">load-factor dependent</td><td>See formula below; capped at £250/MWh</td></tr>
+          <tr><td>Biomass</td><td style="text-align:right">120</td><td>Approximate; based on CfD strike prices; not in DESNZ 2025</td></tr>
+          <tr><td>Large Hydro</td><td style="text-align:right">60</td><td>Existing fleet estimate</td></tr>
+          <tr><td>Battery storage</td><td style="text-align:right">90</td><td>Approximate BESS capital + O&amp;M, per MWh dispatched</td></tr>
+          <tr><td>Imports</td><td style="text-align:right">100</td><td>Approximate average interconnector cost</td></tr>
+          <tr><td>Nuclear</td><td style="text-align:right">excluded</td><td>See note below</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Gas LCOE is load-factor dependent.</strong> A gas plant's fixed capital costs are spread over however many hours it runs — a plant running 5% of the time costs far more per MWh than one running at 90%. The formula is calibrated from DESNZ 2025 Annex A data points for a CCGT at 2030 commissioning:</p>
+      <p style="font-family:monospace; background:var(--bg); padding:10px 14px; border-radius:6px; font-size:13px; border:1px solid var(--border);">LCOE<sub>gas</sub> = 16.74 / LF + 104 &nbsp;&nbsp;(£/MWh, LF = load factor 0–1, capped at £250)</p>
+      <p>The variable component (£104/MWh) covers fuel at £58/MWh — based on the 5-year average UK NBP gas price of approximately 94p/therm for 2020–2024, which includes the 2022 energy crisis — plus carbon costs of £41/MWh and variable O&amp;M of £5/MWh. The cap of £250/MWh reflects that by 2030, capacity markets, battery storage, and fuel flexibility will prevent purely theoretical scarcity pricing for rarely-used gas peakers.</p>
+      <p><strong>Curtailment cost.</strong> Under the Blueprint, some wind and solar generation is curtailed when output exceeds both demand and available storage capacity. Those turbines and panels still have to be built and financed, so the full generation cost is included even for curtailed MWh — spread across electricity actually delivered to consumers:</p>
+      <p style="font-family:monospace; background:var(--bg); padding:10px 14px; border-radius:6px; font-size:13px; border:1px solid var(--border);">System LCOE = Σ(LCOE<sub>i</sub> × GWh<sub>generated,i</sub>) ÷ Σ(GWh<sub>delivered,i</sub>)</p>
+      <p>The Blueprint simulation gives direct delivery figures for wind and solar. These are scaled up to total generated using the curtailment model (dividing by the direct-delivery fraction), so the cost numerator captures all generation including the curtailed portion.</p>
+      <p><strong>Useful curtailment.</strong> The third LCOE figure assumes that 50% of curtailed renewable energy is usefully consumed — for example, charging electric vehicles, running heat pumps, or producing green hydrogen — rather than being wasted entirely. Since those MWh are already paid for (the turbines exist regardless), every curtailed electron that finds a use reduces the average cost per useful MWh. This scenario is important in the context of decarbonisation: using low-carbon curtailed electricity to power vehicles displaces petrol and diesel, compounding the carbon benefit beyond the electricity sector.</p>
+      <p><strong>Nuclear is excluded</strong> from this comparison. Today's fleet is largely amortised — its effective running cost is well below £50/MWh — while new-build nuclear (Hinkley Point C) carries a strike price of around £140/MWh. Applying the same LCOE figure to both scenarios would either overstate today's cost or understate the Blueprint's. Excluding nuclear keeps the comparison honest; the LCOE tile reflects only the non-nuclear generating mix.</p>
+    </div>
+
     <div class="about-section">
       <h2>Funding</h2>
       <p>MyGridGB is mostly funded through my own pocket and via kind donations.</p>
