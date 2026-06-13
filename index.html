@@ -235,6 +235,78 @@
       .mix-layout { grid-template-columns: 1fr; }
     }
 
+    /* ── Blueprint promo card ── */
+    .blueprint-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 28px;
+      margin: 36px 0;
+      padding: 32px 36px;
+      background: linear-gradient(135deg, #0f2e4d 0%, #1a4d7a 100%);
+      border-radius: 12px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .blueprint-card:hover { opacity: .94; text-decoration: none; }
+    .blueprint-card-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #7dd3fc;
+      margin-bottom: 8px;
+    }
+    .blueprint-card-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+    .blueprint-card-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,.75);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+    .blueprint-card-stats {
+      display: flex;
+      gap: 28px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .blueprint-stat-val {
+      font-size: 2rem;
+      font-weight: 300;
+      color: #4ade80;
+      line-height: 1;
+    }
+    .blueprint-stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,.6);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .blueprint-card-cta {
+      display: inline-block;
+      padding: 12px 28px;
+      background: #4ade80;
+      color: #0f2e4d;
+      border-radius: 24px;
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .blueprint-card { grid-template-columns: 1fr; }
+      .blueprint-card-cta { display: none; }
+      .blueprint-card-desc { display: block; }
+    }
+
     @media (max-width: 1100px) {
       .stat-strip { grid-template-columns: repeat(3, 1fr); }
     }
@@ -425,6 +497,29 @@
         </div>
       </div>
     </section>
+
+    <a href="/2030grid/index.html" class="blueprint-card">
+      <div>
+        <div class="blueprint-card-eyebrow">Simulation</div>
+        <div class="blueprint-card-title">The 2030 Blueprint</div>
+        <div class="blueprint-card-desc">What would Britain's electricity look like if we hit the 2030 clean power target? Running against today's real weather and demand, the Blueprint replaces gas with wind, solar and storage — and shows the cost of getting there.</div>
+        <div class="blueprint-card-stats">
+          <div>
+            <div class="blueprint-stat-val">3×</div>
+            <div class="blueprint-stat-label">more wind &amp; solar</div>
+          </div>
+          <div>
+            <div class="blueprint-stat-val">~90%</div>
+            <div class="blueprint-stat-label">low-carbon electricity</div>
+          </div>
+          <div>
+            <div class="blueprint-stat-val">&lt;100g</div>
+            <div class="blueprint-stat-label">CO₂ per kWh</div>
+          </div>
+        </div>
+      </div>
+      <div class="blueprint-card-cta">Explore the Blueprint →</div>
+    </a>
 
     <h2 style="margin: 32px 0 16px; font-size:1.3rem;">Latest Blogs</h2>
 
