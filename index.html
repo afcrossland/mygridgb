@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MyGridGB — Decarbonisation of British Electricity</title>
   <meta name="description" content="The independent resource charting in real time the decarbonisation of British electricity.">
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://www.mygridgb.co.uk/">
+  <meta property="og:title"       content="MyGridGB — Decarbonisation of British Electricity">
+  <meta property="og:description" content="The independent resource charting in real time the decarbonisation of British electricity.">
+  <meta property="og:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:site"        content="@mygridgb">
+  <meta name="twitter:title"       content="MyGridGB — Decarbonisation of British Electricity">
+  <meta name="twitter:description" content="The independent resource charting in real time the decarbonisation of British electricity.">
+  <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/nav.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -297,8 +309,16 @@
     </section>
 
     <section style="margin:32px 0;">
-      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">From fuel to power</h2>
-      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. Once electricity reaches the grid, a further 6% is lost in transmission. The diagram below traces every unit of energy from input fuel to delivered electricity, in real time.</p>
+      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:6px;">The last 7 days</h2>
+      <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Hourly electricity generation over the past week. Watch renewables rise and fall with the weather while gas fills the gaps.</p>
+      <div style="position:relative; height:300px;">
+        <canvas id="week-chart"></canvas>
+      </div>
+    </section>
+
+    <section style="margin:32px 0;">
+      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">Conversion &amp; grid losses</h2>
+      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram traces every unit of energy from source to delivered electricity, in real time.</p>
       <div id="sankey-chart" style="height:500px; width:100%;"></div>
     </section>
 
@@ -340,14 +360,6 @@
           <div class="countdown-num" id="cd-seconds">—</div>
           <div class="countdown-label">Seconds</div>
         </div>
-      </div>
-    </section>
-
-    <section style="margin:32px 0;">
-      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:6px;">The last 7 days</h2>
-      <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Hourly electricity generation over the past week. Watch renewables rise and fall with the weather while gas fills the gaps.</p>
-      <div style="position:relative; height:300px;">
-        <canvas id="week-chart"></canvas>
       </div>
     </section>
 

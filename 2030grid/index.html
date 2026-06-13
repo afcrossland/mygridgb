@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The 2030 Grid — MyGridGB</title>
+  <title>The 2030 Blueprint — MyGridGB</title>
+  <meta name="description" content="A real-time simulation of Britain's electricity in 2030 — running against today's actual weather and demand data.">
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://www.mygridgb.co.uk/2030grid/">
+  <meta property="og:title"       content="The 2030 Blueprint — MyGridGB">
+  <meta property="og:description" content="A real-time simulation of Britain's electricity in 2030 — running against today's actual weather and demand data.">
+  <meta property="og:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:site"        content="@mygridgb">
+  <meta name="twitter:title"       content="The 2030 Blueprint — MyGridGB">
+  <meta name="twitter:description" content="A real-time simulation of Britain's electricity in 2030 — running against today's actual weather and demand data.">
+  <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -217,6 +230,17 @@
     .manifesto-body ul { margin: 0 0 14px 20px; font-size: 14px; line-height: 1.9; color: var(--text); }
     .manifesto-body a { color: var(--brand); }
 
+    /* ── Tile "was X" secondary line ── */
+    .compare-was {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ── Responsive text helpers ── */
+    .mobile-only  { display: none; }
+    .desktop-only { display: inline; }
+
     @media (max-width: 900px) {
       .compare-strip { grid-template-columns: repeat(3, 1fr); }
     }
@@ -224,6 +248,8 @@
       .compare-strip { grid-template-columns: repeat(2, 1fr); }
       .compare-mix   { grid-template-columns: 1fr; }
       .compare-arrow-col { display: none; }
+      .mobile-only  { display: inline; }
+      .desktop-only { display: none; }
     }
     @media (max-width: 400px) {
       .compare-strip { grid-template-columns: 1fr; }
@@ -266,7 +292,7 @@
 
     <!-- Side-by-side mix comparison -->
     <h2 class="section-h2">Today vs the 2030 Blueprint</h2>
-    <p class="section-p">The right-hand pie shows a simulation of what the 2030 Blueprint electricity mix would have looked like over the last 28 days — using actual weather and demand data, but with the Blueprint's generating capacity in place. The left shows what actually happened.</p>
+    <p class="section-p">The <span class="desktop-only">right-hand</span><span class="mobile-only">lower</span> pie shows a simulation of what the 2030 Blueprint electricity mix would have looked like over the last 28 days — using actual weather and demand data, but with the Blueprint's generating capacity in place. The <span class="desktop-only">left</span><span class="mobile-only">upper</span> shows what actually happened.</p>
     <div class="compare-mix">
       <div>
         <div class="compare-panel-title compare-panel-title--now">Today's Grid</div>
@@ -283,7 +309,7 @@
 
     <!-- Timeseries -->
     <h2 class="section-h2">The 2030 Blueprint in action</h2>
-    <p class="section-p">The simulation runs the 2030 Blueprint mix against real-time weather and demand data, showing how an expanded fleet of wind, solar, nuclear and storage would actually perform. Gas almost disappears; storage charges during sunny and windy periods and discharges at night; curtailment rises when renewables generate more than demand and storage can absorb.</p>
+    <p class="section-p" id="timeseries-desc">The simulation runs the 2030 Blueprint mix against real-time weather and demand data over the last <span class="desktop-only">28 days</span><span class="mobile-only">7 days</span>, showing how an expanded fleet of wind, solar, nuclear and storage would actually perform. Gas almost disappears; storage charges during sunny and windy periods and discharges at night; curtailment rises when renewables generate more than demand and storage can absorb.</p>
     <div style="position:relative; height:420px;">
       <canvas id="timeseries-chart"></canvas>
     </div>
@@ -515,18 +541,14 @@
     ];
 
     metrics.forEach(m => {
-      const nowCls = m.nowGood ? 'compare-val--now-ok' : 'compare-val--now';
-      const tipHtml = m.tip ? `<div class="lcoe-tip">${m.tip}</div>` : '';
       const pre = m.prefix ?? '';
       stripEl.insertAdjacentHTML('beforeend', `
         <div class="compare-card">
-          ${tipHtml}
           <div class="compare-card-label">${m.label}</div>
           <div class="compare-values">
-            <span class="compare-val ${nowCls}">${pre}${m.now}${m.suffix}</span>
-            <span class="compare-arrow-sym">→</span>
             <span class="compare-val compare-val--manifesto">${pre}${m.after}${m.suffix}</span>
           </div>
+          <div class="compare-was">was ${pre}${m.now}</div>
           <div class="compare-unit">${m.unit}</div>
         </div>`);
     });
@@ -612,7 +634,9 @@
 
   // ── Timeseries ────────────────────────────────────────────────────
   if (tsResult.status === 'fulfilled') {
-    const rows = tsResult.value.rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
+    const allRows = tsResult.value.rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
+    const isMobile = window.innerWidth <= 760;
+    const rows = isMobile ? allRows.slice(-168) : allRows;  // 7 days (168 h) on mobile, 28 on desktop
 
     const labels = rows.map(r => {
       const d = parseGDate(r.c[0].v);
