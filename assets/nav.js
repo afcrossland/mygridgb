@@ -3,7 +3,7 @@
 const NAV_HTML = `
 <header id="site-header">
   <div class="header-inner">
-    <a class="logo" href="/index.html">MyGrid<span class="logo-accent">GB</span></a>
+    <a class="logo" href="/index.html">MyGrid<span class="logo-accent">GB</span> 🇬🇧</a>
     <button id="nav-toggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
