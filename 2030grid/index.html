@@ -194,6 +194,35 @@
     .fuel-pct { font-size: 11px; font-weight: 600; color: var(--muted); text-align: right; }
 
     /* ── How it works ── */
+    /* ── Chart filter bar (shared style with last-12-months) ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .filter-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      align-self: center;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .filter-btn {
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: 'DM Sans', system-ui, Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .filter-btn:hover  { border-color: var(--brand); color: var(--brand); }
+    .filter-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
     .manifesto-details {
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -310,6 +339,12 @@
     <!-- Timeseries -->
     <h2 class="section-h2">The 2030 Blueprint in action</h2>
     <p class="section-p" id="timeseries-desc">The simulation runs the 2030 Blueprint mix against real-time weather and demand data over the last <span class="desktop-only">28 days</span><span class="mobile-only">7 days</span>, showing how an expanded fleet of wind, solar, nuclear and storage would actually perform. Gas almost disappears; storage charges during sunny and windy periods and discharges at night; curtailment rises when renewables generate more than demand and storage can absorb.</p>
+    <div class="filter-bar" id="ts-filter">
+      <span class="filter-bar-label">Show:</span>
+      <button class="filter-btn" data-hours="48">Last 48 hrs</button>
+      <button class="filter-btn active" data-hours="168">Last 7 days</button>
+      <button class="filter-btn" data-hours="0">All data</button>
+    </div>
     <div style="position:relative; height:420px;">
       <canvas id="timeseries-chart"></canvas>
     </div>
@@ -635,28 +670,59 @@
   // ── Timeseries ────────────────────────────────────────────────────
   if (tsResult.status === 'fulfilled') {
     const allRows = tsResult.value.rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
-    const isMobile = window.innerWidth <= 760;
-    const rows = isMobile ? allRows.slice(-168) : allRows;  // 7 days (168 h) on mobile, 28 on desktop
+    const hasCurtail = allRows.some(r => r.c[9]?.v > 0);
 
-    const labels = rows.map(r => {
-      const d = parseGDate(r.c[0].v);
-      return d ? fmtDate(d) : '';
-    });
+    function buildShowLabelAt(filteredLabels, hours) {
+      const set = new Set();
+      if (hours === 48) {
+        filteredLabels.forEach((_, idx) => { if (idx % 12 === 0) set.add(idx); });
+      } else if (hours === 168) {
+        let last = '';
+        filteredLabels.forEach((lbl, idx) => { if (lbl !== last) { last = lbl; set.add(idx); } });
+      } else {
+        let dayCount = 0, last = '';
+        filteredLabels.forEach((lbl, idx) => {
+          if (lbl !== last) { last = lbl; dayCount++; if (dayCount % 3 === 1) set.add(idx); }
+        });
+      }
+      return set;
+    }
 
-    const datasets = TIME_SOURCES.map(src => ({
-      label: src.label,
-      data: rows.map(r => r.c[src.col]?.v ?? null),
-      backgroundColor: src.color,
-      borderColor: src.color,
-      borderWidth: 0.5,
-      fill: true,
-      pointRadius: 0,
-      tension: 0.2,
-    }));
+    function buildDatasets(rows) {
+      const ds = TIME_SOURCES.map(src => ({
+        label: src.label,
+        data: rows.map(r => r.c[src.col]?.v ?? null),
+        backgroundColor: src.color,
+        borderColor: src.color,
+        borderWidth: 0.5,
+        fill: true,
+        pointRadius: 0,
+        tension: 0.2,
+        stack: 'sources',
+      }));
+      if (hasCurtail) {
+        ds.push({
+          label: 'Curtailment',
+          data: rows.map(r => r.c[9]?.v ?? null),
+          borderColor: '#dc2626',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          fill: false,
+          pointRadius: 0,
+          tension: 0.2,
+        });
+      }
+      return ds;
+    }
 
-    new Chart(document.getElementById('timeseries-chart'), {
+    const initHours = 168;
+    const initRows  = allRows.slice(-initHours);
+    const initLabels = initRows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
+
+    const tsChart = new Chart(document.getElementById('timeseries-chart'), {
       type: 'line',
-      data: { labels, datasets },
+      data: { labels: initLabels, datasets: buildDatasets(initRows) },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -674,8 +740,8 @@
             stacked: true,
             ticks: {
               font: { family: FONT, size: 10 },
-              maxRotation: 90, minRotation: 90, autoSkip: false,
-              callback: (_, idx) => labels[idx] !== labels[idx - 1] ? labels[idx] : ''
+              maxRotation: 45, minRotation: 0, autoSkip: false,
+              callback: (_, idx) => buildShowLabelAt(initLabels, initHours).has(idx) ? initLabels[idx] : ''
             },
             grid: { display: false }
           },
@@ -688,6 +754,21 @@
           }
         }
       }
+    });
+
+    document.getElementById('ts-filter').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('#ts-filter .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const hours = parseInt(btn.dataset.hours, 10);
+      const rows  = hours > 0 ? allRows.slice(-hours) : allRows;
+      const lbls  = rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
+      const showAt = buildShowLabelAt(lbls, hours);
+      tsChart.data.labels = lbls;
+      buildDatasets(rows).forEach((ds, i) => { tsChart.data.datasets[i].data = ds.data; });
+      tsChart.options.scales.x.ticks.callback = (_, idx) => showAt.has(idx) ? lbls[idx] : '';
+      tsChart.update('none');
     });
   }
 

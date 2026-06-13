@@ -243,6 +243,44 @@
     @media (max-width: 360px) {
       .stat-strip { grid-template-columns: 1fr; }
     }
+
+    /* ── Explore links ── */
+    .explore-links {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 28px 0 36px;
+    }
+    .explore-link {
+      display: block;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .explore-link:hover {
+      border-color: var(--brand);
+      box-shadow: 0 2px 8px rgba(26,77,122,.1);
+    }
+    .explore-link-title {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--brand);
+      margin-bottom: 4px;
+    }
+    .explore-link-desc {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    @media (max-width: 760px) {
+      .explore-links { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -307,6 +345,25 @@
         <div class="fuel-list" id="fuel-list"></div>
       </div>
     </section>
+
+    <div class="explore-links">
+      <a href="/last-28-days/index.html" class="explore-link">
+        <span class="explore-link-title">Last 28 days →</span>
+        <span class="explore-link-desc">Hourly generation & carbon intensity</span>
+      </a>
+      <a href="/last-12-months/index.html" class="explore-link">
+        <span class="explore-link-title">Last 12 months →</span>
+        <span class="explore-link-desc">Monthly generation mix & trends</span>
+      </a>
+      <a href="/historicaldata/index.html" class="explore-link">
+        <span class="explore-link-title">Historical data →</span>
+        <span class="explore-link-desc">Annual generation since 1998</span>
+      </a>
+      <a href="/2030grid/index.html" class="explore-link">
+        <span class="explore-link-title">2030 Blueprint →</span>
+        <span class="explore-link-desc">Clean power simulation & cost</span>
+      </a>
+    </div>
 
     <section style="margin:32px 0;">
       <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:6px;">The last 7 days</h2>

@@ -21,6 +21,7 @@
   <script src="../assets/nav.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
 <body>
 <div class="page-wrap">
@@ -41,6 +42,13 @@
     <div style="position:relative; height:400px;">
       <canvas id="gen-chart"></canvas>
     </div>
+
+    <!-- Carbon intensity -->
+    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:40px 0 12px;">Carbon intensity</h2>
+    <p style="color:var(--muted); margin-bottom:20px;">Hourly carbon intensity of British electricity over the last 28 days (gCO₂eq/kWh). The red line marks the 2030 clean power target of 100 gCO₂eq/kWh. Intensity falls when renewables are generating strongly and rises when gas fills a larger share of demand.</p>
+    <div style="position:relative; height:320px;">
+      <canvas id="carbon-intensity-chart"></canvas>
+    </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
@@ -49,8 +57,9 @@
 (async () => {
   const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
 
-  const TREEMAP_ID = '1nh3oCqRrDg0pyhByZt9Ssga11mV4ptTybTzBIjmTmZw';
-  const STACK_ID   = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
+  const TREEMAP_ID  = '1nh3oCqRrDg0pyhByZt9Ssga11mV4ptTybTzBIjmTmZw';
+  const STACK_ID    = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
+  const CARBON_ID   = '1Xx0Crp8hZRWoFOb_NQ6kptP69EplFBjUQnLUekbYJag';
 
   const PALETTE = {
     'Nuclear':       '#4ade80',
@@ -89,9 +98,10 @@
     return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
   }
 
-  const [tmResult, stackResult] = await Promise.allSettled([
+  const [tmResult, stackResult, carbonResult] = await Promise.allSettled([
     fetchTable(TREEMAP_ID),
     fetchTable(STACK_ID),
+    fetchTable(CARBON_ID),
   ]);
 
   // ── Treemap ─────────────────────────────────────────────────
@@ -228,6 +238,77 @@
       }
     });
   }
+  // ── Carbon intensity line chart ──────────────────────────────────
+  if (carbonResult.status === 'fulfilled') {
+    const rows = carbonResult.value.rows.filter(r => r.c[2]?.v != null);
+    const ciLabels = rows.map(r => {
+      const d = parseGDate(r.c[0].v);
+      return d ? fmtDate(d) : '';
+    });
+    const ciData = rows.map(r => r.c[2].v);
+
+    // Show one label per day only
+    const ciShowAt = new Set();
+    let ciLastDay = '';
+    ciLabels.forEach((lbl, idx) => { if (lbl !== ciLastDay) { ciLastDay = lbl; ciShowAt.add(idx); } });
+
+    new Chart(document.getElementById('carbon-intensity-chart'), {
+      type: 'line',
+      data: {
+        labels: ciLabels,
+        datasets: [{
+          label: 'Carbon intensity',
+          data: ciData,
+          borderColor: '#1a4d7a',
+          backgroundColor: 'rgba(26,77,122,0.08)',
+          borderWidth: 1.5,
+          fill: true,
+          pointRadius: 0,
+          tension: 0.2,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${Math.round(ctx.parsed.y)} gCO₂eq/kWh` } },
+          annotation: {
+            annotations: {
+              target: {
+                type: 'line', yMin: 100, yMax: 100,
+                borderColor: '#ef4444', borderWidth: 2,
+                label: {
+                  display: true, content: '2030 Target', position: 'end',
+                  yAdjust: -14, backgroundColor: 'transparent', color: '#ef4444',
+                  font: { family: "'DM Sans', sans-serif", size: 13, weight: '600' }, padding: 0
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              font: { family: "'Segoe UI', Arial, sans-serif", size: 10 },
+              maxRotation: 45, minRotation: 0, autoSkip: false,
+              callback: (_, idx) => ciShowAt.has(idx) ? ciLabels[idx] : ''
+            },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'gCO₂eq/kWh', font: { family: "'Segoe UI', Arial, sans-serif", size: 12 }, color: '#555' },
+            ticks: { font: { family: "'Segoe UI', Arial, sans-serif", size: 11 } },
+            grid: { color: '#eeeeee' }
+          }
+        }
+      }
+    });
+  }
+
 })();
 </script>
 

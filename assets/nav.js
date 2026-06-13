@@ -52,7 +52,7 @@ const SIDEBAR_HTML = `
 <div class="bottom-cards">
   <div class="bottom-card">
     <div class="bottom-card-label">Supported by</div>
-    <a href="https://www.dur.ac.uk/dei/" target="_blank">
+    <a href="https://www.dur.ac.uk/dei/" target="_blank" style="display:block; text-align:center;">
       <img src="/images/dei.webp" alt="Durham Energy Institute">
     </a>
     <p>MyGridGB is kindly supported by the Durham Energy Institute.</p>
