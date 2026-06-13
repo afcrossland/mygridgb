@@ -193,36 +193,6 @@
     .fuel-bar { height: 100%; border-radius: 3px; }
     .fuel-pct { font-size: 11px; font-weight: 600; color: var(--muted); text-align: right; }
 
-    /* ── How it works ── */
-    /* ── Chart filter bar (shared style with last-12-months) ── */
-    .filter-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .filter-bar-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      align-self: center;
-      margin-right: 4px;
-      white-space: nowrap;
-    }
-    .filter-btn {
-      padding: 6px 18px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      font-family: 'DM Sans', system-ui, Arial, sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background .15s, color .15s, border-color .15s;
-    }
-    .filter-btn:hover  { border-color: var(--brand); color: var(--brand); }
-    .filter-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
-
     .manifesto-details {
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -711,6 +681,7 @@
           fill: false,
           pointRadius: 0,
           tension: 0.2,
+          stack: 'curtail',  // own group → renders at absolute value, not stacked with sources
         });
       }
       return ds;
@@ -748,6 +719,7 @@
           y: {
             stacked: true,
             beginAtZero: true,
+            min: 0,
             title: { display: true, text: 'Power, GW', font: { family: FONT, size: 12 }, color: '#555' },
             ticks: { font: { family: FONT, size: 11 } },
             grid: { color: '#eeeeee' }

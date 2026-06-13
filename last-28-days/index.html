@@ -39,6 +39,12 @@
     <!-- Stacked area -->
     <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:32px 0 12px;">Hourly electricity generation</h2>
     <p style="color:var(--muted); margin-bottom:20px;">Hourly generation across the last 28 days, showing how the electricity mix shifts through the day and across weather patterns. Solar peaks sharply around midday in bright weather. Wind can supply the majority of demand for sustained periods, then drop to near zero as weather fronts pass — these fluctuations drive the need for flexible backup from gas and storage.</p>
+    <div class="filter-bar" id="gen-filter">
+      <span class="filter-bar-label">Show:</span>
+      <button class="filter-btn active" data-hours="0">All data</button>
+      <button class="filter-btn" data-hours="168">Last 7 days</button>
+      <button class="filter-btn" data-hours="48">Last 48 hrs</button>
+    </div>
     <div style="position:relative; height:400px;">
       <canvas id="gen-chart"></canvas>
     </div>
@@ -162,28 +168,31 @@
 
   // ── Stacked area ─────────────────────────────────────────────
   if (stackResult.status === 'fulfilled') {
-    const rows = stackResult.value.rows;
-    const valid = rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
+    const allValid = stackResult.value.rows.filter(r => r.c.slice(1).some(c => c && c.v != null));
 
-    const labels = valid.map(r => {
-      const d = parseGDate(r.c[0].v);
-      return d ? fmtDate(d) : '';
-    });
+    function genLabels(rows) {
+      return rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
+    }
+    function genDatasets(rows) {
+      return STACK_SOURCES.map((name, i) => ({
+        label: name,
+        data: rows.map(r => r.c[i + 1]?.v ?? null),
+        backgroundColor: PALETTE[name],
+        borderColor: PALETTE[name],
+        borderWidth: 0.5,
+        fill: true,
+        pointRadius: 0,
+        tension: 0.2,
+      }));
+    }
+    function genTickCallback(lbls) {
+      return (_, idx) => lbls[idx] !== lbls[idx - 1] ? lbls[idx] : '';
+    }
 
-    const datasets = STACK_SOURCES.map((name, i) => ({
-      label: name,
-      data: valid.map(r => r.c[i + 1]?.v ?? null),
-      backgroundColor: PALETTE[name],
-      borderColor: PALETTE[name],
-      borderWidth: 0.5,
-      fill: true,
-      pointRadius: 0,
-      tension: 0.2,
-    }));
-
-    new Chart(document.getElementById('gen-chart'), {
+    const initLabels = genLabels(allValid);
+    const genChart = new Chart(document.getElementById('gen-chart'), {
       type: 'line',
-      data: { labels, datasets },
+      data: { labels: initLabels, datasets: genDatasets(allValid) },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -215,13 +224,14 @@
               maxRotation: 90,
               minRotation: 90,
               autoSkip: false,
-              callback: (val, idx) => labels[idx] !== labels[idx - 1] ? labels[idx] : ''
+              callback: genTickCallback(initLabels),
             },
             grid: { display: false }
           },
           y: {
             stacked: true,
             beginAtZero: true,
+            min: 0,
             title: {
               display: true,
               text: 'Power, GW',
@@ -236,6 +246,20 @@
           }
         }
       }
+    });
+
+    document.getElementById('gen-filter').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('#gen-filter .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const hours = parseInt(btn.dataset.hours, 10);
+      const rows  = hours > 0 ? allValid.slice(-hours) : allValid;
+      const lbls  = genLabels(rows);
+      genChart.data.labels = lbls;
+      genDatasets(rows).forEach((ds, i) => { genChart.data.datasets[i].data = ds.data; });
+      genChart.options.scales.x.ticks.callback = genTickCallback(lbls);
+      genChart.update('none');
     });
   }
   // ── Carbon intensity line chart ──────────────────────────────────

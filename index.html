@@ -366,8 +366,13 @@
     </div>
 
     <section style="margin:32px 0;">
-      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:6px;">The last 7 days</h2>
-      <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Hourly electricity generation over the past week. Watch renewables rise and fall with the weather while gas fills the gaps.</p>
+      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:6px;">Recent electricity generation</h2>
+      <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">Hourly electricity generation. Watch renewables rise and fall with the weather while gas fills the gaps.</p>
+      <div class="filter-bar" id="week-filter">
+        <span class="filter-bar-label">Show:</span>
+        <button class="filter-btn active" data-hours="168">Last 7 days</button>
+        <button class="filter-btn" data-hours="672">Last 28 days</button>
+      </div>
       <div style="position:relative; height:300px;">
         <canvas id="week-chart"></canvas>
       </div>
@@ -851,26 +856,32 @@
     const t = await (await fetch(url)).text();
     const allRows = JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table.rows;
     const valid = allRows.filter(r => r.c.slice(1).some(c => c && c.v != null));
-    const rows = valid.slice(-168); // last 7 days (168 hours)
 
-    const labels = rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
-    const datasets = STACK_SOURCES.map((name, i) => ({
-      label: name,
-      data: rows.map(r => r.c[i + 1]?.v ?? null),
-      backgroundColor: PALETTE[name],
-      borderColor: PALETTE[name],
-      borderWidth: 0.5,
-      fill: true,
-      pointRadius: 0,
-      tension: 0.2,
-    }));
+    function weekLabels(rows) {
+      return rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
+    }
+    function weekDatasets(rows) {
+      return STACK_SOURCES.map((name, i) => ({
+        label: name,
+        data: rows.map(r => r.c[i + 1]?.v ?? null),
+        backgroundColor: PALETTE[name],
+        borderColor: PALETTE[name],
+        borderWidth: 0.5,
+        fill: true,
+        pointRadius: 0,
+        tension: 0.2,
+      }));
+    }
 
-    new Chart(document.getElementById('week-chart'), {
+    const initRows   = valid.slice(-168);
+    const initLabels = weekLabels(initRows);
+    const weekChart  = new Chart(document.getElementById('week-chart'), {
       type: 'line',
-      data: { labels, datasets },
+      data: { labels: initLabels, datasets: weekDatasets(initRows) },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false,
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -897,6 +908,19 @@
           }
         }
       }
+    });
+
+    document.getElementById('week-filter').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('#week-filter .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const hours = parseInt(btn.dataset.hours, 10);
+      const rows  = valid.slice(-hours);
+      const lbls  = weekLabels(rows);
+      weekChart.data.labels = lbls;
+      weekDatasets(rows).forEach((ds, i) => { weekChart.data.datasets[i].data = ds.data; });
+      weekChart.update('none');
     });
   } catch (e) { console.error('Week chart error:', e); }
 })();
