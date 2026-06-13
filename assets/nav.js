@@ -45,7 +45,7 @@ const NAV_HTML = `
 const FOOTER_HTML = `
 <footer id="site-footer">
   <p>MyGridGB is kindly supported by the <a href="https://www.dur.ac.uk/dei/" target="_blank">Durham Energy Institute</a>.</p>
-  <p style="margin-top:8px">© MyGridGB · <a href="https://twitter.com/mygridgb" target="_blank">@mygridgb</a></p>
+  <p style="margin-top:8px">© MyGridGB · <a href="https://twitter.com/mygridgb" target="_blank">@mygridgb on X</a> · <a href="https://bsky.app/profile/mygridgb.bsky.social" target="_blank">Bluesky</a></p>
 </footer>`;
 
 const SIDEBAR_HTML = `
@@ -68,6 +68,7 @@ const SIDEBAR_HTML = `
     <div class="bottom-card-label">Connect</div>
     <p style="margin-bottom:12px">Follow for the latest GB electricity data and analysis, or connect on LinkedIn.</p>
     <a href="https://twitter.com/intent/follow?screen_name=mygridgb" target="_blank" class="follow-btn">Follow @mygridgb on X</a>
+    <a href="https://bsky.app/profile/mygridgb.bsky.social" target="_blank" class="follow-btn" style="background:#0085ff">Follow on Bluesky</a>
     <a href="https://www.linkedin.com/in/afcrossland" target="_blank" class="follow-btn" style="background:#0a66c2">Connect on LinkedIn</a>
   </div>
 </div>`;
