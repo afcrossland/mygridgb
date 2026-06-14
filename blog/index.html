@@ -5,25 +5,384 @@
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blog — MyGridGB</title>
+  <meta name="description" content="Analysis, opinion and data on British electricity and energy transition from Dr Andrew Crossland.">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <style>
+    .blog-index-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 28px;
+    }
+    .blog-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .blog-card-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .blog-card-date { font-size: 12px; color: var(--muted); }
+    .blog-cat { background: var(--brand-bg); color: var(--brand); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; border-radius: 4px; }
+    .blog-card-title { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.2rem; font-weight: 400; margin: 0; line-height: 1.3; }
+    .blog-card-title a { color: var(--text); text-decoration: none; }
+    .blog-card-title a:hover { color: var(--brand); }
+    .blog-card-excerpt { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; flex: 1; }
+    .blog-card-more { font-size: 13px; color: var(--brand); text-decoration: none; font-weight: 600; }
+    .blog-card-more:hover { text-decoration: underline; }
+    @media (max-width: 640px) { .blog-index-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Blog</h1>
-    <div class="blog-grid">
+    <p class="page-intro">Analysis, opinion and data on British electricity and the transition to clean power, by Dr Andrew Crossland and guests.</p>
+    <div class="blog-index-grid">
       <div class="blog-card">
-        <div class="cat">Uncategorized</div>
-        <h3><a href="clean-power-2030.html">Clean Power 2030 – My thoughts</a></h3>
-        <div class="meta">By Dr Andrew Crossland · November 5, 2024</div>
-        <div class="excerpt">National Energy System Operator released the Clean Power 2030 plan today. I've had a brief look this morning…</div>
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 5, 2023</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/decoupling-reducing-energy-bills-by-3bn.html">Decoupling reducing energy bills by £3bn</a></h2>
+        <p class="blog-card-excerpt">Since September 2022, I have been campaigning to stop gas controlling the price of all of our electricity bills. Retrospective analysis shows that thi...</p>
+        <a href="/blog/decoupling-reducing-energy-bills-by-3bn.html" class="blog-card-more">Read more →</a>
       </div>
       <div class="blog-card">
-        <div class="cat">Uncategorized</div>
-        <h3><a href="solar-efficiency.html">How to Maximize Solar Power Efficiency in Small Residential Homes (2024 Guide)</a></h3>
-        <div class="meta">By Dr Andrew Crossland · October 20, 2024</div>
-        <div class="excerpt">Guest Post from Donaldson Bright. Want to harness the sun's power but worried about your compact space?…</div>
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 8, 2023</span>
+          <span class="blog-cat">guest blog</span> <span class="blog-cat">opinion piece</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/three-energy-predictions-for-the-uk-in-2023.html">Three Energy Predictions for the UK in 2023</a></h2>
+        <p class="blog-card-excerpt">GUEST BLOG BY LOGAN BLACK https://www.linkedin.com/in/logangblack/ In 2022, there were many significant developments in the UK energy sector. These in...</p>
+        <a href="/blog/three-energy-predictions-for-the-uk-in-2023.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">August 18, 2022</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/electric-car-myths-debunked.html">Electric Car Myths Debunked</a></h2>
+        <p class="blog-card-excerpt">Guest Blog: Emma Rix, Creative Bloom Rocks As with a lot of things in life, the electric car industry has a few myths floating around. From how green...</p>
+        <a href="/blog/electric-car-myths-debunked.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">July 22, 2022</span>
+          <span class="blog-cat">guest blog</span> <span class="blog-cat">opinion piece</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/natural-gas-green.html">What s Green and Invisible? Natural Gas (apparently)</a></h2>
+        <p class="blog-card-excerpt">A commentary on the relabelling of natural gas a green. GUEST BLOG BY LOGAN BLACK https://www.linkedin.com/in/logangblack/ The Invisible Man Why are p...</p>
+        <a href="/blog/natural-gas-green.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">July 7, 2022</span>
+          <span class="blog-cat">guest blog</span> <span class="blog-cat">opinion piece</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/cfd-ar4-what-does-this-mean.html">CfD AR4 What Does this mean</a></h2>
+        <p class="blog-card-excerpt">GUEST BLOG BY LOGAN BLACK https://www.linkedin.com/in/logangblack/ The results of Contract for Difference (CfD) Allocation Round (AR) 4 were announced...</p>
+        <a href="/blog/cfd-ar4-what-does-this-mean.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">March 17, 2022</span>
+          <span class="blog-cat">guest blog</span> <span class="blog-cat">opinion piece</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/new-uk-energy-strategy.html">New UK Energy Strategy</a></h2>
+        <p class="blog-card-excerpt">GUEST BLOG BY LOGAN BLACK https://www.linkedin.com/in/logangblack/ Number 10 and BEIS are making rumbling noises about launching a new UK energy strat...</p>
+        <a href="/blog/new-uk-energy-strategy.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 21, 2022</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/the-policy-failures-that-caused-the-2022-energy-price-crisis.html">The Policy Failures that Caused the 2022 Energy Price Crisis</a></h2>
+        <p class="blog-card-excerpt">The 2022 energy price crisis is leaving thousands of British homes with a stark choice: heating or eating. It s wrong, unfair and, for reasons outline...</p>
+        <a href="/blog/the-policy-failures-that-caused-the-2022-energy-price-crisis.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 2, 2021</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/guest-blog-oakwood-pt-2.html">Guest Blog: Oakwood pt 2</a></h2>
+        <p class="blog-card-excerpt">My mission I have always had a passion to live as environmentally sustainable as possible without being a full-on tree hugger. So, buying a thermally...</p>
+        <a href="/blog/guest-blog-oakwood-pt-2.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">November 25, 2019</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/opinion-piece-uk-coal.html">Opinion piece UK Coal</a></h2>
+        <p class="blog-card-excerpt">The closure of Wales last coal plant now halves to 4 (in a single year) the number of remaining UK coal power stations being kept on standby as a pric...</p>
+        <a href="/blog/opinion-piece-uk-coal.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">July 17, 2018</span>
+          <span class="blog-cat">efficiency</span> <span class="blog-cat">energy storage</span> <span class="blog-cat">opinion piece</span> <span class="blog-cat">residential</span> <span class="blog-cat">solar</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/oakwood-energy-efficiency-project.html">Oakwood Energy efficiency Project</a></h2>
+        <p class="blog-card-excerpt">In this blog, Alan Chapman talks us through an energy project on his home. His LinkedIn profile is here: https://www.linkedin.com/in/alan-chapman-7314...</p>
+        <a href="/blog/oakwood-energy-efficiency-project.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 25, 2018</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">energy storage</span> <span class="blog-cat">gas</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/are-britains-coal-free-days-a-completely-good-thing.html">Are Britain’s coal free days a completely good thing?</a></h2>
+        <p class="blog-card-excerpt">In 2017, Britain’s reduction in coal use was commended around the world. Over the year, just 6.3% of UK electricity was produced from its coal power s...</p>
+        <a href="/blog/are-britains-coal-free-days-a-completely-good-thing.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 30, 2017</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/record-breaking-renewables-30th-april-2017.html">Record breaking renewables: 30th April 2017</a></h2>
+        <p class="blog-card-excerpt">Sunday 30th April 2017 is seeing record amounts of low carbon generation in Great Britain. At 1030 am, 74% of electricity supplied was from low carbon...</p>
+        <a href="/blog/record-breaking-renewables-30th-april-2017.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 30, 2017</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/guest-blog-are-there-advantages-of-uk-onshore-natural-gas-part-2.html">Guest Blog: Are there advantages of UK onshore natural gas? Part 2</a></h2>
+        <p class="blog-card-excerpt">This is a guest post by Nick Grealy. Nick Grealy has been the natural gas industry for 24 years and found the first 16 really, really, boring. He sees...</p>
+        <a href="/blog/guest-blog-are-there-advantages-of-uk-onshore-natural-gas-part-2.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 21, 2017</span>
+          <span class="blog-cat">coal</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/a-day-without-coal.html">A day without coal</a></h2>
+        <p class="blog-card-excerpt">By Dr Andrew Crossland and Dr Grant Wilson 21st April 2017 looks like the first day ever with no coal generation in the UK. Here are some fast facts t...</p>
+        <a href="/blog/a-day-without-coal.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 19, 2017</span>
+          <span class="blog-cat">gas</span> <span class="blog-cat">opinion piece</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/guest-post-nick-grealy.html">Guest Blog: Are there advantages of UK onshore natural gas? Part 1</a></h2>
+        <p class="blog-card-excerpt">This is a guest post by Nick Grealy. Nick Grealy has been the natural gas industry for 24 years and found the first 16 really, really, boring. He sees...</p>
+        <a href="/blog/guest-post-nick-grealy.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 16, 2017</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">records</span> <span class="blog-cat">solar</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/a-record-breaking-week.html">A record breaking week</a></h2>
+        <p class="blog-card-excerpt">It has been a pretty amazing week for British electricity. At lunchtime on Sunday 9 th April, a record 8GW of solar power was powering British homes....</p>
+        <a href="/blog/a-record-breaking-week.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">April 12, 2017</span>
+          <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">imports</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/where-do-british-imports-come-from.html">Where do British imports come from?</a></h2>
+        <p class="blog-card-excerpt">In this blog, I assess how we import electricity to Great Britain and evaluate whether this is a low carbon thing to do. I conclude that to reduce car...</p>
+        <a href="/blog/where-do-british-imports-come-from.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">March 18, 2017</span>
+          <span class="blog-cat">demand</span> <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">records</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/a-brief-history-of-british-electricity-generation.html">A brief history of British Electricity Generation</a></h2>
+        <p class="blog-card-excerpt">British electricity generation and carbon emissions since 1970. British electricity supply is constantly evolving as the availability of new technolog...</p>
+        <a href="/blog/a-brief-history-of-british-electricity-generation.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 24, 2017</span>
+          <span class="blog-cat">nuclear</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/britains-existing-nuclear-power-stations.html">Britain s existing nuclear power stations</a></h2>
+        <p class="blog-card-excerpt">In this articles I focus on nuclear power something which rarely features in my blogs, but which is a big component of the MyGridGB manifesto. Nuclear...</p>
+        <a href="/blog/britains-existing-nuclear-power-stations.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 24, 2017</span>
+          <span class="blog-cat">manifesto</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/a-windy-week-which-teaches-us-a-lot.html">A windy lesson</a></h2>
+        <p class="blog-card-excerpt">British news is dominated by the devastation caused Storm Doris over the past 24 hours. No doubt somewhere in the papers will be photos of a wind turb...</p>
+        <a href="/blog/a-windy-week-which-teaches-us-a-lot.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 19, 2017</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">demand</span> <span class="blog-cat">greenhouse gas</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/rising-carbon-emissions.html">Rising carbon emissions</a></h2>
+        <p class="blog-card-excerpt">January 2017 saw a rise in carbon emissions from the same period in 2016. The total amount of carbon rose by 17%. Adjusted for the higher demand in 20...</p>
+        <a href="/blog/rising-carbon-emissions.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 19, 2017</span>
+          <span class="blog-cat">education</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/guest-blog-opportunities-for-teaching-sustainable-energy-in-post-compulsory-education.html">Guest Blog: Opportunities for teaching sustainable energy in post-compulsory education.</a></h2>
+        <p class="blog-card-excerpt">The following is a guest blog by Pamela Dugdale, a MyGridGB follower on Twitter. Followers are encouraged to submit guest blogs using mygridapp@gmail....</p>
+        <a href="/blog/guest-blog-opportunities-for-teaching-sustainable-energy-in-post-compulsory-education.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">February 11, 2017</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">gas</span> <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/the-mygridgb-manifesto.html">The MyGridGB manifesto explained</a></h2>
+        <p class="blog-card-excerpt">The MyGridGB Manifesto proposes one way that Britain can meet its present electricity demands using low carbon electricity. I first proposed it in Jul...</p>
+        <a href="/blog/the-mygridgb-manifesto.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 28, 2017</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">education</span> <span class="blog-cat">greenhouse gas</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/energy-data-for-education.html">Guest Blog: Teaching energy</a></h2>
+        <p class="blog-card-excerpt">The following is a guest blog by Pamela Dugdale, a MyGridGB follower on Twitter. Followers are encouraged to submit guest blogs using mygridapp@gmail....</p>
+        <a href="/blog/energy-data-for-education.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 27, 2017</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">demand</span> <span class="blog-cat">review</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/january-2016-vs-january-2017-has-our-electricity-mix-actually-changed.html">January 2016 vs January 2017: Has our electricity mix actually changed?</a></h2>
+        <p class="blog-card-excerpt">January 2017 represents the first chance to provide year on year comparison of electricity generation. When preparing the data for this blog, I didn t...</p>
+        <a href="/blog/january-2016-vs-january-2017-has-our-electricity-mix-actually-changed.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 25, 2017</span>
+          <span class="blog-cat">tidal power</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/what-can-tidal-power-contribute.html">What can Tidal Power Contribute?</a></h2>
+        <p class="blog-card-excerpt">The UK is committed to carbon reduction in all sectors of the economy be that electricity, heating, transport, agriculture or industry. The £1.3bn, 32...</p>
+        <a href="/blog/what-can-tidal-power-contribute.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 21, 2017</span>
+          <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">imports</span> <span class="blog-cat">interconnectors</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/our-electricity-imports-have-become-less-green.html">Are imports really low-carbon?</a></h2>
+        <p class="blog-card-excerpt">Earlier this month, I reported how Britain has recently become a net exporter of electricity to France and has increased imports from Holland. Since w...</p>
+        <a href="/blog/our-electricity-imports-have-become-less-green.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 15, 2017</span>
+          <span class="blog-cat">gas</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/is-electricity-now-the-primary-consumer-of-gas.html">Has electricity become the primary consumer of gas?</a></h2>
+        <p class="blog-card-excerpt">My prediction is that in 2016 gas for electricity will have outstripped domestic consumption. That has only happened 4 times in the last 20 years. Bri...</p>
+        <a href="/blog/is-electricity-now-the-primary-consumer-of-gas.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 15, 2017</span>
+          <span class="blog-cat">energy storage</span> <span class="blog-cat">gas</span> <span class="blog-cat">greenhouse gas</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/changing-demand-changes-carbon.html">Peak demand doesn t cause peak carbon emissions</a></h2>
+        <p class="blog-card-excerpt">In this blog, I look how demand fluctuates on a daily and weekly basis and the impact that that has on our carbon emissions. A simple conclusion can b...</p>
+        <a href="/blog/changing-demand-changes-carbon.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 10, 2017</span>
+          <span class="blog-cat">imports</span> <span class="blog-cat">interconnectors</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/importing-and-exporting.html">For 3 months, Britain was a net exporter of electricity to France</a></h2>
+        <p class="blog-card-excerpt">Britain became a net exporter of electricity to France in the last three months of 2016. Find out more in this blog. On the MyGridGB live dashboard ,...</p>
+        <a href="/blog/importing-and-exporting.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 7, 2017</span>
+          <span class="blog-cat">coal</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/what-is-replacing-coal.html">What is replacing coal?</a></h2>
+        <p class="blog-card-excerpt">Coal generation has dropped from providing 30% of our electricity at the beginning of 2015, to providing less than 7% in the last 6 months of 2016. Fu...</p>
+        <a href="/blog/what-is-replacing-coal.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">January 4, 2017</span>
+          <span class="blog-cat">gas</span> <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/returning-to-work-part-1.html">Returning to work part 1</a></h2>
+        <p class="blog-card-excerpt">Demand falls over Christmas and New Year as many of us are on leave but it quickly returns when we go back to work. In the chart below, I show our ele...</p>
+        <a href="/blog/returning-to-work-part-1.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 31, 2016</span>
+          <span class="blog-cat">review</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/2016-in-review.html">2016 in Review</a></h2>
+        <p class="blog-card-excerpt">2016 was a momentous year for our electricity supply: the signing and ratification of the Paris climate agreement, the announced closure of all coal p...</p>
+        <a href="/blog/2016-in-review.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 29, 2016</span>
+          <span class="blog-cat">demand</span> <span class="blog-cat">efficiency</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/the-grid-impact-of-energy-efficiency.html">The carbon value of energy efficiency</a></h2>
+        <p class="blog-card-excerpt">Electricity is changing in the way it is being generated and also in how it is being used. At the end of 2015, I switched my house from incandescent/h...</p>
+        <a href="/blog/the-grid-impact-of-energy-efficiency.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 28, 2016</span>
+          
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/a-return-to-gas.html">The return to gas</a></h2>
+        <p class="blog-card-excerpt">Christmas Day 2016 created headlines due to high amounts of low carbon generation and low demand. Since then, the use of fossil fuels increased as Bri...</p>
+        <a href="/blog/a-return-to-gas.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 26, 2016</span>
+          <span class="blog-cat">gas</span> <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">records</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/where-did-electricity-come-from-on-christmas-day.html">Where did electricity come from on Christmas Day?</a></h2>
+        <p class="blog-card-excerpt">In this blog, I focus on where our electricity came from across the whole of Christmas Day On Christmas Day, this piece looked at how National Grid us...</p>
+        <a href="/blog/where-did-electricity-come-from-on-christmas-day.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 25, 2016</span>
+          <span class="blog-cat">gas</span> <span class="blog-cat">records</span> <span class="blog-cat">wind</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/christmas-2016.html">Cooking turkeys with record amounts of wind</a></h2>
+        <p class="blog-card-excerpt">On Christmas, the normal rules of providing electricity are a little different. Every day there is a peak demand for electricity which is met by switc...</p>
+        <a href="/blog/christmas-2016.html" class="blog-card-more">Read more →</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-card-meta">
+          <span class="blog-card-date">December 23, 2016</span>
+          <span class="blog-cat">demand</span> <span class="blog-cat">greenhouse gas</span> <span class="blog-cat">records</span> <span class="blog-cat">review</span>
+        </div>
+        <h2 class="blog-card-title"><a href="/blog/a-new-clean-energy-milestone.html">A new clean energy milestone?</a></h2>
+        <p class="blog-card-excerpt">It was reported in the Guardian newspaper that the UK hit a clean energy milestone after low carbon power accounted for 50% of electricity generation...</p>
+        <a href="/blog/a-new-clean-energy-milestone.html" class="blog-card-more">Read more →</a>
       </div>
     </div>
   </main>
