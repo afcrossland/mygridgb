@@ -278,7 +278,8 @@ nav ul ul li a:hover {
 .social-btn--x        { background: #000; }
 .social-btn--bluesky  { background: #0085ff; }
 .social-btn--linkedin { background: #0a66c2; }
-.social-btn--substack { background: #FF6719; }
+.social-btn--substack     { background: #FF6719; }
+.social-btn--researchgate { background: #00CCBB; }
 
 /* ===== HOME PAGE ===== */
 .home-hero {

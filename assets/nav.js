@@ -84,6 +84,10 @@ const SIDEBAR_HTML = `
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
       <span class="social-btn-text"><span class="social-btn-name">Subscribe on Substack</span><span class="social-btn-handle">@afcrossland</span></span>
     </a>
+    <a href="https://www.researchgate.net/profile/Andrew-Crossland" target="_blank" class="social-btn social-btn--researchgate">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M19.586 0H4.414A4.414 4.414 0 0 0 0 4.414v15.172A4.414 4.414 0 0 0 4.414 24h15.172A4.414 4.414 0 0 0 24 19.586V4.414A4.414 4.414 0 0 0 19.586 0zm-7.41 5.808h2.034c.57 0 1.036.077 1.397.232.361.154.638.37.83.647.192.277.288.6.288.97 0 .31-.067.592-.2.847a1.74 1.74 0 0 1-.57.637c-.248.17-.548.285-.9.345l1.862 2.99h-1.56l-1.713-2.857h-.468v2.857h-1.3V5.808zm1.3 1.056v1.77h.683c.38 0 .674-.086.882-.257.208-.171.312-.412.312-.722 0-.298-.1-.527-.3-.687-.199-.16-.49-.24-.872-.24h-.705zm4.163 2.27c0-.71.158-1.345.474-1.903a3.38 3.38 0 0 1 1.316-1.312c.561-.313 1.194-.47 1.898-.47.51 0 .978.084 1.403.252.426.168.793.41 1.102.725l-.838.872a2.37 2.37 0 0 0-.747-.497 2.19 2.19 0 0 0-.883-.175c-.43 0-.816.1-1.157.3a2.1 2.1 0 0 0-.8.836c-.19.357-.286.762-.286 1.214 0 .457.096.866.287 1.227.19.36.458.642.8.844.343.202.733.303 1.17.303.27 0 .527-.036.77-.108.244-.072.457-.176.64-.312v-.97h-1.56v-1.03h2.8v2.59a4.21 4.21 0 0 1-1.228.671 4.47 4.47 0 0 1-1.48.238c-.694 0-1.32-.155-1.876-.465a3.35 3.35 0 0 1-1.295-1.295c-.309-.553-.464-1.183-.464-1.89zM3.9 14.4h16.2v1.2H3.9zm0 3h16.2v1.2H3.9z"/></svg>
+      <span class="social-btn-text"><span class="social-btn-name">ResearchGate</span><span class="social-btn-handle">Andrew-Crossland</span></span>
+    </a>
   </div>
 </div>`;
 
