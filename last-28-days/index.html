@@ -118,9 +118,12 @@
     const treeItems = rows
       .filter(r => r.c[1]?.v > 0)
       .map(r => {
-        const label  = r.c[0].v;                     // "Gas, 23.0%"
-        const source = label.split(',')[0].trim();    // "Gas"
-        return { label, source, value: r.c[1].v };
+        const raw    = r.c[0].v;                          // "Gas, 22.2%"
+        const parts  = raw.split(',');
+        const source = parts[0].trim();                   // "Gas"
+        const pct    = parts[1]?.trim() ?? '';            // "22.2%"
+        const gwh    = Math.round(r.c[1].v * 672);       // avg GW × 28 days × 24 hrs
+        return { source, pct, gwh, value: r.c[1].v };
       });
 
     new Chart(document.getElementById('treemap-chart'), {
@@ -138,8 +141,8 @@
           labels: {
             display: 'auto',
             formatter(ctx) {
-              const parts = ctx.raw._data.label.split(',');
-              return parts.length > 1 ? [parts[0].trim(), parts[1].trim()] : [ctx.raw._data.label];
+              const d = ctx.raw._data;
+              return [d.source, d.gwh.toLocaleString() + ' GWh', d.pct];
             },
             color: '#fff',
             font: {
@@ -158,8 +161,11 @@
           legend: { display: false },
           tooltip: {
             callbacks: {
-              title: ctx => ctx[0]?.raw?._data?.label ?? '',
-              label: ctx => ` ${ctx.raw._data.value.toFixed(2)} GW avg`,
+              title: ctx => ctx[0]?.raw?._data?.source ?? '',
+              label: ctx => [
+                ` ${ctx.raw._data.gwh.toLocaleString()} GWh`,
+                ` ${ctx.raw._data.pct} of mix`,
+              ],
             }
           }
         }
