@@ -67,12 +67,12 @@
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Last 12 Months</h1>
-    <p class="page-intro">Monthly average electricity generation by fuel type and carbon intensity. The treemap summarises the mix for a chosen recent window; the column charts let you zoom out up to three years to reveal longer seasonal patterns.</p>
+    <p class="page-intro">Monthly electricity generation (TWh) by fuel type and carbon intensity. The treemap shows total generation by source for the chosen window; the column charts let you zoom out up to three years to reveal longer seasonal patterns.</p>
 
     <!-- ── Treemap ─────────────────────────────────────── -->
     <div class="chart-section">
       <h2>Generation mix share</h2>
-      <p>Average contribution of each fuel type over the selected period. Tile size reflects share of total generation — the balance between gas, nuclear, wind and solar shifts significantly with season and weather.</p>
+      <p>Total generation (TWh) by fuel type over the selected period. Tile size reflects share of the mix — the balance between gas, nuclear, wind and solar shifts significantly with season and weather.</p>
       <div class="filter-bar" id="treemap-filter">
         <span class="filter-bar-label">Show:</span>
         <button class="filter-btn" data-months="3">3 months</button>
@@ -96,7 +96,7 @@
     </div>
 
     <div class="chart-section">
-      <p>Average power output (GW) by fuel type per month. Winter months typically see higher total demand and more wind; summer brings solar peaks. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
+      <p>Electricity generation (TWh) by fuel type per month. Winter months typically see higher total generation and more wind; summer brings solar peaks. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
       <div style="position:relative; height:420px;">
         <canvas id="gen-chart"></canvas>
       </div>
@@ -170,10 +170,9 @@
     rows.forEach(r => SOURCES.forEach(src => {
       sums[src.label] += r.c[src.col]?.v ?? 0;
     }));
-    const n = rows.length || 1;
     return Object.entries(sums)
       .filter(([, v]) => v > 0)
-      .map(([label, total]) => ({ label, source: label, value: total / n }));
+      .map(([label, total]) => ({ label, source: label, value: total }));
   }
 
   // ── Treemap ──────────────────────────────────────────────────────
@@ -193,7 +192,7 @@
           display: 'auto',
           formatter(ctx) {
             const d = ctx.raw._data;
-            return [d.source, d.value.toFixed(1) + ' GW'];
+            return [d.source, d.value.toFixed(1) + ' TWh'];
           },
           color: '#fff',
           font: { family: FONT, size: 13, weight: '600' },
@@ -209,7 +208,7 @@
         tooltip: {
           callbacks: {
             title: ctx => ctx[0]?.raw?._data?.source ?? '',
-            label: ctx => ` ${ctx.raw._data.value.toFixed(2)} GW avg`,
+            label: ctx => ` ${ctx.raw._data.value.toFixed(1)} TWh`,
           }
         }
       }
@@ -247,7 +246,7 @@
         tooltip: {
           mode: 'index',
           callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} GW`
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} TWh`
           }
         }
       },
@@ -262,7 +261,7 @@
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Power, GW',
+            text: 'Energy, TWh',
             font: { family: FONT, size: 12 },
             color: '#555'
           },
