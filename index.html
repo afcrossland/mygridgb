@@ -984,7 +984,17 @@
         maintainAspectRatio: false,
         animation: false,
         plugins: {
-          legend: { display: false },
+          legend: {
+            position: 'top',
+            labels: {
+              font: { family: FONT, size: 12 },
+              padding: 14,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 10,
+              boxHeight: 10,
+            }
+          },
           tooltip: {
             mode: 'index',
             callbacks: { label: ctx => ctx.parsed.y != null ? ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} GW` : null }
