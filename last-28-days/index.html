@@ -84,8 +84,16 @@
 
 
   const STACK_SOURCES = [
-    'Nuclear', 'Biomass', 'Large Hydro', 'Solar',
-    'Onshore Wind', 'Offshore Wind', 'Imports', 'Coal', 'Gas', 'Storage',
+    { label: 'Nuclear',       col: 1  },
+    { label: 'Biomass',       col: 2  },
+    { label: 'Large Hydro',   col: 3  },
+    { label: 'Solar',         col: 6  },
+    { label: 'Onshore Wind',  col: 4  },
+    { label: 'Offshore Wind', col: 5  },
+    { label: 'Imports',       col: 7  },
+    { label: 'Coal',          col: 8  },
+    { label: 'Gas',           col: 9  },
+    { label: 'Storage',       col: 10 },
   ];
 
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -181,11 +189,11 @@
       return rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
     }
     function genDatasets(rows) {
-      return STACK_SOURCES.map((name, i) => ({
-        label: name,
-        data: rows.map(r => r.c[i + 1]?.v ?? null),
-        backgroundColor: PALETTE[name],
-        borderColor: PALETTE[name],
+      return STACK_SOURCES.map(src => ({
+        label: src.label,
+        data: rows.map(r => r.c[src.col]?.v ?? null),
+        backgroundColor: PALETTE[src.label],
+        borderColor: PALETTE[src.label],
         borderWidth: 0.5,
         fill: true,
         pointRadius: 0,
