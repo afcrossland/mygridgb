@@ -34,6 +34,7 @@
     <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:24px 0 8px;">Generation mix share</h2>
     <p style="color:var(--muted); margin-bottom:16px;">Each tile shows the average contribution of a fuel type to British electricity over the last 28 days, sized by its share of the mix. In windy periods, renewables dominate; gas and nuclear fill the gaps when weather-dependent generation is low.</p>
     <div style="position:relative; height:420px;">
+      <div class="chart-loading" id="treemap-chart-loading"></div>
       <canvas id="treemap-chart"></canvas>
     </div>
 
@@ -47,6 +48,7 @@
       <button class="filter-btn" data-hours="48">Last 48 hrs</button>
     </div>
     <div style="position:relative; height:400px;">
+      <div class="chart-loading" id="gen-chart-loading"></div>
       <canvas id="gen-chart"></canvas>
     </div>
 
@@ -54,6 +56,7 @@
     <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:40px 0 12px;">Carbon intensity</h2>
     <p style="color:var(--muted); margin-bottom:20px;">Hourly carbon intensity of British electricity over the last 28 days (gCO₂eq/kWh). The red line marks the 2030 clean power target of 100 gCO₂eq/kWh. Intensity falls when renewables are generating strongly and rises when gas fills a larger share of demand.</p>
     <div style="position:relative; height:320px;">
+      <div class="chart-loading" id="carbon-intensity-chart-loading"></div>
       <canvas id="carbon-intensity-chart"></canvas>
     </div>
   </main>
@@ -61,6 +64,12 @@
 </div>
 
 <script>
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
 (async () => {
   const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
 
@@ -134,6 +143,7 @@
         return { source, pct, gwh, value: r.c[1].v };
       });
 
+    hideLoader('treemap-chart');
     new Chart(document.getElementById('treemap-chart'), {
       type: 'treemap',
       data: {
@@ -205,6 +215,7 @@
     }
 
     const initLabels = genLabels(allValid);
+    hideLoader('gen-chart');
     const genChart = new Chart(document.getElementById('gen-chart'), {
       type: 'line',
       data: { labels: initLabels, datasets: genDatasets(allValid) },
@@ -291,6 +302,7 @@
     let ciLastDay = '';
     ciLabels.forEach((lbl, idx) => { if (lbl !== ciLastDay) { ciLastDay = lbl; ciShowAt.add(idx); } });
 
+    hideLoader('carbon-intensity-chart');
     new Chart(document.getElementById('carbon-intensity-chart'), {
       type: 'line',
       data: {

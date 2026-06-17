@@ -41,6 +41,7 @@
         <h2 class="chart-h2">Annual generation by fuel type (TWh)</h2>
         <p class="chart-p">Absolute electricity generation in terawatt-hours by fuel type each year since 2012. The steep decline in coal and steady growth of wind and solar is clear — as is the overall fall in total generation driven by efficiency improvements and reduced industrial demand. The most recent year is partial.</p>
         <div style="position:relative; height:440px;">
+          <div class="chart-loading" id="twh-chart-loading"></div>
           <canvas id="twh-chart"></canvas>
         </div>
       </div>
@@ -48,6 +49,7 @@
         <h2 class="chart-h2">Annual electricity mix (%)</h2>
         <p class="chart-p">How Britain's electricity generation mix has changed since 2012. Coal has been almost entirely replaced by renewables and gas; wind and solar have grown from a small fraction to major contributors. Each bar shows the proportional share of generation from each fuel type for that year.</p>
         <div style="position:relative; height:440px;">
+          <div class="chart-loading" id="history-chart-loading"></div>
           <canvas id="history-chart"></canvas>
         </div>
       </div>
@@ -55,6 +57,7 @@
     <h2 style="font-size:1.3rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:40px 0 8px;">Annual carbon emissions</h2>
     <p style="color:var(--muted); margin-bottom:16px;">Megatons of CO₂ equivalent from British electricity generation each year. The long-term downward trend reflects the rapid decarbonisation of the grid. The most recent bar is a partial estimate based on data available so far this year.</p>
     <div style="position:relative; height:300px;">
+      <div class="chart-loading" id="carbon-emissions-chart-loading"></div>
       <canvas id="carbon-emissions-chart"></canvas>
     </div>
   </main>
@@ -62,6 +65,12 @@
 </div>
 
 <script>
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
 // ── Absolute TWh chart ───────────────────────────────────────────
 (async () => {
   const SHEET_ID = '1vWKOAe4-RdCCYmmCiU0CQdYxJmJcBJjCmOPjXfS9Bek';
@@ -101,6 +110,7 @@
       borderWidth: 1,
     }));
 
+    hideLoader('twh-chart');
     new Chart(document.getElementById('twh-chart'), {
       type: 'bar',
       data: { labels, datasets },
@@ -184,6 +194,7 @@
       borderWidth: 1,
     }));
 
+    hideLoader('history-chart');
     new Chart(document.getElementById('history-chart'), {
       type: 'bar',
       data: { labels, datasets },
@@ -257,6 +268,7 @@
     const partial = rows.map(r => String(r.c[1]?.v ?? '').includes('so far'));
     const colors  = rows.map((_, i) => partial[i] ? '#9E9E9E' : '#111827');
 
+    hideLoader('carbon-emissions-chart');
     new Chart(document.getElementById('carbon-emissions-chart'), {
       type: 'bar',
       data: {

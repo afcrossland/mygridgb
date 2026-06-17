@@ -80,6 +80,7 @@
         <button class="filter-btn active" data-months="12">12 months</button>
       </div>
       <div style="position:relative; height:360px;">
+        <div class="chart-loading" id="treemap-chart-loading"></div>
         <canvas id="treemap-chart"></canvas>
       </div>
     </div>
@@ -98,6 +99,7 @@
     <div class="chart-section">
       <p>Electricity generation (TWh) by fuel type per month. Winter months typically see higher total generation and more wind; summer brings solar peaks. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
       <div style="position:relative; height:420px;">
+        <div class="chart-loading" id="gen-chart-loading"></div>
         <canvas id="gen-chart"></canvas>
       </div>
     </div>
@@ -106,6 +108,7 @@
       <h2>Monthly carbon intensity</h2>
       <p>Average carbon intensity of British electricity (gCO₂eq/kWh) for each month. Carbon intensity falls when wind and solar output is high and rises when gas fills a larger share of demand.</p>
       <div style="position:relative; height:320px;">
+        <div class="chart-loading" id="carbon-chart-loading"></div>
         <canvas id="carbon-chart"></canvas>
       </div>
     </div>
@@ -114,6 +117,12 @@
 </div>
 
 <script>
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
 (async () => {
   const GEN_ID    = '1XmfoB1pj75UMhM9d2r2KbA0P-TAjUddyY0iAuFmgCVw';
   const CARBON_ID = '1M7mmIpZuKLk2GyRSfsRhQgTQiZoGnLI3P5HRiQWxGoc';
@@ -176,6 +185,7 @@
   }
 
   // ── Treemap ──────────────────────────────────────────────────────
+  hideLoader('treemap-chart');
   const treemapChart = new Chart(document.getElementById('treemap-chart'), {
     type: 'treemap',
     data: {
@@ -217,6 +227,7 @@
 
   // ── Generation chart ─────────────────────────────────────────────
   const genInit = tail(genRows, 12);
+  hideLoader('gen-chart');
   const genChart = new Chart(document.getElementById('gen-chart'), {
     type: 'bar',
     data: {
@@ -274,6 +285,7 @@
 
   // ── Carbon chart ─────────────────────────────────────────────────
   const carbonInit = tail(carbonRows, 12);
+  hideLoader('carbon-chart');
   const carbonChart = new Chart(document.getElementById('carbon-chart'), {
     type: 'bar',
     data: {

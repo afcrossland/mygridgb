@@ -413,6 +413,7 @@
       <!-- Pie left + fuel list right -->
       <div class="mix-layout">
         <div class="pie-col">
+          <div class="chart-loading" id="mix-chart-loading"></div>
           <canvas id="mix-chart"></canvas>
         </div>
         <div class="fuel-list" id="fuel-list"></div>
@@ -447,6 +448,7 @@
         <button class="filter-btn" data-hours="672">Last 28 days</button>
       </div>
       <div style="position:relative; height:300px;">
+        <div class="chart-loading" id="week-chart-loading"></div>
         <canvas id="week-chart"></canvas>
       </div>
     </section>
@@ -481,13 +483,17 @@
     <section style="margin:32px 0;">
       <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">Conversion &amp; grid losses</h2>
       <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram traces every unit of energy from source to delivered electricity, in real time.</p>
-      <div id="sankey-chart" style="height:500px; width:100%;"></div>
+      <div style="position:relative; height:500px; width:100%;">
+        <div class="chart-loading" id="sankey-chart-loading"></div>
+        <div id="sankey-chart" style="height:100%; width:100%;"></div>
+      </div>
     </section>
 
     <section style="margin:32px 0; text-align:center;">
       <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">Decarbonising British Electricity</h2>
       <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">The carbon intensity of British electricity has fallen dramatically since 1998, driven by the closure of coal plants and growth in wind, solar and nuclear. The chart tracks this progress — and how far there is still to go to meet the 2030 clean power target of 50–100 gCO₂eq/kWh.</p>
       <div style="position:relative; height:400px;">
+        <div class="chart-loading" id="carbon-chart-loading"></div>
         <canvas id="carbon-chart"></canvas>
       </div>
     </section>
@@ -553,6 +559,13 @@
 </div>
 
 <script>
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
+
 (async () => {
   const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
 
@@ -697,6 +710,7 @@
       listEl.appendChild(row);
     });
 
+    hideLoader('mix-chart');
     new Chart(document.getElementById('mix-chart'), {
       type: 'pie',
       data: {
@@ -833,7 +847,9 @@
           plot_bgcolor:  'rgba(0,0,0,0)',
           margin: { l: 10, r: 10, t: 10, b: 10 },
         }, { responsive: true, displayModeBar: false });
+        hideLoader('sankey-chart');
       }).catch(() => {
+        hideLoader('sankey-chart');
         const el = document.getElementById('sankey-chart');
         if (el) el.style.display = 'none';
       });
@@ -847,6 +863,7 @@
     const colB  = rows.map(r => r.c[1]?.v ?? null);
     const colC  = rows.map(r => r.c[2]?.v ?? null);
 
+    hideLoader('carbon-chart');
     new Chart(document.getElementById('carbon-chart'), {
       type: 'bar',
       data: {
@@ -976,6 +993,7 @@
 
     const initRows   = valid.slice(-168);
     const initLabels = weekLabels(initRows);
+    hideLoader('week-chart');
     const weekChart  = new Chart(document.getElementById('week-chart'), {
       type: 'line',
       data: { labels: initLabels, datasets: weekDatasets(initRows) },

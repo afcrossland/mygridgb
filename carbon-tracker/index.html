@@ -38,6 +38,7 @@
       <h2>Hours at the 2030 target per year</h2>
       <p>Total hours in each calendar year when GB electricity carbon intensity met the 2030 target. The count rises as more wind, solar and nuclear displace gas — years with higher renewable output typically score more hours. The most recent year may be incomplete.</p>
       <div style="position:relative; height:380px;">
+        <div class="chart-loading" id="bar-chart-loading"></div>
         <canvas id="bar-chart"></canvas>
       </div>
     </div>
@@ -47,6 +48,7 @@
       <h2>Cumulative hours at the 2030 target — by year</h2>
       <p>How the cumulative count of hours at the target builds through the year, compared across years since 2016. Steeper lines indicate periods of low-carbon generation — typically high wind and solar months. Comparing years shows how the grid is improving over time.</p>
       <div style="position:relative; height:420px;">
+        <div class="chart-loading" id="line-chart-loading"></div>
         <canvas id="line-chart"></canvas>
       </div>
     </div>
@@ -55,6 +57,12 @@
 </div>
 
 <script>
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
 (async () => {
   const BAR_ID  = '1w2bX1YwhPYUOkxayfJtmNIG_SvCj8UDXxzTy5pxZEqM';
   const LINE_ID = '1ItQ1pZ2JU0itdmcFveTqAtyg0mEyTAR5q54TatkS9D0';
@@ -79,6 +87,7 @@
     const values = rows.map(r => r.c[1]?.v ?? 0);
     const maxYear = Math.max(...labels.map(Number));
 
+    hideLoader('bar-chart');
     new Chart(document.getElementById('bar-chart'), {
       type: 'bar',
       data: {
@@ -170,6 +179,7 @@
       };
     });
 
+    hideLoader('line-chart');
     new Chart(document.getElementById('line-chart'), {
       type: 'line',
       data: { labels: months, datasets },

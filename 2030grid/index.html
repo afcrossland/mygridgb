@@ -296,13 +296,13 @@
     <div class="compare-mix">
       <div>
         <div class="compare-panel-title compare-panel-title--now">Today's Grid</div>
-        <div class="pie-col"><canvas id="pie-actual"></canvas></div>
+        <div class="pie-col"><div class="chart-loading" id="pie-actual-loading"></div><canvas id="pie-actual"></canvas></div>
         <div class="fuel-list" id="fuel-actual"></div>
       </div>
       <div class="compare-arrow-col">→</div>
       <div>
         <div class="compare-panel-title compare-panel-title--manifesto">2030 Blueprint</div>
-        <div class="pie-col"><canvas id="pie-manifesto"></canvas></div>
+        <div class="pie-col"><div class="chart-loading" id="pie-manifesto-loading"></div><canvas id="pie-manifesto"></canvas></div>
         <div class="fuel-list" id="fuel-manifesto"></div>
       </div>
     </div>
@@ -317,6 +317,7 @@
       <button class="filter-btn" data-hours="0">All data</button>
     </div>
     <div style="position:relative; height:420px;">
+      <div class="chart-loading" id="timeseries-chart-loading"></div>
       <canvas id="timeseries-chart"></canvas>
     </div>
 
@@ -324,6 +325,7 @@
     <h2 class="section-h2">Renewable curtailment</h2>
     <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed — switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 Blueprint.</p>
     <div style="position:relative; height:160px;">
+      <div class="chart-loading" id="curtailment-chart-loading"></div>
       <canvas id="curtailment-chart"></canvas>
     </div>
 
@@ -332,6 +334,12 @@
 </div>
 
 <script>
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
 (async () => {
   const MIX_ID        = '1u35y6W2NqBTa5knVrqsYybjIGTPCwjBrIqg0rIZKLes';
   const TIMESERIES_ID = '1ctbznBuW040HtFabgrTu4qDo2TfbsqPZvDiU8rglNRc';
@@ -634,6 +642,8 @@
       });
     }
 
+    hideLoader('pie-actual');
+    hideLoader('pie-manifesto');
     buildPie('pie-actual',    'fuel-actual',    actualRow);
     buildPie('pie-manifesto', 'fuel-manifesto', manifestoRow);
   }
@@ -692,6 +702,7 @@
     const initRows  = allRows.slice(-initHours);
     const initLabels = initRows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
 
+    hideLoader('timeseries-chart');
     const tsChart = new Chart(document.getElementById('timeseries-chart'), {
       type: 'line',
       data: { labels: initLabels, datasets: buildDatasets(initRows) },
@@ -750,6 +761,7 @@
     const rows = curtailResult.value.rows;
     const labels = rows.map(r => r.c[0].v);
 
+    hideLoader('curtailment-chart');
     new Chart(document.getElementById('curtailment-chart'), {
       type: 'bar',
       data: {
