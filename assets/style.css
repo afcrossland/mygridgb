@@ -282,27 +282,29 @@ nav ul ul li a:hover {
 .social-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 11px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 12px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
   transition: opacity .15s, transform .1s;
   box-sizing: border-box;
-  margin-bottom: 8px;
+  white-space: nowrap;
 }
-.social-btn:last-child { margin-bottom: 0; }
 .social-btn:hover { opacity: .88; text-decoration: none; color: #fff; transform: translateY(-1px); }
 .social-btn svg { flex-shrink: 0; }
-.social-btn-text { display: flex; flex-direction: column; gap: 1px; }
-.social-btn-name { font-size: 13px; font-weight: 700; line-height: 1.2; }
-.social-btn-handle { font-size: 11px; font-weight: 400; opacity: .85; }
-.social-btn--x        { background: #000; }
-.social-btn--bluesky  { background: #0085ff; }
-.social-btn--linkedin { background: #0a66c2; }
+.social-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.social-btn--website      { background: #1a4d7a; width: 100%; margin-bottom: 2px; }
+.social-btn--x            { background: #000; }
+.social-btn--bluesky      { background: #0085ff; }
+.social-btn--linkedin     { background: #0a66c2; }
 .social-btn--substack     { background: #FF6719; }
 .social-btn--researchgate { background: #00CCBB; }
 
