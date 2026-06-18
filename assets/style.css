@@ -301,12 +301,12 @@ nav ul ul li a:hover {
   gap: 6px;
   margin-top: 8px;
 }
-.social-btn--website      { background: #1a4d7a; width: 100%; margin-bottom: 2px; }
+.social-btn--website      { background: #2d8c5a; width: 100%; margin-bottom: 2px; }
 .social-btn--x            { background: #000; }
 .social-btn--bluesky      { background: #0085ff; }
 .social-btn--linkedin     { background: #0a66c2; }
 .social-btn--substack     { background: #FF6719; }
-.social-btn--researchgate { background: #00CCBB; }
+.social-btn--researchgate { background: #00CCBB; grid-column: 1 / -1; }
 
 /* ===== HOME PAGE ===== */
 .home-hero {
