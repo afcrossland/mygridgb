@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Solar Calculator — MyGridGB</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/nav.js" defer></script>
+  <style>
+    /* ── Layout ── */
+    .postcode-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .pc-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      padding: 10px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      width: 180px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .pc-input:focus { border-color: var(--brand); }
+    .pc-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .pc-btn:hover { background: var(--brand-dark); }
+    .pc-zone {
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .pc-zone strong { color: var(--brand); }
+    .pc-error { font-size: 13.5px; color: #dc2626; }
+
+    /* ── Calculator grid ── */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 820px) {
+      .calc-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Config panel ── */
+    .config-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+    }
+    .config-panel h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--brand);
+      margin-bottom: 20px;
+    }
+    .ctrl-group {
+      margin-bottom: 18px;
+    }
+    .ctrl-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .ctrl-val {
+      font-weight: 700;
+      color: var(--brand);
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--brand);
+      cursor: pointer;
+    }
+    select.ctrl-select {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .ctrl-hint { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+
+    .rates-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .rate-input-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .rate-label { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .rate-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 100%;
+    }
+
+    /* ── Results panel ── */
+    .results-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+    }
+    .results-panel h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--brand);
+      margin-bottom: 20px;
+    }
+
+    /* ── Roof mode tabs ── */
+    .roof-tabs {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .roof-tab {
+      flex: 1;
+      padding: 6px 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-align: center;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .roof-tab.active {
+      background: var(--surface);
+      color: var(--brand);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+
+    /* ── Array rows ── */
+    .array-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+    .array-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .array-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand);
+      flex: 1;
+    }
+    .array-gen-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .arr-remove {
+      background: none;
+      border: 1px solid #e5e7eb;
+      border-radius: 5px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1;
+      padding: 2px 7px;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .arr-remove:hover { border-color: #dc2626; color: #dc2626; }
+    .array-controls {
+      display: grid;
+      grid-template-columns: 60px 1fr 60px;
+      gap: 8px;
+      align-items: end;
+    }
+    .arr-field { display: flex; flex-direction: column; gap: 3px; }
+    .arr-field label { font-size: 11px; font-weight: 600; color: var(--muted); }
+    .arr-field input[type=number],
+    .arr-field select {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 5px 7px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      width: 100%;
+      background: white;
+    }
+    .arrays-footer {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+    }
+    .add-arr-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1px dashed var(--brand);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--brand);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .add-arr-btn:hover { background: #e8f4fd; }
+    .add-arr-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .array-total-label {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .array-total-label strong { color: var(--brand); }
+
+    /* ── Payback table ── */
+    .payback-section {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .payback-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .payback-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .payback-table th {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 3px 6px 6px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .payback-table td {
+      padding: 7px 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .payback-table tr:last-child td { border-bottom: none; }
+    .payback-table .mid-row td { font-weight: 700; }
+    .payback-table .mid-row .pb-yrs { color: var(--brand); }
+    .pb-yrs { font-weight: 600; }
+    .payback-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── Gauge ── */
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .gauge-wrap svg { width: 100%; max-width: 260px; }
+
+    /* ── Stat cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-card .stat-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-card .stat-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    .stat-card.highlight { background: #e8f4fd; border-color: #b6d8f2; }
+    .stat-card.highlight .stat-val { color: var(--brand); }
+
+    /* ── How this tool works ── */
+    .method-details {
+      margin-top: 28px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .method-details summary {
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brand);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .method-details summary::-webkit-details-marker { display: none; }
+    .method-details summary::before {
+      content: '▶';
+      font-size: 10px;
+      transition: transform .2s;
+      color: var(--muted);
+    }
+    .method-details[open] summary::before { transform: rotate(90deg); }
+    .method-body {
+      padding: 0 24px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .method-body h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 18px 0 6px;
+    }
+    .method-body p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .method-body a { font-size: 13.5px; }
+
+    /* ── Placeholder state ── */
+    .results-placeholder {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .results-placeholder .placeholder-icon {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <main>
+    <h1 class="page-title">Home Solar Calculator</h1>
+    <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year. Enter your postcode and adjust the system settings below.</p>
+
+    <!-- Postcode lookup -->
+    <div class="postcode-row">
+      <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or SW1" maxlength="8" autocomplete="postal-code">
+      <button id="pc-btn" class="pc-btn">Find location</button>
+      <div id="pc-status"></div>
+    </div>
+
+    <!-- Main calculator -->
+    <div class="calc-grid">
+
+      <!-- Left: Configuration -->
+      <div class="config-panel">
+        <h2>System &amp; household</h2>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Solar panels</span>
+            <span class="ctrl-val" id="val-total-kwp">3.80 kWp</span>
+          </div>
+
+          <div class="roof-tabs">
+            <button class="roof-tab active" id="tab-single">Single roof</button>
+            <button class="roof-tab" id="tab-multi">Multiple roofs</button>
+          </div>
+
+          <!-- Single roof -->
+          <div id="panel-single">
+            <div class="ctrl-label" style="margin-top:8px">
+              <span>Number of panels</span>
+              <span class="ctrl-val" id="val-panels">8 panels</span>
+            </div>
+            <input type="range" id="ctrl-panels" min="1" max="30" value="8" step="1">
+            <div class="ctrl-label" style="margin-top:10px">
+              <span>Orientation</span>
+              <span class="ctrl-val" id="val-orient">South (0°)</span>
+            </div>
+            <input type="range" id="ctrl-orient" min="0" max="175" value="0" step="5">
+            <div class="ctrl-label" style="margin-top:10px">
+              <span>Roof pitch (tilt)</span>
+              <span class="ctrl-val" id="val-tilt">30°</span>
+            </div>
+            <input type="range" id="ctrl-tilt" min="0" max="60" value="30" step="1">
+            <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · typical UK roof is 30–40°</div>
+          </div>
+
+          <!-- Multiple roofs -->
+          <div id="panel-multi" style="display:none">
+            <div id="arrays-container"></div>
+            <div class="arrays-footer">
+              <button id="add-array-btn" class="add-arr-btn">+ Add array</button>
+              <span class="array-total-label">Total: <strong id="arr-total-gen">—</strong></span>
+            </div>
+            <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · max 10 arrays</div>
+          </div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>Battery storage</span></div>
+          <select id="ctrl-battery" class="ctrl-select">
+            <option value="0">No battery</option>
+            <option value="2.5">2.5 kWh battery</option>
+            <option value="5">5 kWh battery</option>
+            <option value="7.5">7.5 kWh battery</option>
+            <option value="10" selected>10 kWh battery</option>
+            <option value="13.5">13.5 kWh battery</option>
+          </select>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Annual electricity use</span>
+            <span class="ctrl-val" id="val-demand">3,500 kWh</span>
+          </div>
+          <input type="range" id="ctrl-demand" min="1000" max="8000" value="3500" step="100">
+          <div class="ctrl-hint">UK average is ~3,500 kWh/year</div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>Occupancy pattern</span></div>
+          <select id="ctrl-archetype" class="ctrl-select">
+            <option value="homeallday">Home all day</option>
+            <option value="inhalftheday" selected>In half the day</option>
+            <option value="outallday">Out all day (working day)</option>
+          </select>
+          <div class="ctrl-hint">Affects how much solar you use directly vs export</div>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>Electricity tariff rates</span></div>
+          <div class="rates-row">
+            <div class="rate-input-wrap">
+              <label class="rate-label" for="ctrl-import">Import (p/kWh)</label>
+              <input id="ctrl-import" class="rate-input" type="number" value="20" min="1" max="100" step="0.5">
+            </div>
+            <div class="rate-input-wrap">
+              <label class="rate-label" for="ctrl-export">Export (p/kWh)</label>
+              <input id="ctrl-export" class="rate-input" type="number" value="5" min="0" max="50" step="0.5">
+            </div>
+            <div class="rate-input-wrap">
+              <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
+              <input id="ctrl-cheap" class="rate-input" type="number" value="7.5" min="0" max="50" step="0.5">
+            </div>
+          </div>
+          <div class="ctrl-hint">Import = standard rate; overnight = off-peak tariff (e.g. Octopus Go); export = SEG rate</div>
+        </div>
+      </div>
+
+      <!-- Right: Results -->
+      <div class="results-panel">
+        <h2>Your estimate</h2>
+
+        <!-- Placeholder state (no postcode yet) -->
+        <div id="results-placeholder" class="results-placeholder">
+          <span class="placeholder-icon">☀️</span>
+          Enter your postcode to see how much electricity your solar system could generate based on local irradiance data.
+        </div>
+
+        <!-- Results (hidden until postcode entered) -->
+        <div id="results-content" style="display:none">
+          <!-- SVG Gauge -->
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 220 130" role="img" aria-label="Solar self-supply gauge">
+              <!-- Background track -->
+              <path d="M 15 115 a 95 95 0 0 1 190 0"
+                    fill="none" stroke="#e5e7eb" stroke-width="16" stroke-linecap="round"/>
+              <!-- Fill (dynamic via JS) -->
+              <path id="gauge-arc"
+                    d="M 15 115 a 95 95 0 0 1 190 0"
+                    fill="none" stroke="#1a4d7a" stroke-width="16"
+                    stroke-linecap="round"
+                    stroke-dasharray="0 299"/>
+              <!-- Percentage -->
+              <text id="gauge-text" x="110" y="90" text-anchor="middle"
+                    font-size="40" font-weight="700" fill="#1a4d7a"
+                    font-family="DM Sans, sans-serif">--%</text>
+              <text x="110" y="116" text-anchor="middle"
+                    font-size="11" fill="#64748b"
+                    font-family="DM Sans, sans-serif">electricity from solar</text>
+            </svg>
+          </div>
+
+          <!-- Stat cards -->
+          <div class="stats-grid">
+            <div class="stat-card highlight">
+              <div class="stat-label">Annual generation</div>
+              <div class="stat-val" id="stat-gen">—</div>
+              <div class="stat-sub">kWh / year</div>
+            </div>
+            <div class="stat-card highlight">
+              <div class="stat-label">Annual saving</div>
+              <div class="stat-val" id="stat-saving">—</div>
+              <div class="stat-sub" id="stat-import-line">&nbsp;</div>
+              <div class="stat-sub" id="stat-export-line">&nbsp;</div>
+              <div class="stat-sub" id="stat-arbitrage-line" style="color:#0e7a3e">&nbsp;</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Self-consumed</div>
+              <div class="stat-val" id="stat-self">—</div>
+              <div class="stat-sub">kWh used in home</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Exported to grid</div>
+              <div class="stat-val" id="stat-export">—</div>
+              <div class="stat-sub">kWh sold / exported</div>
+            </div>
+          </div>
+
+          <!-- Payback table -->
+          <div class="payback-section">
+            <div class="payback-heading">Estimated payback</div>
+            <table class="payback-table">
+              <thead>
+                <tr>
+                  <th>Install cost</th>
+                  <th>Year 1 saving</th>
+                  <th>Simple payback</th>
+                </tr>
+              </thead>
+              <tbody id="payback-body">
+                <tr><td colspan="3">—</td></tr>
+              </tbody>
+            </table>
+            <div class="payback-note">£170/panel · £2k labour · £2k scaffolding · battery: £1k + £200/kWh. Import savings &amp; arbitrage inflate at 2.1%/yr; export rate fixed.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- .calc-grid -->
+
+    <!-- How this tool works -->
+    <details class="method-details">
+      <summary>How this tool works</summary>
+      <div class="method-body">
+        <h3>Generation estimate</h3>
+        <p>Annual solar generation is calculated using irradiance data from the <strong>MCS MGD003 dataset</strong> — the same data used by certified solar installers in the UK. The dataset provides annual yield figures (kWh per kWp) for 25 climate zones across the UK, at every combination of roof tilt (0–90°) and orientation (0–175° from south). Your postcode is matched to the nearest zone centre. The panel output assumes each panel is rated at <strong>475 Wp</strong>; performance losses (wiring, inverter, temperature) are already embedded in the MCS irradiance figures.</p>
+
+        <h3>Self-consumption &amp; battery</h3>
+        <p>What fraction of generated electricity is actually used in your home (rather than exported) depends on when you're home and whether you have a battery. These fractions come from the <strong>MCS MGD003 self-consumption lookup tables</strong>, which model three occupancy archetypes and a range of battery sizes against different generation and demand levels. A 90% cap on demand met is applied — it is not practically possible to cover all electricity from solar alone due to overnight and low-irradiance periods.</p>
+
+        <h3>Financial estimate</h3>
+        <p>Annual saving = (self-consumed kWh × import rate) + (exported kWh × export rate) + battery arbitrage saving. The import rate is what you currently pay per kWh; the export rate is what you receive under the <a href="https://www.ofgem.gov.uk/check-if-energy-price-cap-affects-you" target="_blank">Smart Export Guarantee (SEG)</a> or similar tariff.</p>
+
+        <h3>Battery arbitrage</h3>
+        <p>A battery can earn additional value by charging from the grid overnight at a cheap off-peak rate (e.g. Octopus Go at ~7.5p/kWh) and discharging during the day instead of importing at the standard rate. The number of available arbitrage cycles = 365 minus the cycles already used for solar self-consumption. Solar self-consumption cycles are estimated from the uplift in the MCS self-consumption fraction between PV-only and PV-with-battery, divided by battery capacity (accounting for 90% round-trip efficiency). Each arbitrage cycle earns: battery capacity × 90% efficiency × (import rate − overnight rate). Arbitrage saving is set to zero if the overnight rate exceeds the effective discharge value.</p>
+
+        <h3>Limitations</h3>
+        <p>The MCS lookup tables cover generation and demand up to 5,999 kWh/year. Very large systems (typically &gt;12 panels) or high-demand homes may approach this boundary; results in those cases are approximations. This tool does not account for shading, soiling, or system degradation over time. Always get a quote from an <a href="https://mcscertified.com/find-an-installer/" target="_blank">MCS-certified installer</a> before making any purchasing decision.</p>
+      </div>
+    </details>
+
+  </main>
+  <div id="sidebar-placeholder"></div>
+</div>
+
+<script>
+// ── Zone centres for nearest-zone lookup ─────────────────────────────────────
+const ZONE_CENTRES = [
+  { key: 'Z1 - London',          lat: 51.50, lon: -0.12,  label: 'London'          },
+  { key: 'Z2 - Brighton',        lat: 50.83, lon: -0.14,  label: 'Brighton'        },
+  { key: 'Z3 - Southampton',     lat: 50.90, lon: -1.40,  label: 'Southampton'     },
+  { key: 'Z4 - Plymouth',        lat: 50.38, lon: -4.14,  label: 'Plymouth'        },
+  { key: 'Z5E - Bristol',        lat: 51.45, lon: -2.58,  label: 'Bristol'         },
+  { key: 'Z5W - Cardiff',        lat: 51.48, lon: -3.18,  label: 'Cardiff'         },
+  { key: 'Z6 - Birmingham',      lat: 52.49, lon: -1.90,  label: 'Birmingham'      },
+  { key: 'Z7E - Manchester',     lat: 53.48, lon: -2.24,  label: 'Manchester'      },
+  { key: 'Z7W - Chester',        lat: 53.19, lon: -2.89,  label: 'Chester'         },
+  { key: 'Z8S - Dumfries',       lat: 55.07, lon: -3.61,  label: 'Dumfries'        },
+  { key: 'Z8E - Carlisle',       lat: 54.89, lon: -2.94,  label: 'Carlisle'        },
+  { key: 'Z9E - Newcastle',      lat: 54.97, lon: -1.61,  label: 'Newcastle'       },
+  { key: 'Z9S - Edinburgh',      lat: 55.95, lon: -3.19,  label: 'Edinburgh'       },
+  { key: 'Z10 - Middlesborough', lat: 54.57, lon: -1.23,  label: 'Middlesbrough'   },
+  { key: 'Z11 - Sheffield',      lat: 53.38, lon: -1.47,  label: 'Sheffield'       },
+  { key: 'Z12 - Norwich',        lat: 52.63, lon:  1.30,  label: 'Norwich'         },
+  { key: 'Z13 - Aberystwith',    lat: 52.42, lon: -4.09,  label: 'Aberystwyth'     },
+  { key: 'Z14 - Glasgow',        lat: 55.86, lon: -4.25,  label: 'Glasgow'         },
+  { key: 'Z15 - Dundee',         lat: 56.46, lon: -2.97,  label: 'Dundee'          },
+  { key: 'Z16 - Aberdeen',       lat: 57.15, lon: -2.11,  label: 'Aberdeen'        },
+  { key: 'Z17 - Inverness',      lat: 57.48, lon: -4.22,  label: 'Inverness'       },
+  { key: 'Z18 - Stornoway',      lat: 58.21, lon: -6.39,  label: 'Stornoway'       },
+  { key: 'Z19 - Kirkwall',       lat: 58.98, lon: -2.96,  label: 'Kirkwall'        },
+  { key: 'Z20 - Lerwick',        lat: 60.15, lon: -1.15,  label: 'Lerwick'         },
+  { key: 'Z21 - Belfast',        lat: 54.60, lon: -5.93,  label: 'Belfast'         },
+];
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+function nearestZone(lat, lon) {
+  let best = null, bestD = Infinity;
+  for (const z of ZONE_CENTRES) {
+    const d = haversine(lat, lon, z.lat, z.lon);
+    if (d < bestD) { bestD = d; best = z; }
+  }
+  return best;
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let irradianceData = null, lookupData = null;
+let currentZoneKey = null;
+
+// ── Load data ────────────────────────────────────────────────────────────────
+Promise.all([
+  fetch('/solar-calculator/data/irradiance.json').then(r => r.json()),
+  fetch('/solar-calculator/data/lookup.json').then(r => r.json()),
+]).then(([irr, lk]) => {
+  irradianceData = irr;
+  lookupData = lk;
+}).catch(err => console.error('Data load error:', err));
+
+// ── Postcode lookup ───────────────────────────────────────────────────────────
+const pcInput  = document.getElementById('pc-input');
+const pcBtn    = document.getElementById('pc-btn');
+const pcStatus = document.getElementById('pc-status');
+
+async function lookupPostcode() {
+  const raw = pcInput.value.trim().toUpperCase();
+  if (!raw) return;
+  pcBtn.disabled = true;
+  pcBtn.textContent = 'Looking up…';
+  pcStatus.innerHTML = '';
+
+  // Normalise: strip spaces, detect full postcode vs outward/partial code
+  const stripped = raw.replace(/\s+/g, '');
+  // Full UK postcode without space is 5-7 chars; inward code is always exactly 3 chars
+  // Insert space before last 3 chars to get standard format (e.g. DN226UF → DN22 6UF)
+  const isFullPostcode = stripped.length >= 5;
+  const normalised = isFullPostcode
+    ? stripped.slice(0, -3) + ' ' + stripped.slice(-3)
+    : stripped;
+
+  try {
+    let latitude, longitude, displayCode;
+
+    if (isFullPostcode) {
+      // Full postcode lookup — use normalised form (e.g. DN22 6UF)
+      const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(normalised)}`);
+      const data = await res.json();
+      if (data.status !== 200) throw new Error('not found');
+      latitude  = data.result.latitude;
+      longitude = data.result.longitude;
+      displayCode = data.result.postcode;
+    } else {
+      // Outward / partial code — use outcodes endpoint
+      const res = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(stripped)}`);
+      const data = await res.json();
+      if (data.status !== 200) throw new Error('not found');
+      latitude  = data.result.latitude;
+      longitude = data.result.longitude;
+      displayCode = data.result.outcode + ' (approximate)';
+    }
+
+    const zone = nearestZone(latitude, longitude);
+    currentZoneKey = zone.key;
+
+    pcStatus.innerHTML = `<span class="pc-zone">${displayCode} → MCS zone: <strong>${zone.label}</strong></span>`;
+    document.getElementById('results-placeholder').style.display = 'none';
+    document.getElementById('results-content').style.display  = 'block';
+    calculate();
+  } catch (e) {
+    console.error('Postcode lookup error:', e);
+    pcStatus.innerHTML = `<span class="pc-error">Postcode not recognised — try a full postcode (e.g. SW1A 1AA) or district code (e.g. DN22)</span>`;
+  } finally {
+    pcBtn.disabled = false;
+    pcBtn.textContent = 'Find location';
+  }
+}
+
+pcBtn.addEventListener('click', lookupPostcode);
+pcInput.addEventListener('keydown', e => { if (e.key === 'Enter') lookupPostcode(); });
+
+// ── Orientation helpers ────────────────────────────────────────────────────────
+const ORIENT_OPTIONS = [
+  { label: 'South',       az:   0 },
+  { label: 'SSE / SSW',   az:  20 },
+  { label: 'SE / SW',     az:  45 },
+  { label: 'ESE / WSW',   az:  65 },
+  { label: 'East / West', az:  90 },
+  { label: 'ENE / WNW',   az: 110 },
+  { label: 'NE / NW',     az: 135 },
+  { label: 'NNE / NNW',   az: 155 },
+  { label: 'North',       az: 175 },
+];
+
+function orientLabel(deg) {
+  return (ORIENT_OPTIONS.find(o => o.az >= deg) || ORIENT_OPTIONS.at(-1)).label;
+}
+
+// ── Arrays data model (shared by both modes) ──────────────────────────────────
+let arrays = [{ panels: 8, azimuth: 0, tilt: 30 }];
+
+// ── Single-roof controls ──────────────────────────────────────────────────────
+const ctrlPanels = document.getElementById('ctrl-panels');
+const ctrlOrient = document.getElementById('ctrl-orient');
+const ctrlTilt   = document.getElementById('ctrl-tilt');
+
+function updateSingleLabels() {
+  const n  = +ctrlPanels.value;
+  const az = +ctrlOrient.value;
+  document.getElementById('val-panels').textContent = `${n} panel${n !== 1 ? 's' : ''}`;
+  document.getElementById('val-orient').textContent = `${orientLabel(az)} (${az}°)`;
+  document.getElementById('val-tilt').textContent   = `${ctrlTilt.value}°`;
+}
+
+[ctrlPanels, ctrlOrient, ctrlTilt].forEach(el =>
+  el.addEventListener('input', () => {
+    arrays[0] = { panels: +ctrlPanels.value, azimuth: +ctrlOrient.value, tilt: +ctrlTilt.value };
+    updateSingleLabels();
+    calculate();
+  })
+);
+
+updateSingleLabels();
+
+// ── Multiple-roof array rows ───────────────────────────────────────────────────
+function arrayRowHTML(idx, arr) {
+  const orientOpts = ORIENT_OPTIONS.map(o =>
+    `<option value="${o.az}"${arr.azimuth === o.az ? ' selected' : ''}>${o.label}</option>`
+  ).join('');
+  const removeBtn = arrays.length > 1
+    ? `<button class="arr-remove" data-idx="${idx}" title="Remove">×</button>`
+    : '';
+  return `
+    <div class="array-row" data-idx="${idx}">
+      <div class="array-header">
+        <span class="array-num">Array ${idx + 1}</span>
+        <span class="array-gen-label" id="arr-gen-${idx}">—</span>
+        ${removeBtn}
+      </div>
+      <div class="array-controls">
+        <div class="arr-field"><label>Panels</label>
+          <input type="number" class="arr-panels" data-idx="${idx}" value="${arr.panels}" min="1" max="30" step="1">
+        </div>
+        <div class="arr-field"><label>Orientation</label>
+          <select class="arr-orient" data-idx="${idx}">${orientOpts}</select>
+        </div>
+        <div class="arr-field"><label>Tilt (°)</label>
+          <input type="number" class="arr-tilt" data-idx="${idx}" value="${arr.tilt}" min="0" max="60" step="1">
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderArrays() {
+  const container = document.getElementById('arrays-container');
+  container.innerHTML = arrays.map((a, i) => arrayRowHTML(i, a)).join('');
+  container.querySelectorAll('.arr-panels').forEach(el =>
+    el.addEventListener('change', e => {
+      const i = +e.target.dataset.idx;
+      arrays[i].panels = Math.max(1, Math.min(30, +e.target.value || 1));
+      e.target.value = arrays[i].panels;
+      calculate();
+    })
+  );
+  container.querySelectorAll('.arr-orient').forEach(el =>
+    el.addEventListener('change', e => { arrays[+e.target.dataset.idx].azimuth = +e.target.value; calculate(); })
+  );
+  container.querySelectorAll('.arr-tilt').forEach(el =>
+    el.addEventListener('change', e => {
+      const i = +e.target.dataset.idx;
+      arrays[i].tilt = Math.max(0, Math.min(60, +e.target.value || 0));
+      e.target.value = arrays[i].tilt;
+      calculate();
+    })
+  );
+  container.querySelectorAll('.arr-remove').forEach(el =>
+    el.addEventListener('click', e => { arrays.splice(+e.target.dataset.idx, 1); renderArrays(); calculate(); })
+  );
+  document.getElementById('add-array-btn').disabled = arrays.length >= 10;
+}
+
+document.getElementById('add-array-btn').addEventListener('click', () => {
+  if (arrays.length < 10) { arrays.push({ panels: 4, azimuth: 0, tilt: 30 }); renderArrays(); calculate(); }
+});
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+const tabSingle   = document.getElementById('tab-single');
+const tabMulti    = document.getElementById('tab-multi');
+const panelSingle = document.getElementById('panel-single');
+const panelMulti  = document.getElementById('panel-multi');
+
+tabSingle.addEventListener('click', () => {
+  tabSingle.classList.add('active'); tabMulti.classList.remove('active');
+  panelSingle.style.display = ''; panelMulti.style.display = 'none';
+  // Keep only the first array; sync sliders to it
+  arrays = [arrays[0]];
+  ctrlPanels.value = arrays[0].panels;
+  ctrlOrient.value = arrays[0].azimuth;
+  ctrlTilt.value   = arrays[0].tilt;
+  updateSingleLabels();
+  calculate();
+});
+
+tabMulti.addEventListener('click', () => {
+  tabMulti.classList.add('active'); tabSingle.classList.remove('active');
+  panelMulti.style.display = ''; panelSingle.style.display = 'none';
+  renderArrays();
+  calculate();
+});
+
+// ── Other controls ────────────────────────────────────────────────────────────
+const ctrlBattery  = document.getElementById('ctrl-battery');
+const ctrlDemand   = document.getElementById('ctrl-demand');
+const ctrlArchtype = document.getElementById('ctrl-archetype');
+const ctrlImport   = document.getElementById('ctrl-import');
+const ctrlExport   = document.getElementById('ctrl-export');
+const ctrlCheap    = document.getElementById('ctrl-cheap');
+
+ctrlDemand.addEventListener('input', () => {
+  document.getElementById('val-demand').textContent =
+    `${Number(ctrlDemand.value).toLocaleString()} kWh`;
+  calculate();
+});
+[ctrlBattery, ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
+  el.addEventListener('change', calculate)
+);
+
+// ── Calculation ───────────────────────────────────────────────────────────────
+const DEMAND_BANDS = [1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500];
+const ARC_LENGTH = Math.PI * 95; // ≈ 298.5 px (half circumference, r=95)
+
+function demandBand(kWh) {
+  const c = Math.max(1500, Math.min(5999, kWh));
+  let band = 1500;
+  for (const b of DEMAND_BANDS) { if (c >= b) band = b; }
+  return band;
+}
+
+function batteryCol(kwh) {
+  if (kwh < 1.1) return 0;
+  return Math.min(14, Math.floor(kwh - 0.1));
+}
+
+function calculate() {
+  if (!irradianceData || !lookupData || !currentZoneKey) return;
+
+  const battery  = +ctrlBattery.value;
+  const demand   = +ctrlDemand.value;
+  const archtype = ctrlArchtype.value;
+  const importP  = +ctrlImport.value / 100;
+  const exportP  = +ctrlExport.value / 100;
+  const cheapP   = +ctrlCheap.value / 100;
+
+  // ── 1. Generation — sum across all arrays ──────────────────────────────────
+  const zoneData = irradianceData.zones[currentZoneKey];
+  let generation = 0;
+  let totalKWp = 0;
+
+  arrays.forEach((arr, i) => {
+    const azIdx  = Math.round(Math.min(175, arr.azimuth) / 5);
+    const tiltKey = String(Math.max(0, Math.min(90, arr.tilt)));
+    const row    = zoneData[tiltKey] || zoneData['30'];
+    const irr    = row[azIdx] || 0;
+    const kWp    = arr.panels * 0.475;
+    const arrGen = Math.round(irr * kWp);
+    generation  += arrGen;
+    totalKWp    += kWp;
+    const genEl  = document.getElementById(`arr-gen-${i}`);
+    if (genEl) genEl.textContent = arrGen.toLocaleString() + ' kWh';
+  });
+
+  document.getElementById('arr-total-gen').textContent = generation.toLocaleString() + ' kWh';
+  document.getElementById('val-total-kwp').textContent = totalKWp.toFixed(2) + ' kWp total';
+
+  // ── 3. Self-consumption fraction (MCS lookup tables) ──────────────────────
+  const dBand     = demandBand(demand);
+  const genBandIdx = Math.min(19, Math.floor(generation / 300));
+  const bCol      = batteryCol(battery);
+
+  const table    = lookupData[archtype];
+  const bandKey  = String(dBand);
+  const tableRow = (table[bandKey] && table[bandKey][genBandIdx]) ? table[bandKey][genBandIdx] : null;
+
+  const fraction       = tableRow ? (tableRow[bCol] || 0) : 0;
+  const fractionPVOnly = tableRow ? (tableRow[0]    || 0) : 0;
+
+  // ── 4. Self-consumption outputs ────────────────────────────────────────────
+  const selfConsumed = Math.min(Math.round(generation * fraction), Math.floor(demand * 0.90));
+  const exported     = generation - selfConsumed;
+  const pctMet       = Math.round(selfConsumed / demand * 100);
+
+  // ── 5. Battery arbitrage ───────────────────────────────────────────────────
+  const BATT_EFFICIENCY = 0.90;
+  let scCycles = 0, arbitrageCycles = 0, arbitrageSaving = 0;
+
+  if (battery >= 1.1) {
+    // Energy delivered from battery for solar self-consumption
+    const energyThroughBattery = Math.max(0, generation * (fraction - fractionPVOnly));
+    // Equivalent full cycles (input side: energy / efficiency / capacity)
+    scCycles = energyThroughBattery / (battery * BATT_EFFICIENCY);
+    // Remaining cycles available for grid arbitrage
+    arbitrageCycles = Math.max(0, 365 - scCycles);
+    // Saving: charge cheaply overnight, discharge instead of importing at peak
+    arbitrageSaving = Math.max(0, Math.round(
+      arbitrageCycles * battery * (BATT_EFFICIENCY * importP - cheapP)
+    ));
+  }
+
+  const importSaved  = Math.round(selfConsumed * importP);
+  const exportEarned = Math.round(exported * exportP);
+  const totalSaving  = importSaved + exportEarned + arbitrageSaving;
+
+  // ── 6. Update UI ───────────────────────────────────────────────────────────
+  const arcFill = ARC_LENGTH * Math.min(1, selfConsumed / demand);
+  document.getElementById('gauge-arc').setAttribute(
+    'stroke-dasharray', `${arcFill.toFixed(1)} ${ARC_LENGTH.toFixed(1)}`
+  );
+  document.getElementById('gauge-text').textContent = pctMet + '%';
+
+  document.getElementById('stat-gen').textContent    = generation.toLocaleString();
+  document.getElementById('stat-saving').textContent = '£' + totalSaving.toLocaleString();
+  document.getElementById('stat-import-line').textContent    = `£${importSaved.toLocaleString()} import saved`;
+  document.getElementById('stat-export-line').textContent    = `£${exportEarned.toLocaleString()} export earned`;
+  document.getElementById('stat-arbitrage-line').textContent = battery >= 1.1
+    ? `£${arbitrageSaving.toLocaleString()} battery arbitrage (${Math.round(arbitrageCycles)} cycles)`
+    : '';
+  document.getElementById('stat-self').textContent   = selfConsumed.toLocaleString();
+  document.getElementById('stat-export').textContent = exported.toLocaleString();
+
+  // ── 5. Payback ──────────────────────────────────────────────────────────────
+  const totalPanels = arrays.reduce((s, a) => s + a.panels, 0);
+  const rawCost = 170 * totalPanels
+    + (battery >= 1.1 ? 1000 + 200 * battery : 0)
+    + 4000; // £2k labour + £2k scaffolding
+  const baseCost = Math.round(rawCost / 1000) * 1000;
+  const costs = [baseCost - 2000, baseCost, baseCost + 2000];
+
+  const growingAnnual = importSaved + arbitrageSaving; // inflates 2.1%/yr
+  const fixedAnnual   = exportEarned;                  // flat
+
+  function simplePayback(cost) {
+    let cum = 0;
+    for (let y = 1; y <= 50; y++) {
+      cum += fixedAnnual + Math.round(growingAnnual * Math.pow(1.021, y - 1));
+      if (cum >= cost) return y;
+    }
+    return '>50';
+  }
+
+  const yr1 = fixedAnnual + growingAnnual;
+  document.getElementById('payback-body').innerHTML = costs.map((c, i) => {
+    const pb = simplePayback(c);
+    const mid = i === 1 ? ' class="mid-row"' : '';
+    return `<tr${mid}>
+      <td>£${c.toLocaleString()}</td>
+      <td>£${yr1.toLocaleString()}</td>
+      <td class="pb-yrs">${typeof pb === 'number' ? pb + ' yrs' : pb}</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+
+</body>
+</html>
