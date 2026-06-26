@@ -501,6 +501,12 @@
             </div>
           </div>
           <div class="ctrl-hint">Import = standard rate; overnight = off-peak tariff (e.g. Octopus Go); export = SEG rate</div>
+          <div class="ctrl-label" style="margin-top:12px">
+            <span>Electricity price inflation</span>
+            <span class="ctrl-val" id="val-inflation">2.1% / yr</span>
+          </div>
+          <input type="range" id="ctrl-inflation" min="0" max="10" value="2.1" step="0.1">
+          <div class="ctrl-hint">Applied to import savings &amp; arbitrage in payback model; export rate kept flat</div>
         </div>
       </div>
 
@@ -865,9 +871,15 @@ tabMulti.addEventListener('click', () => {
 const ctrlBattery  = document.getElementById('ctrl-battery');
 const ctrlDemand   = document.getElementById('ctrl-demand');
 const ctrlArchtype = document.getElementById('ctrl-archetype');
-const ctrlImport   = document.getElementById('ctrl-import');
-const ctrlExport   = document.getElementById('ctrl-export');
-const ctrlCheap    = document.getElementById('ctrl-cheap');
+const ctrlImport     = document.getElementById('ctrl-import');
+const ctrlExport     = document.getElementById('ctrl-export');
+const ctrlCheap      = document.getElementById('ctrl-cheap');
+const ctrlInflation  = document.getElementById('ctrl-inflation');
+
+ctrlInflation.addEventListener('input', () => {
+  document.getElementById('val-inflation').textContent = `${ctrlInflation.value}% / yr`;
+  calculate();
+});
 
 ctrlDemand.addEventListener('input', () => {
   document.getElementById('val-demand').textContent =
@@ -988,20 +1000,21 @@ function calculate() {
   const baseCost = Math.round(rawCost / 1000) * 1000;
   const costs = [baseCost - 2000, baseCost, baseCost + 2000];
 
-  const growingAnnual = importSaved + arbitrageSaving; // inflates 2.1%/yr
-  const fixedAnnual   = exportEarned;                  // flat
+  const growingAnnual = importSaved + arbitrageSaving;
+  const fixedAnnual   = exportEarned;
+  const inflRate      = 1 + (+ctrlInflation.value / 100);
 
   function simplePayback(cost) {
     let cum = 0;
     for (let y = 1; y <= 50; y++) {
-      cum += fixedAnnual + Math.round(growingAnnual * Math.pow(1.021, y - 1));
+      cum += fixedAnnual + Math.round(growingAnnual * Math.pow(inflRate, y - 1));
       if (cum >= cost) return y;
     }
     return '>50';
   }
 
   const yr1 = fixedAnnual + growingAnnual;
-  const yr5 = fixedAnnual + Math.round(growingAnnual * Math.pow(1.021, 4));
+  const yr5 = fixedAnnual + Math.round(growingAnnual * Math.pow(inflRate, 4));
   document.getElementById('payback-body').innerHTML = costs.map((c, i) => {
     const pb = simplePayback(c);
     const mid = i === 1 ? ' class="mid-row"' : '';
