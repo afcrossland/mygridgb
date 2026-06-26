@@ -571,8 +571,9 @@
               <thead>
                 <tr>
                   <th>Install cost</th>
-                  <th>Year 1 saving</th>
-                  <th>Simple payback</th>
+                  <th>Yr 1 saving</th>
+                  <th>Yr 5 saving</th>
+                  <th>Payback</th>
                 </tr>
               </thead>
               <tbody id="payback-body">
@@ -1000,12 +1001,14 @@ function calculate() {
   }
 
   const yr1 = fixedAnnual + growingAnnual;
+  const yr5 = fixedAnnual + Math.round(growingAnnual * Math.pow(1.021, 4));
   document.getElementById('payback-body').innerHTML = costs.map((c, i) => {
     const pb = simplePayback(c);
     const mid = i === 1 ? ' class="mid-row"' : '';
     return `<tr${mid}>
       <td>£${c.toLocaleString()}</td>
       <td>£${yr1.toLocaleString()}</td>
+      <td>£${yr5.toLocaleString()}</td>
       <td class="pb-yrs">${typeof pb === 'number' ? pb + ' yrs' : pb}</td>
     </tr>`;
   }).join('');
