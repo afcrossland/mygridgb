@@ -236,6 +236,26 @@
     .easy-card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
     .easy-card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .easy-mode-hint  { font-size: 12px; color: var(--muted); margin-top: 14px; font-style: italic; }
+    .house-size-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .house-mode-toggle { display: flex; gap: 2px; }
+    .house-mode-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .12s, color .12s;
+    }
+    .house-mode-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
     /* ── Roof mode tabs ── */
     .roof-tabs {
@@ -546,25 +566,15 @@
 
         <!-- ── Simple panel ── -->
         <div id="simple-panel">
-          <div class="easy-section-label">House size</div>
-          <div class="easy-cards" id="house-size-cards">
-            <button class="easy-card" data-panels="6">
-              <span class="easy-card-title">Small</span>
-              <span class="easy-card-sub">2–3 bed terraced</span>
-            </button>
-            <button class="easy-card selected" data-panels="10">
-              <span class="easy-card-title">Medium</span>
-              <span class="easy-card-sub">3–4 bed semi</span>
-            </button>
-            <button class="easy-card" data-panels="14">
-              <span class="easy-card-title">Large</span>
-              <span class="easy-card-sub">4–5 bed detached</span>
-            </button>
-            <button class="easy-card" data-panels="20">
-              <span class="easy-card-title">Very large</span>
-              <span class="easy-card-sub">5+ bed detached</span>
-            </button>
+          <div class="house-size-header">
+            <span class="easy-section-label" style="margin-bottom:0">House size</span>
+            <div class="house-mode-toggle">
+              <button class="house-mode-btn active" data-hmode="B">Bedrooms</button>
+              <button class="house-mode-btn" data-hmode="A">Roof size</button>
+              <button class="house-mode-btn" data-hmode="C">House type</button>
+            </div>
           </div>
+          <div class="easy-cards" id="house-size-cards"></div>
 
           <div class="easy-section-label">Which way does your main roof face?</div>
           <div class="easy-cards" id="roof-dir-cards">
@@ -739,9 +749,10 @@
               <text id="gauge-text" x="110" y="90" text-anchor="middle"
                     font-size="40" font-weight="700" fill="#1a4d7a"
                     font-family="DM Sans, sans-serif">--%</text>
-              <text x="110" y="116" text-anchor="middle"
-                    font-size="11" fill="#64748b"
-                    font-family="DM Sans, sans-serif">of your home powered by your roof</text>
+              <text text-anchor="middle" font-size="11" fill="#64748b" font-family="DM Sans, sans-serif">
+                <tspan x="110" y="112">of your home powered</tspan>
+                <tspan x="110" dy="14">by your roof</tspan>
+              </text>
             </svg>
           </div>
 
@@ -1020,6 +1031,51 @@ function bindCards(containerID, stateKey, callback) {
     callback();
   });
 }
+
+// ── House size mode (A/B/C) ───────────────────────────────────────────────────
+const HOUSE_MODES = {
+  B: [
+    { title: '1–2 bed',  sub: 'typical small home',       panels: 6  },
+    { title: '3 bed',    sub: 'typical family home',       panels: 10 },
+    { title: '4 bed',    sub: 'larger family home',        panels: 14 },
+    { title: '5+ bed',   sub: 'large detached',            panels: 20 },
+  ],
+  A: [
+    { title: '4–6 panels',   sub: '~2 kWp',  panels: 6  },
+    { title: '8–12 panels',  sub: '~4 kWp',  panels: 10 },
+    { title: '14–18 panels', sub: '~6 kWp',  panels: 14 },
+    { title: '20+ panels',   sub: '~8 kWp',  panels: 20 },
+  ],
+  C: [
+    { title: 'Small',      sub: 'terrace or small semi',   panels: 6  },
+    { title: 'Medium',     sub: '3 bed semi or detached',  panels: 10 },
+    { title: 'Large',      sub: '4+ bed detached',         panels: 14 },
+    { title: 'Very large', sub: 'big detached',            panels: 20 },
+  ],
+};
+
+let currentHouseMode = 'B';
+
+function renderHouseCards() {
+  const cards = HOUSE_MODES[currentHouseMode];
+  document.getElementById('house-size-cards').innerHTML = cards.map(c =>
+    `<button class="easy-card${c.panels === easyPanels ? ' selected' : ''}" data-panels="${c.panels}">
+      <span class="easy-card-title">${c.title}</span>
+      <span class="easy-card-sub">${c.sub}</span>
+    </button>`
+  ).join('');
+}
+
+document.querySelectorAll('.house-mode-btn').forEach(btn =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.house-mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentHouseMode = btn.dataset.hmode;
+    renderHouseCards();
+  })
+);
+
+renderHouseCards();
 
 bindCards('house-size-cards', 'panels', () => { applyEasyConfig(); calculate(); });
 bindCards('roof-dir-cards',   'az',     () => { applyEasyConfig(); calculate(); });
