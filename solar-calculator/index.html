@@ -11,11 +11,19 @@
   <style>
     /* ── Layout ── */
     .postcode-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
       margin-bottom: 28px;
+      padding: 16px 20px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .postcode-label {
+      display: block;
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .postcode-input-row {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
     }
     .pc-input {
       font-family: 'DM Sans', sans-serif;
@@ -424,6 +432,12 @@
       .calc-hero { grid-template-columns: 1fr; }
     }
 
+    .hero-prompt {
+      font-size: 15px; font-weight: 600; color: var(--muted);
+      text-align: center; margin-bottom: 10px; letter-spacing: .01em;
+    }
+    .hero-card-icon { font-size: 28px; margin-bottom: 6px; }
+
     /* ── Compare mode ───────────────────────────────────────── */
     main.compare-mode { display: flex; flex-direction: column; }
     main.compare-mode .page-title    { order: 1; }
@@ -436,6 +450,23 @@
     main.compare-mode .mode-toggle   { display: none; }
     .quotes-add-btn { border-color: var(--brand) !important; color: var(--brand) !important; font-weight: 700 !important; }
     .quotes-add-btn:hover { background: var(--brand) !important; color: #fff !important; }
+
+    /* ── Battery slider ────────────────────────────────────── */
+    .battery-slider-wrap {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .battery-slider {
+      flex: 1; accent-color: var(--brand); cursor: pointer;
+    }
+    .battery-num-input {
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      width: 64px; padding: 5px 8px;
+      border: 1px solid var(--border); border-radius: 6px;
+      text-align: right;
+    }
+    .battery-num-input:focus { outline: none; border-color: var(--brand); }
+    .battery-unit { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .battery-slider-wrap--sm .battery-num-input { width: 54px; }
 
     /* ── Inline add-quote form ────────────────────────────── */
     .quote-add-form {
@@ -477,9 +508,14 @@
       border: 1px solid var(--border); border-radius: 7px;
       background: transparent; color: var(--muted); cursor: pointer;
     }
+    .qf-hint {
+      font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+    }
+    .qf-field--battery { grid-column: span 3; }
     @media (max-width: 600px) {
       .qf-grid { grid-template-columns: 1fr 1fr; }
       .qf-field--wide { grid-column: span 2; }
+      .qf-field--battery { grid-column: span 2; }
     }
 
     /* ── Array builder in quote form ──────────────────────── */
@@ -506,6 +542,7 @@
       background: transparent; color: #dc2626; cursor: pointer; margin-bottom: 1px;
     }
     .qf-arr-remove:hover { background: #fef2f2; }
+    #quotes-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     @media (max-width: 640px) {
       .qf-array-row { grid-template-columns: 1fr 1fr; }
       .qf-array-num { grid-column: span 2; }
@@ -532,7 +569,10 @@
       border-radius: 7px; width: 100%;
     }
     .shared-input:focus { outline: none; border-color: var(--brand); }
-    @media (max-width: 700px) {
+    @media (max-width: 800px) {
+      .shared-inputs-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
       .shared-inputs-grid { grid-template-columns: 1fr 1fr; }
     }
 
@@ -866,28 +906,34 @@
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Home Solar Calculator</h1>
-    <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year. Enter your postcode and adjust the system settings below.</p>
+    <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year.</p>
 
-    <!-- Postcode lookup -->
-    <div class="postcode-row">
-      <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or SW1" maxlength="8" autocomplete="postal-code">
-      <button id="pc-btn" class="pc-btn">Find location</button>
+    <!-- Mode chooser -->
+    <p class="hero-prompt">What would you like to do?</p>
+    <div id="calc-hero" class="calc-hero">
+      <button class="hero-card" id="hero-explore">
+        <div class="hero-card-icon">☀️</div>
+        <div class="hero-card-title">I'm just looking</div>
+        <div class="hero-card-sub">See what solar could do for your home — enter a few details and get an instant estimate</div>
+      </button>
+      <button class="hero-card" id="hero-compare">
+        <div class="hero-card-icon">📋</div>
+        <div class="hero-card-title">I have quotes to compare</div>
+        <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
+      </button>
+    </div>
+
+    <!-- Postcode lookup — hidden until a mode is chosen -->
+    <div class="postcode-row" style="display:none">
+      <label class="postcode-label">Enter your postcode to estimate solar potential in your area</label>
+      <div class="postcode-input-row">
+        <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or DN22" maxlength="8" autocomplete="postal-code">
+        <button id="pc-btn" class="pc-btn">Find location</button>
+      </div>
       <div id="pc-status"></div>
     </div>
 
-    <!-- Main calculator -->
-    <div id="calc-hero" class="calc-hero">
-      <button class="hero-card active" id="hero-explore">
-        <div class="hero-card-title">I'm just looking</div>
-        <div class="hero-card-sub">Show me what solar could do for my home</div>
-      </button>
-      <button class="hero-card" id="hero-compare">
-        <div class="hero-card-title">I want to compare</div>
-        <div class="hero-card-sub">Compare quotes or different system designs</div>
-      </button>
-    </div>
-
-    <div id="calc-grid" class="calc-grid">
+    <div id="calc-grid" class="calc-grid" style="display:none">
 
       <!-- Left: Configuration -->
       <div class="config-panel">
@@ -910,7 +956,7 @@
           </div>
           <div class="easy-cards" id="house-size-cards"></div>
 
-          <div class="easy-section-label">Which way does your main roof face?</div>
+          <div class="easy-section-label">Which way does your sunniest roof face?</div>
           <div class="easy-cards" id="roof-dir-cards">
             <button class="easy-card" data-az="0">
               <span class="easy-card-title">South-facing</span>
@@ -998,14 +1044,12 @@
 
           <div class="ctrl-group">
             <div class="ctrl-label"><span>Battery storage</span></div>
-            <select id="ctrl-battery" class="ctrl-select">
-              <option value="0">No battery</option>
-              <option value="2.5">2.5 kWh battery</option>
-              <option value="5">5 kWh battery</option>
-              <option value="7.5" selected>7.5 kWh battery</option>
-              <option value="10">10 kWh battery</option>
-              <option value="13.5">13.5 kWh battery</option>
-            </select>
+            <div class="battery-slider-wrap">
+              <input type="range" id="ctrl-battery" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
+              <input type="number" id="ctrl-battery-num" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
+              <span class="battery-unit">kWh</span>
+            </div>
+            <div class="ctrl-hint">0 = no battery</div>
           </div>
 
           <div class="ctrl-group">
@@ -1026,8 +1070,8 @@
                 <input id="ctrl-import" class="rate-input" type="number" value="24.7" min="1" max="100" step="0.5">
               </div>
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-export">Export (p/kWh)</label>
-                <input id="ctrl-export" class="rate-input" type="number" value="5" min="0" max="50" step="0.5">
+                <label class="rate-label" for="ctrl-export">Export/SEG (p/kWh)</label>
+                <input id="ctrl-export" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
               </div>
               <div class="rate-input-wrap">
                 <label class="rate-label" for="ctrl-cheap">Overnight rate (p/kWh)</label>
@@ -1161,14 +1205,39 @@
         <h3 class="quotes-panel-title">Your quotes</h3>
         <div class="quotes-panel-actions">
           <button id="qf-open-btn" class="quotes-action-btn quotes-add-btn">+ Add quote</button>
-          <button id="quotes-download-btn" class="quotes-action-btn">↓ Download JSON</button>
-          <label class="quotes-action-btn" style="cursor:pointer">↑ Upload JSON
+          <button id="quotes-download-btn" class="quotes-action-btn">↓ Save for Later</button>
+          <label class="quotes-action-btn" style="cursor:pointer">↑ Upload save file
             <input type="file" id="quotes-upload-input" accept=".json" style="display:none">
           </label>
           <button id="quotes-clear-btn" class="quotes-action-btn quotes-clear-btn">Clear all</button>
         </div>
       </div>
-      <p class="quotes-hint">Shared assumptions: postcode, demand, tariff rates, inflation. Per-quote: system and price.</p>
+      <!-- Shared assumptions (always visible in Compare mode) -->
+      <div class="shared-assumptions">
+        <div class="shared-assumptions-title">Shared assumptions</div>
+        <div class="shared-inputs-grid">
+          <div class="shared-input-wrap">
+            <label class="shared-label">Annual demand (kWh)</label>
+            <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Import (p/kWh)</label>
+            <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Export/SEG (p/kWh)</label>
+            <input type="number" id="sa-export" class="shared-input" min="0" max="50" step="0.5">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Overnight (p/kWh)</label>
+            <input type="number" id="sa-overnight" class="shared-input" min="0" max="50" step="0.5">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Inflation (%/yr)</label>
+            <input type="number" id="sa-inflation" class="shared-input" min="0" max="10" step="0.1">
+          </div>
+        </div>
+      </div>
 
       <!-- Inline add/edit form -->
       <div id="quote-add-form" class="quote-add-form" style="display:none">
@@ -1179,17 +1248,12 @@
             <label class="qf-label">Quote name</label>
             <input type="text" id="qf-name" class="qf-input" placeholder="e.g. SolarCo quote">
           </div>
-          <div class="qf-field">
-            <label class="qf-label">Battery</label>
-            <select id="qf-battery" class="qf-input">
-              <option value="0">No battery</option>
-              <option value="3.5">3.5 kWh</option>
-              <option value="5">5 kWh</option>
-              <option value="7.5" selected>7.5 kWh</option>
-              <option value="10">10 kWh</option>
-              <option value="13.5">13.5 kWh</option>
-              <option value="15">15 kWh</option>
-            </select>
+          <div class="qf-field qf-field--battery">
+            <label class="qf-label">Battery (kWh)</label>
+            <div class="battery-slider-wrap battery-slider-wrap--sm">
+              <input type="range" id="qf-battery-slider" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
+              <input type="number" id="qf-battery" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
+            </div>
           </div>
           <div class="qf-field">
             <label class="qf-label">Occupancy</label>
@@ -1202,6 +1266,7 @@
           <div class="qf-field">
             <label class="qf-label">Quoted price £</label>
             <input type="number" id="qf-price" class="qf-input" placeholder="Optional">
+            <div class="qf-hint">Leave blank to use estimated cost based on average costs</div>
           </div>
         </div>
 
@@ -1219,33 +1284,6 @@
       </div>
 
       <div id="quotes-table-wrap"></div>
-
-      <!-- Shared assumptions (always visible in Compare mode) -->
-      <div class="shared-assumptions">
-        <div class="shared-assumptions-title">Shared assumptions</div>
-        <div class="shared-inputs-grid">
-          <div class="shared-input-wrap">
-            <label class="shared-label">Annual demand (kWh)</label>
-            <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
-          </div>
-          <div class="shared-input-wrap">
-            <label class="shared-label">Import (p/kWh)</label>
-            <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
-          </div>
-          <div class="shared-input-wrap">
-            <label class="shared-label">Export (p/kWh)</label>
-            <input type="number" id="sa-export" class="shared-input" min="0" max="50" step="0.5">
-          </div>
-          <div class="shared-input-wrap">
-            <label class="shared-label">Overnight (p/kWh)</label>
-            <input type="number" id="sa-overnight" class="shared-input" min="0" max="50" step="0.5">
-          </div>
-          <div class="shared-input-wrap">
-            <label class="shared-label">Inflation (%/yr)</label>
-            <input type="number" id="sa-inflation" class="shared-input" min="0" max="10" step="0.1">
-          </div>
-        </div>
-      </div>
 
     </div>
 
@@ -1452,7 +1490,7 @@ pcInput.addEventListener('keydown', e => { if (e.key === 'Enter') lookupPostcode
 let arrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
 
 // ── Mode: Simple / Detailed ───────────────────────────────────────────────────
-let currentMode = 'explore';
+let currentMode = null; // null until hero card is chosen
 let easyPanels  = 10;   // Medium default
 let easyAzimuth = 45;   // "Not sure" → SE/SW default
 
@@ -1526,6 +1564,11 @@ function setMode(mode) {
   const prevMode  = currentMode;
   currentMode     = mode;
   const inCompare = mode === 'compare';
+
+  // First time a card is chosen — reveal postcode row
+  if (prevMode === null) {
+    document.querySelector('.postcode-row').style.display = '';
+  }
 
   ['explore','detailed','compare'].forEach(m =>
     document.getElementById(`mode-${m}`).classList.toggle('active', m === mode)
@@ -1694,7 +1737,19 @@ tabMulti.addEventListener('click', () => {
 });
 
 // ── Other controls ────────────────────────────────────────────────────────────
-const ctrlBattery  = document.getElementById('ctrl-battery');
+const ctrlBattery    = document.getElementById('ctrl-battery');
+const ctrlBatteryNum = document.getElementById('ctrl-battery-num');
+ctrlBattery.addEventListener('input', () => { ctrlBatteryNum.value = ctrlBattery.value; calculate(); });
+ctrlBatteryNum.addEventListener('input', () => { ctrlBattery.value = ctrlBatteryNum.value; calculate(); });
+
+// qf-battery slider sync (in inline form)
+document.getElementById('qf-battery-slider').addEventListener('input', e => {
+  document.getElementById('qf-battery').value = e.target.value;
+});
+document.getElementById('qf-battery').addEventListener('input', e => {
+  document.getElementById('qf-battery-slider').value = e.target.value;
+});
+
 const ctrlDemand   = document.getElementById('ctrl-demand');
 const ctrlArchtype = document.getElementById('ctrl-archetype');
 const ctrlImport     = document.getElementById('ctrl-import');
@@ -1718,7 +1773,7 @@ ctrlDemand.addEventListener('input', () => {
     `${Number(ctrlDemand.value).toLocaleString()} kWh`;
   calculate();
 });
-[ctrlBattery, ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
+[ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
   el.addEventListener('change', calculate)
 );
 
@@ -1961,6 +2016,7 @@ function openQF(prefill) {
     editingQuoteId = prefill.id;
   }
   renderQFArrays();
+  document.getElementById('qf-battery-slider').value = document.getElementById('qf-battery').value;
   qfForm.style.display    = '';
   qfOpenBtn.style.display = 'none';
   qfForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

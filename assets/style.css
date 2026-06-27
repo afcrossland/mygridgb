@@ -111,6 +111,16 @@ nav > ul > li > a.active {
   text-decoration: none;
 }
 
+nav > ul > li > a.nav-solar {
+  background: #f59e0b;
+  color: #1c1917;
+  font-weight: 700;
+}
+nav > ul > li > a.nav-solar:hover {
+  background: #fbbf24;
+  color: #1c1917;
+}
+
 /* Dropdown */
 nav ul ul {
   display: none;

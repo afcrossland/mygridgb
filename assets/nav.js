@@ -32,10 +32,11 @@ const NAV_HTML = `
           </ul>
         </li>
         <li><a href="/2030grid/index.html">The 2030 Blueprint</a></li>
-        <li><a href="/blog/index.html">Blog</a></li>
+        <li><a href="/solar-calculator/index.html" class="nav-solar">☀️ Solar Calculator</a></li>
         <li>
           <a href="/map/index.html">Resources ▾</a>
           <ul>
+            <li><a href="/blog/index.html">Blog</a></li>
             <li><a href="/map/index.html">UK Renewable Energy Map</a></li>
             <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
             <li><a href="/educational-resources/index.html">Educational Resources</a></li>
