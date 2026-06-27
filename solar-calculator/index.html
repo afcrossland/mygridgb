@@ -112,7 +112,7 @@
       gap: 10px;
       margin-top: 4px;
     }
-    .rate-input-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .rate-input-wrap { display: flex; flex-direction: column; gap: 4px; justify-content: flex-end; }
     .rate-label { font-size: 12px; font-weight: 500; color: var(--muted); }
     .rate-input {
       font-family: 'DM Sans', sans-serif;
@@ -695,7 +695,7 @@
                 <input id="ctrl-export" class="rate-input" type="number" value="5" min="0" max="50" step="0.5">
               </div>
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
+                <label class="rate-label" for="ctrl-cheap">Overnight rate (p/kWh)</label>
                 <input id="ctrl-cheap" class="rate-input" type="number" value="10" min="0" max="50" step="0.5">
               </div>
             </div>
