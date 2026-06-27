@@ -179,6 +179,14 @@
     }
 
     /* ── Simple / Detailed mode toggle ── */
+    .config-section-heading {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
     .mode-toggle {
       display: flex;
       gap: 3px;
@@ -426,6 +434,108 @@
     main.compare-mode #compare-panel { display: none !important; }
     main.compare-mode .method-details { order: 6; }
     main.compare-mode .mode-toggle   { display: none; }
+    .quotes-add-btn { border-color: var(--brand) !important; color: var(--brand) !important; font-weight: 700 !important; }
+    .quotes-add-btn:hover { background: var(--brand) !important; color: #fff !important; }
+
+    /* ── Inline add-quote form ────────────────────────────── */
+    .quote-add-form {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .qf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .qf-field--wide { grid-column: span 3; }
+    .qf-label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .qf-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 100%;
+      background: #fff;
+    }
+    .qf-actions { display: flex; gap: 8px; }
+    .qf-save-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      padding: 8px 20px;
+      border: none; border-radius: 7px;
+      background: var(--brand); color: #fff; cursor: pointer;
+    }
+    .qf-cancel-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: 7px;
+      background: transparent; color: var(--muted); cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .qf-grid { grid-template-columns: 1fr 1fr; }
+      .qf-field--wide { grid-column: span 2; }
+    }
+
+    /* ── Array builder in quote form ──────────────────────── */
+    .qf-arrays-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 10px 0 6px;
+    }
+    .qf-arrays-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .qf-add-array-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      padding: 4px 10px; border: 1.5px solid var(--brand); border-radius: 6px;
+      background: transparent; color: var(--brand); cursor: pointer;
+    }
+    .qf-add-array-btn:hover { background: var(--brand); color: #fff; }
+    .qf-array-row {
+      display: grid; grid-template-columns: 60px 1fr 1fr 1fr auto;
+      gap: 8px; align-items: end; padding: 8px 0;
+      border-top: 1px solid #f1f5f9;
+    }
+    .qf-array-num { font-size: 12px; font-weight: 700; color: var(--muted); padding-bottom: 8px; }
+    .qf-arr-remove {
+      font-family: 'DM Sans', sans-serif; font-size: 11px;
+      padding: 6px 8px; border: 1px solid #fecaca; border-radius: 6px;
+      background: transparent; color: #dc2626; cursor: pointer; margin-bottom: 1px;
+    }
+    .qf-arr-remove:hover { background: #fef2f2; }
+    @media (max-width: 640px) {
+      .qf-array-row { grid-template-columns: 1fr 1fr; }
+      .qf-array-num { grid-column: span 2; }
+      .qf-arr-remove { grid-column: span 2; }
+    }
+
+    /* ── Shared assumptions ────────────────────────────────── */
+    .shared-assumptions {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .shared-assumptions-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
+    }
+    .shared-inputs-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    }
+    .shared-label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .shared-input {
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      padding: 6px 10px; border: 1px solid var(--border);
+      border-radius: 7px; width: 100%;
+    }
+    .shared-input:focus { outline: none; border-color: var(--brand); }
+    @media (max-width: 700px) {
+      .shared-inputs-grid { grid-template-columns: 1fr 1fr; }
+    }
+
     .quotes-empty-hint {
       text-align: center;
       padding: 32px 20px;
@@ -573,7 +683,7 @@
       margin-left: 4px;
       vertical-align: middle;
     }
-    .q-load-btn, .q-del-btn {
+    .q-edit-btn, .q-del-btn {
       font-family: 'DM Sans', sans-serif;
       font-size: 11px;
       font-weight: 600;
@@ -583,8 +693,8 @@
       border: 1px solid var(--border);
       background: transparent;
     }
-    .q-load-btn { color: var(--brand); }
-    .q-load-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .q-edit-btn { color: var(--brand); }
+    .q-edit-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); }
     .q-del-btn { color: #dc2626; margin-left: 3px; }
     .q-del-btn:hover { background: #fef2f2; border-color: #dc2626; }
     .payback-heading {
@@ -783,10 +893,11 @@
       <div class="config-panel">
 
         <!-- Mode toggle -->
+        <div class="config-section-heading">Your solar system</div>
         <div class="mode-toggle">
           <button class="mode-btn active" id="mode-explore">Explore</button>
           <button class="mode-btn" id="mode-detailed">Detailed</button>
-          <button class="mode-btn" id="mode-compare">Compare quotes</button>
+          <button class="mode-btn" id="mode-compare" style="display:none">Compare quotes</button>
         </div>
 
         <!-- ── Explore panel ── -->
@@ -1047,8 +1158,9 @@
 
     <div id="quotes-panel" class="quotes-panel" style="display:none">
       <div class="quotes-panel-header">
-        <h3 class="quotes-panel-title">Saved quotes</h3>
+        <h3 class="quotes-panel-title">Your quotes</h3>
         <div class="quotes-panel-actions">
+          <button id="qf-open-btn" class="quotes-action-btn quotes-add-btn">+ Add quote</button>
           <button id="quotes-download-btn" class="quotes-action-btn">↓ Download JSON</button>
           <label class="quotes-action-btn" style="cursor:pointer">↑ Upload JSON
             <input type="file" id="quotes-upload-input" accept=".json" style="display:none">
@@ -1056,8 +1168,85 @@
           <button id="quotes-clear-btn" class="quotes-action-btn quotes-clear-btn">Clear all</button>
         </div>
       </div>
-      <p class="quotes-hint">Shared: postcode region, demand, tariff rates, inflation. Per-quote: system config and price.</p>
+      <p class="quotes-hint">Shared assumptions: postcode, demand, tariff rates, inflation. Per-quote: system and price.</p>
+
+      <!-- Inline add/edit form -->
+      <div id="quote-add-form" class="quote-add-form" style="display:none">
+
+        <!-- Top row: name, battery, occupancy, price -->
+        <div class="qf-grid">
+          <div class="qf-field qf-field--wide">
+            <label class="qf-label">Quote name</label>
+            <input type="text" id="qf-name" class="qf-input" placeholder="e.g. SolarCo quote">
+          </div>
+          <div class="qf-field">
+            <label class="qf-label">Battery</label>
+            <select id="qf-battery" class="qf-input">
+              <option value="0">No battery</option>
+              <option value="3.5">3.5 kWh</option>
+              <option value="5">5 kWh</option>
+              <option value="7.5" selected>7.5 kWh</option>
+              <option value="10">10 kWh</option>
+              <option value="13.5">13.5 kWh</option>
+              <option value="15">15 kWh</option>
+            </select>
+          </div>
+          <div class="qf-field">
+            <label class="qf-label">Occupancy</label>
+            <select id="qf-archtype" class="qf-input">
+              <option value="homeallday">Home all day</option>
+              <option value="inhalftheday" selected>In half the day</option>
+              <option value="outallday">Out all day</option>
+            </select>
+          </div>
+          <div class="qf-field">
+            <label class="qf-label">Quoted price £</label>
+            <input type="number" id="qf-price" class="qf-input" placeholder="Optional">
+          </div>
+        </div>
+
+        <!-- Arrays builder -->
+        <div class="qf-arrays-header">
+          <span class="qf-arrays-label">Roof arrays</span>
+          <button type="button" id="qf-add-array-btn" class="qf-add-array-btn">+ Add array</button>
+        </div>
+        <div id="qf-arrays-list"></div>
+
+        <div class="qf-actions">
+          <button id="qf-save" class="qf-save-btn">Save quote</button>
+          <button id="qf-cancel" class="qf-cancel-btn">Cancel</button>
+        </div>
+      </div>
+
       <div id="quotes-table-wrap"></div>
+
+      <!-- Shared assumptions (always visible in Compare mode) -->
+      <div class="shared-assumptions">
+        <div class="shared-assumptions-title">Shared assumptions</div>
+        <div class="shared-inputs-grid">
+          <div class="shared-input-wrap">
+            <label class="shared-label">Annual demand (kWh)</label>
+            <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Import (p/kWh)</label>
+            <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Export (p/kWh)</label>
+            <input type="number" id="sa-export" class="shared-input" min="0" max="50" step="0.5">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Overnight (p/kWh)</label>
+            <input type="number" id="sa-overnight" class="shared-input" min="0" max="50" step="0.5">
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Inflation (%/yr)</label>
+            <input type="number" id="sa-inflation" class="shared-input" min="0" max="10" step="0.1">
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- How this tool works -->
@@ -1336,40 +1525,27 @@ function setMode(mode) {
   if (currentMode === mode) return;
   const prevMode  = currentMode;
   currentMode     = mode;
-  const mainEl    = document.querySelector('.page-wrap > main');
   const inCompare = mode === 'compare';
 
   ['explore','detailed','compare'].forEach(m =>
     document.getElementById(`mode-${m}`).classList.toggle('active', m === mode)
   );
 
-  // Hero card reflects top-level intent
   document.getElementById('hero-explore').classList.toggle('active', !inCompare);
   document.getElementById('hero-compare').classList.toggle('active',  inCompare);
 
-  mainEl.classList.toggle('compare-mode', inCompare);
-
-  // Panel visibility — in Compare mode show the detailed config panel below the quotes table
-  document.getElementById('explore-panel').style.display  = mode === 'explore'                ? '' : 'none';
-  document.getElementById('detailed-panel').style.display = (mode === 'detailed' || inCompare) ? '' : 'none';
-  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0)   ? '' : 'none';
+  document.getElementById('calc-grid').style.display     = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display= mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display  = (inCompare || quotes.length > 0) ? '' : 'none';
 
   if (inCompare) {
-    // Sync detailed inputs if arriving from Explore
-    if (prevMode === 'explore') {
-      ctrlPanels.value = easyPanels;
-      ctrlOrient.value = easyAzimuth;
-      ctrlTilt.value   = 35;
-      arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
-      updateSingleLabels();
-    }
-    calculate();
+    initSharedAssumptions();
     renderQuotesTable();
   } else if (mode === 'explore') {
     applyEasyConfig();
     calculate();
   } else {
-    // entering Detailed from Explore
     if (prevMode === 'explore') {
       ctrlPanels.value = easyPanels;
       ctrlOrient.value = easyAzimuth;
@@ -1707,10 +1883,147 @@ function calculate() {
 // ── Quote comparison ───────────────────────────────────────────────────────────
 let quotes = [];
 let quoteCounter = 0;
+let editingQuoteId = null;
 
-const quoteAddBtn    = document.getElementById('quote-add-btn');
-const quoteSaveForm  = document.getElementById('quote-save-form');
-const quoteNameInput = document.getElementById('quote-name-input');
+// ── Inline add/edit form ───────────────────────────────────────────────────────
+const qfOpenBtn = document.getElementById('qf-open-btn');
+const qfForm    = document.getElementById('quote-add-form');
+const qfName    = document.getElementById('qf-name');
+
+let qfArrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
+
+const AZ_OPTIONS = [
+  { v: '0',  l: 'South' }, { v: '20', l: 'SSE / SSW' },
+  { v: '45', l: 'SE / SW' }, { v: '65', l: 'ESE / WSW' },
+  { v: '90', l: 'East / West' },
+];
+function azOptionsHtml(selected) {
+  return AZ_OPTIONS.map(o =>
+    `<option value="${o.v}"${+o.v === +selected ? ' selected' : ''}>${o.l}</option>`
+  ).join('');
+}
+
+function renderQFArrays() {
+  document.getElementById('qf-arrays-list').innerHTML = qfArrays.map((a, i) => `
+    <div class="qf-array-row">
+      <div class="qf-array-num">Array ${i + 1}</div>
+      <div class="qf-field">
+        <label class="qf-label">Panels</label>
+        <input type="number" class="qf-input qf-arr-panels" value="${a.panels}" min="1" max="50" step="1">
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Orientation</label>
+        <select class="qf-input qf-arr-az">${azOptionsHtml(a.azimuth)}</select>
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Tilt (°)</label>
+        <input type="number" class="qf-input qf-arr-tilt" value="${a.tilt}" min="0" max="90" step="5">
+      </div>
+      ${qfArrays.length > 1
+        ? `<button type="button" class="qf-arr-remove" data-idx="${i}">Remove</button>`
+        : '<div></div>'}
+    </div>`).join('');
+  document.querySelectorAll('.qf-arr-remove').forEach(btn =>
+    btn.addEventListener('click', () => { qfArrays.splice(+btn.dataset.idx, 1); renderQFArrays(); })
+  );
+}
+
+document.getElementById('qf-add-array-btn').addEventListener('click', () => {
+  qfArrays.push({ panels: 10, azimuth: 45, tilt: 35 });
+  renderQFArrays();
+});
+
+function readQFArrays() {
+  return [...document.querySelectorAll('#qf-arrays-list .qf-array-row')].map(row => ({
+    panels:  Math.max(1, parseInt(row.querySelector('.qf-arr-panels').value) || 10),
+    azimuth: parseInt(row.querySelector('.qf-arr-az').value),
+    tilt:    parseInt(row.querySelector('.qf-arr-tilt').value) || 35,
+  }));
+}
+
+function openQF(prefill) {
+  if (!prefill) {
+    quoteCounter++;
+    qfName.value = `Quote ${quoteCounter}`;
+    document.getElementById('qf-battery').value  = '7.5';
+    document.getElementById('qf-archtype').value = 'inhalftheday';
+    document.getElementById('qf-price').value    = '';
+    document.getElementById('qf-save').textContent = 'Save quote';
+    qfArrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
+    editingQuoteId = null;
+  } else {
+    qfName.value = prefill.name;
+    document.getElementById('qf-battery').value  = prefill.batteryKwh || 0;
+    document.getElementById('qf-archtype').value = prefill.archtype || 'inhalftheday';
+    document.getElementById('qf-price').value    = prefill.quotedPrice != null ? prefill.quotedPrice : '';
+    document.getElementById('qf-save').textContent = 'Update quote';
+    qfArrays = prefill.arrays.map(a => ({ ...a }));
+    editingQuoteId = prefill.id;
+  }
+  renderQFArrays();
+  qfForm.style.display    = '';
+  qfOpenBtn.style.display = 'none';
+  qfForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  qfName.focus(); qfName.select();
+}
+
+function closeQF() {
+  qfForm.style.display    = 'none';
+  qfOpenBtn.style.display = '';
+  editingQuoteId = null;
+}
+
+qfOpenBtn.addEventListener('click', () => openQF(null));
+
+document.getElementById('qf-cancel').addEventListener('click', () => {
+  if (!editingQuoteId) quoteCounter--;
+  closeQF();
+});
+
+document.getElementById('qf-save').addEventListener('click', () => {
+  const name        = qfName.value.trim() || `Quote ${quoteCounter}`;
+  const batteryKwh  = parseFloat(document.getElementById('qf-battery').value) || 0;
+  const archtype    = document.getElementById('qf-archtype').value;
+  const priceVal    = document.getElementById('qf-price').value;
+  const quotedPrice = priceVal !== '' ? parseFloat(priceVal) : null;
+  const quoteData   = { name, quotedPrice, arrays: readQFArrays(), batteryKwh, archtype };
+
+  if (editingQuoteId) {
+    const idx = quotes.findIndex(q => q.id === editingQuoteId);
+    if (idx !== -1) quotes[idx] = { ...quotes[idx], ...quoteData };
+  } else {
+    quotes.push({ id: Date.now(), ...quoteData });
+  }
+  closeQF();
+  renderQuotesTable();
+  document.getElementById('quotes-panel').style.display = '';
+});
+
+// ── Shared assumptions panel ───────────────────────────────────────────────────
+function initSharedAssumptions() {
+  document.getElementById('sa-demand').value    = ctrlDemand.value;
+  document.getElementById('sa-import').value    = ctrlImport.value;
+  document.getElementById('sa-export').value    = ctrlExport.value;
+  document.getElementById('sa-overnight').value = ctrlCheap.value;
+  document.getElementById('sa-inflation').value = ctrlInflation.value;
+}
+[
+  ['sa-demand',    ctrlDemand],
+  ['sa-import',    ctrlImport],
+  ['sa-export',    ctrlExport],
+  ['sa-overnight', ctrlCheap],
+  ['sa-inflation', ctrlInflation],
+].forEach(([saId, ctrl]) =>
+  document.getElementById(saId).addEventListener('input', e => {
+    ctrl.value = e.target.value;
+    renderQuotesTable();
+  })
+);
+
+// ── Save-as-quote from results panel (Explore / Detailed modes) ───────────────
+const quoteAddBtn     = document.getElementById('quote-add-btn');
+const quoteSaveForm   = document.getElementById('quote-save-form');
+const quoteNameInput  = document.getElementById('quote-name-input');
 const quotePriceInput = document.getElementById('quote-price-input');
 
 quoteAddBtn.addEventListener('click', () => {
@@ -1733,9 +2046,7 @@ document.getElementById('quote-save-confirm').addEventListener('click', () => {
   const name        = quoteNameInput.value.trim() || `Quote ${quoteCounter}`;
   const quotedPrice = quotePriceInput.value !== '' ? parseFloat(quotePriceInput.value) : null;
   quotes.push({
-    id: Date.now(),
-    name,
-    quotedPrice,
+    id: Date.now(), name, quotedPrice,
     arrays:     JSON.parse(JSON.stringify(arrays)),
     batteryKwh: +ctrlBattery.value,
     archtype:   ctrlArchtype.value,
@@ -1761,7 +2072,7 @@ function getSharedParams() {
 function renderQuotesTable() {
   if (quotes.length === 0) {
     document.getElementById('quotes-table-wrap').innerHTML =
-      `<div class="quotes-empty-hint">No quotes saved yet — configure a system below and click <strong>+ Save as quote</strong> in the results panel.</div>`;
+      `<div class="quotes-empty-hint">No quotes yet — click <strong>+ Add quote</strong> above to enter your first one.</div>`;
     return;
   }
   const shared = getSharedParams();
@@ -1797,7 +2108,7 @@ function renderQuotesTable() {
       <td>${r ? '£' + r.yr5.toLocaleString() : '—'}</td>
       <td class="pb-yrs">${pb}</td>
       <td>
-        <button class="q-load-btn" data-qid="${q.id}">Load</button>
+        <button class="q-edit-btn" data-qid="${q.id}">Edit</button>
         <button class="q-del-btn"  data-qid="${q.id}">✕</button>
       </td>
     </tr>`;
@@ -1820,15 +2131,10 @@ function renderQuotesTable() {
     })
   );
 
-  document.querySelectorAll('.q-load-btn').forEach(btn =>
+  document.querySelectorAll('.q-edit-btn').forEach(btn =>
     btn.addEventListener('click', () => {
       const q = quotes.find(q => q.id === +btn.dataset.qid);
-      if (!q) return;
-      arrays = JSON.parse(JSON.stringify(q.arrays));
-      ctrlBattery.value  = q.batteryKwh;
-      ctrlArchtype.value = q.archtype;
-      if (currentMode !== 'detailed') setMode('detailed');
-      calculate();
+      if (q) openQF(q);
     })
   );
 }
