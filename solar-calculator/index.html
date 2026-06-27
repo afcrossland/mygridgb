@@ -401,6 +401,24 @@
     }
     .gauge-wrap svg { width: 100%; max-width: 260px; }
 
+    /* ── Results header ── */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .results-header h2 { margin-bottom: 0; }
+    .update-flash {
+      font-size: 12px;
+      font-weight: 600;
+      color: #0e7a3e;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .update-flash.show { opacity: 1; }
+    #gauge-arc { transition: stroke-dasharray 0.5s ease; }
+
     /* ── Plain-language summary ── */
     .results-summary {
       font-size: 14px;
@@ -692,7 +710,10 @@
 
       <!-- Right: Results -->
       <div class="results-panel">
-        <h2>Your estimate</h2>
+        <div class="results-header">
+          <h2>Your estimate</h2>
+          <span class="update-flash" id="update-flash">Updated ✓</span>
+        </div>
 
         <!-- Placeholder state (no postcode yet) -->
         <div id="results-placeholder" class="results-placeholder">
@@ -1335,6 +1356,14 @@ function calculate() {
       <td class="pb-yrs">${typeof pb === 'number' ? pb + ' yrs' : pb}</td>
     </tr>`;
   }).join('');
+
+  // Flash "Updated ✓"
+  const flash = document.getElementById('update-flash');
+  if (flash) {
+    flash.classList.add('show');
+    clearTimeout(flash._t);
+    flash._t = setTimeout(() => flash.classList.remove('show'), 1500);
+  }
 }
 </script>
 
