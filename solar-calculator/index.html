@@ -25,6 +25,12 @@
     .postcode-input-row {
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
     }
+    #pc-map-wrap { margin-top: 12px; }
+    #pc-map {
+      height: 160px; border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
     .pc-input {
       font-family: 'DM Sans', sans-serif;
       font-size: 16px;
@@ -929,8 +935,11 @@
       <div class="postcode-input-row">
         <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or DN22" maxlength="8" autocomplete="postal-code">
         <button id="pc-btn" class="pc-btn">Find location</button>
+        <div id="pc-status"></div>
       </div>
-      <div id="pc-status"></div>
+      <div id="pc-map-wrap" style="display:none">
+        <div id="pc-map"></div>
+      </div>
     </div>
 
     <div id="calc-grid" class="calc-grid" style="display:none">
@@ -1314,6 +1323,24 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// ── Postcode confirmation map ─────────────────────────────────────────────────
+let pcMap = null, pcMapMarker = null;
+
+function showPcMap(lat, lon) {
+  document.getElementById('pc-map-wrap').style.display = '';
+  if (!pcMap) {
+    pcMap = L.map('pc-map', { zoomControl: false, attributionControl: false })
+              .setView([lat, lon], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 })
+     .addTo(pcMap);
+    pcMapMarker = L.marker([lat, lon]).addTo(pcMap);
+  } else {
+    pcMap.setView([lat, lon], 13);
+    pcMapMarker.setLatLng([lat, lon]);
+    pcMap.invalidateSize();
+  }
+}
+
 // ── Satellite map ─────────────────────────────────────────────────────────────
 let satelliteMap = null;
 let mapMarker    = null;
@@ -1478,6 +1505,7 @@ async function lookupPostcode() {
 
   // Run outside try/catch so a JS error here doesn't show as a postcode failure
   if (foundLat !== undefined) {
+    showPcMap(foundLat, foundLon);
     setMapLocation(foundLat, foundLon);
     calculate();
   }
