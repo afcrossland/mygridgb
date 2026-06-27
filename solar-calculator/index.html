@@ -376,6 +376,75 @@
       border-top: 1px solid var(--border);
     }
 
+    /* ── Intent hero ─────────────────────────────────────────── */
+    .calc-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .hero-card {
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 16px 20px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color .15s, background .15s;
+    }
+    .hero-card:hover { border-color: var(--brand); }
+    .hero-card.active {
+      border-color: var(--brand);
+      background: #eef5fb;
+    }
+    .hero-card-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hero-card-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    @media (max-width: 560px) {
+      .calc-hero { grid-template-columns: 1fr; }
+    }
+
+    /* ── Compare mode ───────────────────────────────────────── */
+    main.compare-mode { display: flex; flex-direction: column; }
+    main.compare-mode .page-title    { order: 1; }
+    main.compare-mode .page-intro    { order: 2; }
+    main.compare-mode #calc-hero     { order: 3; }
+    main.compare-mode #quotes-panel  { order: 4; display: block !important; margin-bottom: 20px; }
+    main.compare-mode #calc-grid     { order: 5; }
+    main.compare-mode #compare-panel { display: none !important; }
+    main.compare-mode .method-details { order: 6; }
+    main.compare-mode .mode-toggle   { display: none; }
+    .quotes-empty-hint {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--muted);
+      font-size: 13.5px;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+    }
+    .compare-config-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin: 20px 0 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
     /* ── Quote save ─────────────────────────────────────────── */
     .quote-save-row {
       margin-top: 14px;
@@ -697,19 +766,31 @@
     </div>
 
     <!-- Main calculator -->
-    <div class="calc-grid">
+    <div id="calc-hero" class="calc-hero">
+      <button class="hero-card active" id="hero-explore">
+        <div class="hero-card-title">I'm just looking</div>
+        <div class="hero-card-sub">Show me what solar could do for my home</div>
+      </button>
+      <button class="hero-card" id="hero-compare">
+        <div class="hero-card-title">I want to compare</div>
+        <div class="hero-card-sub">Compare quotes or different system designs</div>
+      </button>
+    </div>
+
+    <div id="calc-grid" class="calc-grid">
 
       <!-- Left: Configuration -->
       <div class="config-panel">
 
         <!-- Mode toggle -->
         <div class="mode-toggle">
-          <button class="mode-btn active" id="mode-simple">Simple</button>
+          <button class="mode-btn active" id="mode-explore">Explore</button>
           <button class="mode-btn" id="mode-detailed">Detailed</button>
+          <button class="mode-btn" id="mode-compare">Compare quotes</button>
         </div>
 
-        <!-- ── Simple panel ── -->
-        <div id="simple-panel">
+        <!-- ── Explore panel ── -->
+        <div id="explore-panel">
           <div class="easy-section-label">Let's estimate your roof size</div>
           <div class="house-mode-toggle">
             <button class="house-mode-btn active" data-hmode="B">By bedrooms</button>
@@ -962,6 +1043,8 @@
 
     </div><!-- .calc-grid -->
 
+    <div id="compare-panel" style="display:none"></div>
+
     <div id="quotes-panel" class="quotes-panel" style="display:none">
       <div class="quotes-panel-header">
         <h3 class="quotes-panel-title">Saved quotes</h3>
@@ -1180,7 +1263,7 @@ pcInput.addEventListener('keydown', e => { if (e.key === 'Enter') lookupPostcode
 let arrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
 
 // ── Mode: Simple / Detailed ───────────────────────────────────────────────────
-let currentMode = 'simple';
+let currentMode = 'explore';
 let easyPanels  = 10;   // Medium default
 let easyAzimuth = 45;   // "Not sure" → SE/SW default
 
@@ -1249,33 +1332,61 @@ renderHouseCards();
 bindCards('house-size-cards', 'panels', () => { applyEasyConfig(); calculate(); });
 bindCards('roof-dir-cards',   'az',     () => { applyEasyConfig(); calculate(); });
 
-// Mode toggle
-document.getElementById('mode-simple').addEventListener('click', () => {
-  if (currentMode === 'simple') return;
-  currentMode = 'simple';
-  document.getElementById('mode-simple').classList.add('active');
-  document.getElementById('mode-detailed').classList.remove('active');
-  document.getElementById('simple-panel').style.display = '';
-  document.getElementById('detailed-panel').style.display = 'none';
-  applyEasyConfig();
-  calculate();
-});
+function setMode(mode) {
+  if (currentMode === mode) return;
+  const prevMode  = currentMode;
+  currentMode     = mode;
+  const mainEl    = document.querySelector('.page-wrap > main');
+  const inCompare = mode === 'compare';
 
-document.getElementById('mode-detailed').addEventListener('click', () => {
-  if (currentMode === 'detailed') return;
-  currentMode = 'detailed';
-  document.getElementById('mode-detailed').classList.add('active');
-  document.getElementById('mode-simple').classList.remove('active');
-  document.getElementById('detailed-panel').style.display = '';
-  document.getElementById('simple-panel').style.display = 'none';
-  // Sync detailed sliders to current easy state
-  ctrlPanels.value = easyPanels;
-  ctrlOrient.value = easyAzimuth;
-  ctrlTilt.value   = 35;
-  arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
-  updateSingleLabels();
-  calculate();
-});
+  ['explore','detailed','compare'].forEach(m =>
+    document.getElementById(`mode-${m}`).classList.toggle('active', m === mode)
+  );
+
+  // Hero card reflects top-level intent
+  document.getElementById('hero-explore').classList.toggle('active', !inCompare);
+  document.getElementById('hero-compare').classList.toggle('active',  inCompare);
+
+  mainEl.classList.toggle('compare-mode', inCompare);
+
+  // Panel visibility — in Compare mode show the detailed config panel below the quotes table
+  document.getElementById('explore-panel').style.display  = mode === 'explore'                ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = (mode === 'detailed' || inCompare) ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0)   ? '' : 'none';
+
+  if (inCompare) {
+    // Sync detailed inputs if arriving from Explore
+    if (prevMode === 'explore') {
+      ctrlPanels.value = easyPanels;
+      ctrlOrient.value = easyAzimuth;
+      ctrlTilt.value   = 35;
+      arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+      updateSingleLabels();
+    }
+    calculate();
+    renderQuotesTable();
+  } else if (mode === 'explore') {
+    applyEasyConfig();
+    calculate();
+  } else {
+    // entering Detailed from Explore
+    if (prevMode === 'explore') {
+      ctrlPanels.value = easyPanels;
+      ctrlOrient.value = easyAzimuth;
+      ctrlTilt.value   = 35;
+      arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+      updateSingleLabels();
+    }
+    calculate();
+  }
+}
+
+document.getElementById('mode-explore').addEventListener('click',  () => setMode('explore'));
+document.getElementById('mode-detailed').addEventListener('click', () => setMode('detailed'));
+document.getElementById('mode-compare').addEventListener('click',  () => setMode('compare'));
+
+document.getElementById('hero-explore').addEventListener('click', () => setMode(currentMode === 'detailed' ? 'detailed' : 'explore'));
+document.getElementById('hero-compare').addEventListener('click', () => setMode('compare'));
 
 // Init easy mode
 applyEasyConfig();
@@ -1648,6 +1759,11 @@ function getSharedParams() {
 }
 
 function renderQuotesTable() {
+  if (quotes.length === 0) {
+    document.getElementById('quotes-table-wrap').innerHTML =
+      `<div class="quotes-empty-hint">No quotes saved yet — configure a system below and click <strong>+ Save as quote</strong> in the results panel.</div>`;
+    return;
+  }
   const shared = getSharedParams();
   const rows = quotes.map(q => {
     const r = shared.zoneKey ? runCalc({
@@ -1711,13 +1827,7 @@ function renderQuotesTable() {
       arrays = JSON.parse(JSON.stringify(q.arrays));
       ctrlBattery.value  = q.batteryKwh;
       ctrlArchtype.value = q.archtype;
-      if (currentMode !== 'detailed') {
-        currentMode = 'detailed';
-        document.getElementById('mode-detailed').classList.add('active');
-        document.getElementById('mode-simple').classList.remove('active');
-        document.getElementById('simple-panel').style.display   = 'none';
-        document.getElementById('detailed-panel').style.display = '';
-      }
+      if (currentMode !== 'detailed') setMode('detailed');
       calculate();
     })
   );
