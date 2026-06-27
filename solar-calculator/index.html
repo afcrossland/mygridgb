@@ -401,6 +401,16 @@
     }
     .gauge-wrap svg { width: 100%; max-width: 260px; }
 
+    /* ── Plain-language summary ── */
+    .results-summary {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+      margin: -10px 0 18px;
+      text-align: center;
+    }
+    .results-summary strong { color: var(--brand); }
+
     /* ── Stat cards ── */
     .stats-grid {
       display: grid;
@@ -710,14 +720,17 @@
                     font-family="DM Sans, sans-serif">--%</text>
               <text x="110" y="116" text-anchor="middle"
                     font-size="11" fill="#64748b"
-                    font-family="DM Sans, sans-serif">electricity from solar</text>
+                    font-family="DM Sans, sans-serif">of your home powered by your roof</text>
             </svg>
           </div>
+
+          <!-- Plain-language summary -->
+          <p id="stat-summary" class="results-summary"></p>
 
           <!-- Stat cards -->
           <div class="stats-grid">
             <div class="stat-card highlight">
-              <div class="stat-label">Annual generation</div>
+              <div class="stat-label">Generated on your roof</div>
               <div class="stat-val" id="stat-gen">—</div>
               <div class="stat-sub">kWh / year</div>
             </div>
@@ -729,14 +742,14 @@
               <div class="stat-sub" id="stat-arbitrage-line" style="color:#0e7a3e">&nbsp;</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Self-consumed</div>
+              <div class="stat-label">Used from your roof</div>
               <div class="stat-val" id="stat-self">—</div>
-              <div class="stat-sub">kWh used in home</div>
+              <div class="stat-sub">kWh you don't buy from the grid</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Exported to grid</div>
+              <div class="stat-label">Sold back to grid</div>
               <div class="stat-val" id="stat-export">—</div>
-              <div class="stat-sub">kWh sold / exported</div>
+              <div class="stat-sub">kWh surplus exported</div>
             </div>
           </div>
 
@@ -1267,6 +1280,16 @@ function calculate() {
     'stroke-dasharray', `${arcFill.toFixed(1)} ${ARC_LENGTH.toFixed(1)}`
   );
   document.getElementById('gauge-text').textContent = pctMet + '%';
+
+  // Plain-language summary
+  const gridReduction = Math.round((selfConsumed / demand) * 100);
+  const summaryParts = [
+    `Your system could cover <strong>${gridReduction}%</strong> of your home's electricity,`,
+    `cutting your grid bills by <strong>£${importSaved.toLocaleString()}</strong> a year`
+  ];
+  if (exportEarned > 0) summaryParts.push(`and earning <strong>£${exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
+  if (arbitrageSaving > 0) summaryParts.push(`plus <strong>£${arbitrageSaving.toLocaleString()}</strong> from overnight battery charging`);
+  document.getElementById('stat-summary').innerHTML = summaryParts.join(' ') + '.';
 
   document.getElementById('stat-gen').textContent    = generation.toLocaleString();
   document.getElementById('stat-saving').textContent = '£' + totalSaving.toLocaleString();
