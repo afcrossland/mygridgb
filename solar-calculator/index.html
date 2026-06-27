@@ -962,6 +962,9 @@ async function lookupPostcode() {
 pcBtn.addEventListener('click', lookupPostcode);
 pcInput.addEventListener('keydown', e => { if (e.key === 'Enter') lookupPostcode(); });
 
+// ── Arrays data model (must be declared before applyEasyConfig is called) ─────
+let arrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
+
 // ── Mode: Simple / Detailed ───────────────────────────────────────────────────
 let currentMode = 'simple';
 let easyPanels  = 10;   // Medium default
@@ -1034,9 +1037,6 @@ const ORIENT_OPTIONS = [
 function orientLabel(deg) {
   return (ORIENT_OPTIONS.find(o => o.az >= deg) || ORIENT_OPTIONS.at(-1)).label;
 }
-
-// ── Arrays data model (shared by both modes) ──────────────────────────────────
-let arrays = [{ panels: 8, azimuth: 0, tilt: 30 }];
 
 // ── Single-roof controls ──────────────────────────────────────────────────────
 const ctrlPanels = document.getElementById('ctrl-panels');
