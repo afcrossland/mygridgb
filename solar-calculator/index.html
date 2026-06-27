@@ -236,25 +236,26 @@
     .easy-card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
     .easy-card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .easy-mode-hint  { font-size: 12px; color: var(--muted); margin-top: 14px; font-style: italic; }
-    .house-size-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
+    .house-mode-toggle {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
     }
-    .house-mode-toggle { display: flex; gap: 2px; }
     .house-mode-btn {
       font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
+      font-size: 12.5px;
       font-weight: 600;
-      padding: 3px 8px;
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      background: transparent;
+      padding: 9px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
       color: var(--muted);
       cursor: pointer;
-      transition: background .12s, color .12s;
+      text-align: center;
+      transition: border-color .12s, background .12s, color .12s;
     }
+    .house-mode-btn:hover { border-color: var(--brand); color: var(--brand); }
     .house-mode-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
     /* ── Roof mode tabs ── */
@@ -566,13 +567,11 @@
 
         <!-- ── Simple panel ── -->
         <div id="simple-panel">
-          <div class="house-size-header">
-            <span class="easy-section-label" style="margin-bottom:0">House size</span>
-            <div class="house-mode-toggle">
-              <button class="house-mode-btn active" data-hmode="B">Bedrooms</button>
-              <button class="house-mode-btn" data-hmode="A">Roof size</button>
-              <button class="house-mode-btn" data-hmode="C">House type</button>
-            </div>
+          <div class="easy-section-label">How do you think about your home?</div>
+          <div class="house-mode-toggle">
+            <button class="house-mode-btn active" data-hmode="B">By bedrooms</button>
+            <button class="house-mode-btn" data-hmode="C">By house type</button>
+            <button class="house-mode-btn" data-hmode="A">By roof size</button>
           </div>
           <div class="easy-cards" id="house-size-cards"></div>
 
