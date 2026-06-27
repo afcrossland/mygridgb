@@ -375,6 +375,149 @@
       padding-top: 16px;
       border-top: 1px solid var(--border);
     }
+
+    /* ── Quote save ─────────────────────────────────────────── */
+    .quote-save-row {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .quote-add-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1.5px dashed var(--brand);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--brand);
+      cursor: pointer;
+      width: 100%;
+      transition: background .12s, color .12s;
+    }
+    .quote-add-btn:hover { background: var(--brand); color: #fff; }
+    .quote-save-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quote-name-input, .quote-price-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 100%;
+    }
+    .quote-save-btns { display: flex; gap: 6px; }
+    .quote-confirm-btn {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px;
+      border: none;
+      border-radius: 7px;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+    }
+    .quote-cancel-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    /* ── Quotes comparison panel ────────────────────────────── */
+    .quotes-panel {
+      margin-top: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .quotes-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .quotes-panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .quotes-panel-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .quotes-action-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .12s, color .12s;
+    }
+    .quotes-action-btn:hover { border-color: var(--brand); color: var(--brand); }
+    .quotes-clear-btn:hover { border-color: #dc2626; color: #dc2626; }
+    .quotes-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .quotes-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .quotes-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      padding: 4px 8px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .quotes-table td {
+      padding: 9px 8px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .quotes-table tr:last-child td { border-bottom: none; }
+    .q-name { font-weight: 600; }
+    .q-tag {
+      font-size: 10px;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: var(--muted);
+      border-radius: 3px;
+      padding: 1px 4px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .q-load-btn, .q-del-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+    }
+    .q-load-btn { color: var(--brand); }
+    .q-load-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .q-del-btn { color: #dc2626; margin-left: 3px; }
+    .q-del-btn:hover { background: #fef2f2; border-color: #dc2626; }
     .payback-heading {
       font-size: 11px;
       font-weight: 700;
@@ -800,12 +943,39 @@
                 <tr><td colspan="3">—</td></tr>
               </tbody>
             </table>
+          </div><!-- payback-section -->
+
+          <div class="quote-save-row">
+            <div id="quote-save-form" class="quote-save-form" style="display:none">
+              <input type="text" id="quote-name-input" class="quote-name-input" placeholder="Quote name" maxlength="40">
+              <input type="number" id="quote-price-input" class="quote-price-input" placeholder="Actual quoted price £ — leave blank to use estimate" min="0" step="100">
+              <div class="quote-save-btns">
+                <button class="quote-confirm-btn" id="quote-save-confirm">Save quote</button>
+                <button class="quote-cancel-btn" id="quote-save-cancel">Cancel</button>
+              </div>
+            </div>
+            <button class="quote-add-btn" id="quote-add-btn">+ Save as quote</button>
           </div>
 
         </div>
       </div>
 
     </div><!-- .calc-grid -->
+
+    <div id="quotes-panel" class="quotes-panel" style="display:none">
+      <div class="quotes-panel-header">
+        <h3 class="quotes-panel-title">Saved quotes</h3>
+        <div class="quotes-panel-actions">
+          <button id="quotes-download-btn" class="quotes-action-btn">↓ Download JSON</button>
+          <label class="quotes-action-btn" style="cursor:pointer">↑ Upload JSON
+            <input type="file" id="quotes-upload-input" accept=".json" style="display:none">
+          </label>
+          <button id="quotes-clear-btn" class="quotes-action-btn quotes-clear-btn">Clear all</button>
+        </div>
+      </div>
+      <p class="quotes-hint">Shared: postcode region, demand, tariff rates, inflation. Per-quote: system config and price.</p>
+      <div id="quotes-table-wrap"></div>
+    </div>
 
     <!-- How this tool works -->
     <details class="method-details">
@@ -1281,22 +1451,13 @@ function batteryCol(kwh) {
   return Math.min(14, Math.floor(kwh - 0.1));
 }
 
-function calculate() {
-  if (!irradianceData || !lookupData || !currentZoneKey) return;
+// ── Pure calculation (no DOM) ─────────────────────────────────────────────────
+function runCalc({ arrays, battery, archtype, demand, zoneKey, importP, exportP, cheapP, inflRate, houseVal }) {
+  if (!irradianceData || !lookupData || !zoneKey) return null;
+  const zoneData = irradianceData.zones[zoneKey];
 
-  const battery  = +ctrlBattery.value;
-  const demand   = +ctrlDemand.value;
-  const archtype = ctrlArchtype.value;
-  const importP  = +ctrlImport.value / 100;
-  const exportP  = +ctrlExport.value / 100;
-  const cheapP   = +ctrlCheap.value / 100;
-
-  // ── 1. Generation — sum across all arrays ──────────────────────────────────
-  const zoneData = irradianceData.zones[currentZoneKey];
-  let generation = 0;
-  let totalKWp = 0;
-
-  arrays.forEach((arr, i) => {
+  let generation = 0, totalKWp = 0;
+  const perArrayGen = arrays.map(arr => {
     const azIdx  = Math.round(Math.min(175, arr.azimuth) / 5);
     const tiltKey = String(Math.max(0, Math.min(90, arr.tilt)));
     const row    = zoneData[tiltKey] || zoneData['30'];
@@ -1305,90 +1466,46 @@ function calculate() {
     const arrGen = Math.round(irr * kWp);
     generation  += arrGen;
     totalKWp    += kWp;
-    const genEl  = document.getElementById(`arr-gen-${i}`);
-    if (genEl) genEl.textContent = arrGen.toLocaleString() + ' kWh';
+    return arrGen;
   });
 
-  document.getElementById('arr-total-gen').textContent = generation.toLocaleString() + ' kWh';
-  document.getElementById('val-total-kwp').textContent = totalKWp.toFixed(2) + ' kWp total';
-
-  // ── 3. Self-consumption fraction (MCS lookup tables) ──────────────────────
-  const dBand     = demandBand(demand);
+  const dBand      = demandBand(demand);
   const genBandIdx = Math.min(19, Math.floor(generation / 300));
-  const bCol      = batteryCol(battery);
-
-  const table    = lookupData[archtype];
-  const bandKey  = String(dBand);
-  const tableRow = (table[bandKey] && table[bandKey][genBandIdx]) ? table[bandKey][genBandIdx] : null;
-
+  const bCol       = batteryCol(battery);
+  const table      = lookupData[archtype];
+  const bandKey    = String(dBand);
+  const tableRow   = (table[bandKey] && table[bandKey][genBandIdx]) ? table[bandKey][genBandIdx] : null;
   const fraction       = tableRow ? (tableRow[bCol] || 0) : 0;
   const fractionPVOnly = tableRow ? (tableRow[0]    || 0) : 0;
 
-  // ── 4. Self-consumption outputs ────────────────────────────────────────────
   const selfConsumed = Math.min(Math.round(generation * fraction), Math.floor(demand * 0.90));
   const exported     = generation - selfConsumed;
   const pctMet       = Math.round(selfConsumed / demand * 100);
 
-  // ── 5. Battery arbitrage ───────────────────────────────────────────────────
   const BATT_EFFICIENCY = 0.90;
-  let scCycles = 0, arbitrageCycles = 0, arbitrageSaving = 0;
-
+  let arbitrageSaving = 0;
   if (battery >= 1.1) {
-    // Energy delivered from battery for solar self-consumption
     const energyThroughBattery = Math.max(0, generation * (fraction - fractionPVOnly));
-    // Equivalent full cycles (input side: energy / efficiency / capacity)
-    scCycles = energyThroughBattery / (battery * BATT_EFFICIENCY);
-    // Remaining cycles available for grid arbitrage
-    arbitrageCycles = Math.max(0, 365 - scCycles);
-    // Saving: charge cheaply overnight, discharge instead of importing at peak
+    const scCycles        = energyThroughBattery / (battery * BATT_EFFICIENCY);
+    const arbitrageCycles = Math.max(0, 365 - scCycles);
     arbitrageSaving = Math.max(0, Math.round(
       arbitrageCycles * battery * (BATT_EFFICIENCY * importP - cheapP)
     ));
   }
 
   const importSaved  = Math.round(selfConsumed * importP);
-  const exportEarned = Math.round(exported * exportP);
+  const exportEarned = Math.round(exported     * exportP);
   const totalSaving  = importSaved + exportEarned + arbitrageSaving;
 
-  // ── 6. Update UI ───────────────────────────────────────────────────────────
-  const arcFill = ARC_LENGTH * Math.min(1, selfConsumed / demand);
-  document.getElementById('gauge-arc').setAttribute(
-    'stroke-dasharray', `${arcFill.toFixed(1)} ${ARC_LENGTH.toFixed(1)}`
-  );
-  document.getElementById('gauge-text').textContent = pctMet + '%';
-
-  // Plain-language summary
-  const gridReduction = Math.round((selfConsumed / demand) * 100);
-  const summaryParts = [
-    `Your system could cover <strong>${gridReduction}%</strong> of your home's electricity,`,
-    `cutting your grid bills by <strong>£${importSaved.toLocaleString()}</strong> a year`
-  ];
-  if (exportEarned > 0) summaryParts.push(`earning <strong>£${exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
-  if (arbitrageSaving > 0) summaryParts.push(`plus <strong>£${arbitrageSaving.toLocaleString()}</strong> from overnight battery charging`);
-  document.getElementById('stat-summary').innerHTML = summaryParts.join(', ') + '.';
-
-  document.getElementById('stat-gen').textContent    = generation.toLocaleString();
-  document.getElementById('stat-saving').textContent = '£' + totalSaving.toLocaleString();
-  document.getElementById('stat-import-line').textContent    = `£${importSaved.toLocaleString()} import saved`;
-  document.getElementById('stat-export-line').textContent    = `£${exportEarned.toLocaleString()} export earned`;
-  document.getElementById('stat-arbitrage-line').textContent = battery >= 1.1
-    ? `£${arbitrageSaving.toLocaleString()} battery arbitrage`
-    : '';
-  document.getElementById('stat-self').textContent   = selfConsumed.toLocaleString();
-  document.getElementById('stat-export').textContent = exported.toLocaleString();
-
-  // ── 5. Payback ──────────────────────────────────────────────────────────────
-  const totalPanels = arrays.reduce((s, a) => s + a.panels, 0);
-  const rawCost = 170 * totalPanels
-    + (battery >= 1.1 ? 1000 + 200 * battery : 0)
-    + 4000; // £2k labour + £2k scaffolding
-  const baseCost = Math.round(rawCost / 1000) * 1000;
-  const houseVal = +ctrlHouseval.value;
-  const costs = [baseCost - 2000, baseCost, baseCost + 2000].map(c => Math.max(0, c - houseVal));
+  const totalPanels    = arrays.reduce((s, a) => s + a.panels, 0);
+  const rawCost        = 170 * totalPanels + (battery >= 1.1 ? 1000 + 200 * battery : 0) + 4000;
+  const estimatedCost  = Math.round(rawCost / 1000) * 1000;
+  const costs          = [estimatedCost - 2000, estimatedCost, estimatedCost + 2000].map(c => Math.max(0, c - houseVal));
 
   const growingAnnual = importSaved + arbitrageSaving;
   const fixedAnnual   = exportEarned;
-  const inflRate      = 1 + (+ctrlInflation.value / 100);
+  const yr1 = fixedAnnual + growingAnnual;
+  const yr5 = fixedAnnual + Math.round(growingAnnual * Math.pow(inflRate, 4));
 
   function simplePayback(cost) {
     let cum = 0;
@@ -1399,15 +1516,68 @@ function calculate() {
     return '>50';
   }
 
-  const yr1 = fixedAnnual + growingAnnual;
-  const yr5 = fixedAnnual + Math.round(growingAnnual * Math.pow(inflRate, 4));
-  document.getElementById('payback-body').innerHTML = costs.map((c, i) => {
-    const pb = simplePayback(c);
+  return {
+    generation, totalKWp, perArrayGen, selfConsumed, exported, pctMet,
+    importSaved, exportEarned, arbitrageSaving, totalSaving,
+    estimatedCost, costs, yr1, yr5,
+    paybacks: costs.map(simplePayback),
+    growingAnnual, fixedAnnual,
+  };
+}
+
+function calculate() {
+  if (!irradianceData || !lookupData || !currentZoneKey) return;
+
+  const battery  = +ctrlBattery.value;
+  const demand   = +ctrlDemand.value;
+  const archtype = ctrlArchtype.value;
+  const importP  = +ctrlImport.value / 100;
+  const exportP  = +ctrlExport.value / 100;
+  const cheapP   = +ctrlCheap.value / 100;
+  const inflRate = 1 + (+ctrlInflation.value / 100);
+  const houseVal = +ctrlHouseval.value;
+
+  const r = runCalc({ arrays, battery, archtype, demand, zoneKey: currentZoneKey, importP, exportP, cheapP, inflRate, houseVal });
+  if (!r) return;
+
+  // Per-array generation labels
+  r.perArrayGen.forEach((gen, i) => {
+    const el = document.getElementById(`arr-gen-${i}`);
+    if (el) el.textContent = gen.toLocaleString() + ' kWh';
+  });
+  document.getElementById('arr-total-gen').textContent = r.generation.toLocaleString() + ' kWh';
+  document.getElementById('val-total-kwp').textContent = r.totalKWp.toFixed(2) + ' kWp total';
+
+  // Gauge
+  const arcFill = ARC_LENGTH * Math.min(1, r.selfConsumed / demand);
+  document.getElementById('gauge-arc').setAttribute('stroke-dasharray', `${arcFill.toFixed(1)} ${ARC_LENGTH.toFixed(1)}`);
+  document.getElementById('gauge-text').textContent = r.pctMet + '%';
+
+  // Plain-language summary
+  const summaryParts = [
+    `Your system could cover <strong>${r.pctMet}%</strong> of your home's electricity,`,
+    `cutting your grid bills by <strong>£${r.importSaved.toLocaleString()}</strong> a year`
+  ];
+  if (r.exportEarned   > 0) summaryParts.push(`earning <strong>£${r.exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
+  if (r.arbitrageSaving > 0) summaryParts.push(`plus <strong>£${r.arbitrageSaving.toLocaleString()}</strong> from overnight battery charging`);
+  document.getElementById('stat-summary').innerHTML = summaryParts.join(', ') + '.';
+
+  document.getElementById('stat-gen').textContent             = r.generation.toLocaleString();
+  document.getElementById('stat-saving').textContent          = '£' + r.totalSaving.toLocaleString();
+  document.getElementById('stat-import-line').textContent     = `£${r.importSaved.toLocaleString()} import saved`;
+  document.getElementById('stat-export-line').textContent     = `£${r.exportEarned.toLocaleString()} export earned`;
+  document.getElementById('stat-arbitrage-line').textContent  = battery >= 1.1 ? `£${r.arbitrageSaving.toLocaleString()} battery arbitrage` : '';
+  document.getElementById('stat-self').textContent            = r.selfConsumed.toLocaleString();
+  document.getElementById('stat-export').textContent          = r.exported.toLocaleString();
+
+  // Payback table
+  document.getElementById('payback-body').innerHTML = r.costs.map((c, i) => {
+    const pb  = r.paybacks[i];
     const mid = i === 1 ? ' class="mid-row"' : '';
     return `<tr${mid}>
       <td>£${c.toLocaleString()}</td>
-      <td>£${yr1.toLocaleString()}</td>
-      <td>£${yr5.toLocaleString()}</td>
+      <td>£${r.yr1.toLocaleString()}</td>
+      <td>£${r.yr5.toLocaleString()}</td>
       <td class="pb-yrs">${typeof pb === 'number' ? pb + ' yrs' : pb}</td>
     </tr>`;
   }).join('');
@@ -1419,7 +1589,178 @@ function calculate() {
     clearTimeout(flash._t);
     flash._t = setTimeout(() => flash.classList.remove('show'), 1500);
   }
+
+  if (quotes.length > 0) renderQuotesTable();
 }
+
+// ── Quote comparison ───────────────────────────────────────────────────────────
+let quotes = [];
+let quoteCounter = 0;
+
+const quoteAddBtn    = document.getElementById('quote-add-btn');
+const quoteSaveForm  = document.getElementById('quote-save-form');
+const quoteNameInput = document.getElementById('quote-name-input');
+const quotePriceInput = document.getElementById('quote-price-input');
+
+quoteAddBtn.addEventListener('click', () => {
+  quoteCounter++;
+  quoteNameInput.value  = `Quote ${quoteCounter}`;
+  quotePriceInput.value = '';
+  quoteSaveForm.style.display  = 'flex';
+  quoteAddBtn.style.display    = 'none';
+  quoteNameInput.focus();
+  quoteNameInput.select();
+});
+
+document.getElementById('quote-save-cancel').addEventListener('click', () => {
+  quoteSaveForm.style.display = 'none';
+  quoteAddBtn.style.display   = '';
+  quoteCounter--;
+});
+
+document.getElementById('quote-save-confirm').addEventListener('click', () => {
+  const name        = quoteNameInput.value.trim() || `Quote ${quoteCounter}`;
+  const quotedPrice = quotePriceInput.value !== '' ? parseFloat(quotePriceInput.value) : null;
+  quotes.push({
+    id: Date.now(),
+    name,
+    quotedPrice,
+    arrays:     JSON.parse(JSON.stringify(arrays)),
+    batteryKwh: +ctrlBattery.value,
+    archtype:   ctrlArchtype.value,
+  });
+  quoteSaveForm.style.display = 'none';
+  quoteAddBtn.style.display   = '';
+  renderQuotesTable();
+  document.getElementById('quotes-panel').style.display = '';
+});
+
+function getSharedParams() {
+  return {
+    demand:   +ctrlDemand.value,
+    zoneKey:  currentZoneKey,
+    importP:  +ctrlImport.value / 100,
+    exportP:  +ctrlExport.value / 100,
+    cheapP:   +ctrlCheap.value / 100,
+    inflRate: 1 + (+ctrlInflation.value / 100),
+    houseVal: +ctrlHouseval.value,
+  };
+}
+
+function renderQuotesTable() {
+  const shared = getSharedParams();
+  const rows = quotes.map(q => {
+    const r = shared.zoneKey ? runCalc({
+      arrays: q.arrays, battery: q.batteryKwh, archtype: q.archtype, ...shared,
+    }) : null;
+
+    const totalPanels = q.arrays.reduce((s, a) => s + a.panels, 0);
+    const arrDesc     = q.arrays.length > 1 ? ` (${q.arrays.length} arrays)` : '';
+    const sysDesc     = `${totalPanels} panels${arrDesc}` + (q.batteryKwh >= 1.1 ? ` + ${q.batteryKwh} kWh` : '');
+
+    const effectiveCost = q.quotedPrice != null ? q.quotedPrice : (r ? r.estimatedCost : null);
+    const costHtml = effectiveCost != null
+      ? `£${effectiveCost.toLocaleString()} <span class="q-tag">${q.quotedPrice != null ? 'quoted' : 'est.'}</span>`
+      : '—';
+
+    let pb = '—';
+    if (r && effectiveCost != null) {
+      let cum = 0;
+      for (let y = 1; y <= 50; y++) {
+        cum += r.fixedAnnual + Math.round(r.growingAnnual * Math.pow(shared.inflRate, y - 1));
+        if (cum >= effectiveCost) { pb = y + ' yrs'; break; }
+      }
+      if (pb === '—') pb = '>50 yrs';
+    }
+
+    return `<tr>
+      <td class="q-name">${q.name}</td>
+      <td>${sysDesc}</td>
+      <td>${costHtml}</td>
+      <td>${r ? '£' + r.yr1.toLocaleString() : '—'}</td>
+      <td>${r ? '£' + r.yr5.toLocaleString() : '—'}</td>
+      <td class="pb-yrs">${pb}</td>
+      <td>
+        <button class="q-load-btn" data-qid="${q.id}">Load</button>
+        <button class="q-del-btn"  data-qid="${q.id}">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('quotes-table-wrap').innerHTML = `
+    <table class="quotes-table">
+      <thead><tr>
+        <th>Quote</th><th>System</th><th>Cost</th>
+        <th>Yr 1 saving</th><th>Yr 5 saving</th><th>Payback</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  document.querySelectorAll('.q-del-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      quotes = quotes.filter(q => q.id !== +btn.dataset.qid);
+      if (quotes.length === 0) document.getElementById('quotes-panel').style.display = 'none';
+      else renderQuotesTable();
+    })
+  );
+
+  document.querySelectorAll('.q-load-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const q = quotes.find(q => q.id === +btn.dataset.qid);
+      if (!q) return;
+      arrays = JSON.parse(JSON.stringify(q.arrays));
+      ctrlBattery.value  = q.batteryKwh;
+      ctrlArchtype.value = q.archtype;
+      if (currentMode !== 'detailed') {
+        currentMode = 'detailed';
+        document.getElementById('mode-detailed').classList.add('active');
+        document.getElementById('mode-simple').classList.remove('active');
+        document.getElementById('simple-panel').style.display   = 'none';
+        document.getElementById('detailed-panel').style.display = '';
+      }
+      calculate();
+    })
+  );
+}
+
+document.getElementById('quotes-download-btn').addEventListener('click', () => {
+  const blob = new Blob(
+    [JSON.stringify({ quotes, exportedAt: new Date().toISOString() }, null, 2)],
+    { type: 'application/json' }
+  );
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob), download: 'solar-quotes.json'
+  });
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('quotes-upload-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data.quotes) && data.quotes.length) {
+        quotes = data.quotes;
+        quoteCounter = quotes.length;
+        renderQuotesTable();
+        document.getElementById('quotes-panel').style.display = '';
+      }
+    } catch { alert('Could not read file — please upload a valid solar-quotes.json file.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('quotes-clear-btn').addEventListener('click', () => {
+  if (confirm('Clear all saved quotes?')) {
+    quotes = [];
+    quoteCounter = 0;
+    document.getElementById('quotes-panel').style.display = 'none';
+  }
+});
 </script>
 
 </body>
