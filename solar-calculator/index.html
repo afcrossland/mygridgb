@@ -504,15 +504,6 @@
       <div id="pc-status"></div>
     </div>
 
-    <!-- Satellite map (shown after postcode lookup) -->
-    <div id="map-section" style="display:none">
-      <button class="map-toggle-btn" id="map-toggle-btn">Show satellite view ▾</button>
-      <div id="map-wrap" style="display:none">
-        <div id="satellite-map"></div>
-        <p class="map-hint">Find your roof on the map — the N arrow shows north. Use this to judge which way your roof faces, then select above.</p>
-      </div>
-    </div>
-
     <!-- Main calculator -->
     <div class="calc-grid">
 
@@ -565,6 +556,15 @@
               <span class="easy-card-title">Not sure</span>
               <span class="easy-card-sub">We'll assume SE/SW</span>
             </button>
+          </div>
+
+          <!-- Satellite map (appears after postcode lookup) -->
+          <div id="map-section" style="display:none">
+            <button class="map-toggle-btn" id="map-toggle-btn">Need help? Show satellite view ▾</button>
+            <div id="map-wrap" style="display:none">
+              <div id="satellite-map"></div>
+              <p class="map-hint">Find your roof — the N↑ arrow shows north. Use this to judge which way your roof faces, then select above.</p>
+            </div>
           </div>
 
           <p class="easy-mode-hint">For battery, tariffs, and roof detail — switch to Detailed above.</p>
@@ -916,11 +916,11 @@ async function lookupPostcode() {
     ? stripped.slice(0, -3) + ' ' + stripped.slice(-3)
     : stripped;
 
+  let foundLat, foundLon;
   try {
     let latitude, longitude, displayCode;
 
     if (isFullPostcode) {
-      // Full postcode lookup — use normalised form (e.g. DN22 6UF)
       const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(normalised)}`);
       const data = await res.json();
       if (data.status !== 200) throw new Error('not found');
@@ -928,7 +928,6 @@ async function lookupPostcode() {
       longitude = data.result.longitude;
       displayCode = data.result.postcode;
     } else {
-      // Outward / partial code — use outcodes endpoint
       const res = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(stripped)}`);
       const data = await res.json();
       if (data.status !== 200) throw new Error('not found');
@@ -939,18 +938,24 @@ async function lookupPostcode() {
 
     const zone = nearestZone(latitude, longitude);
     currentZoneKey = zone.key;
+    foundLat = latitude;
+    foundLon = longitude;
 
     pcStatus.innerHTML = `<span class="pc-zone">${displayCode} → MCS zone: <strong>${zone.label}</strong></span>`;
     document.getElementById('results-placeholder').style.display = 'none';
     document.getElementById('results-content').style.display  = 'block';
-    setMapLocation(latitude, longitude);
-    calculate();
   } catch (e) {
     console.error('Postcode lookup error:', e);
     pcStatus.innerHTML = `<span class="pc-error">Postcode not recognised — try a full postcode (e.g. SW1A 1AA) or district code (e.g. DN22)</span>`;
   } finally {
     pcBtn.disabled = false;
     pcBtn.textContent = 'Find location';
+  }
+
+  // Run outside try/catch so a JS error here doesn't show as a postcode failure
+  if (foundLat !== undefined) {
+    setMapLocation(foundLat, foundLon);
+    calculate();
   }
 }
 
