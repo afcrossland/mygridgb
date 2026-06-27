@@ -137,6 +137,65 @@
       margin-bottom: 20px;
     }
 
+    /* ── Simple / Detailed mode toggle ── */
+    .mode-toggle {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 18px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .mode-btn.active { background: var(--brand); color: #fff; }
+
+    /* ── Easy mode cards ── */
+    .easy-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+    .easy-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .easy-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color .15s, background .15s;
+    }
+    .easy-card:hover { border-color: var(--brand); }
+    .easy-card.selected { border-color: var(--brand); background: #e8f4fd; }
+    .easy-card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .easy-card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .easy-mode-hint  { font-size: 12px; color: var(--muted); margin-top: 14px; font-style: italic; }
+
     /* ── Roof mode tabs ── */
     .roof-tabs {
       display: flex;
@@ -409,62 +468,59 @@
 
       <!-- Left: Configuration -->
       <div class="config-panel">
-        <h2>System &amp; household</h2>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Solar panels</span>
-            <span class="ctrl-val" id="val-total-kwp">3.80 kWp</span>
-          </div>
-
-          <div class="roof-tabs">
-            <button class="roof-tab active" id="tab-single">Single roof</button>
-            <button class="roof-tab" id="tab-multi">Multiple roofs</button>
-          </div>
-
-          <!-- Single roof -->
-          <div id="panel-single">
-            <div class="ctrl-label" style="margin-top:8px">
-              <span>Number of panels</span>
-              <span class="ctrl-val" id="val-panels">8 panels</span>
-            </div>
-            <input type="range" id="ctrl-panels" min="1" max="30" value="8" step="1">
-            <div class="ctrl-label" style="margin-top:10px">
-              <span>Orientation</span>
-              <span class="ctrl-val" id="val-orient">South (0°)</span>
-            </div>
-            <input type="range" id="ctrl-orient" min="0" max="175" value="0" step="5">
-            <div class="ctrl-label" style="margin-top:10px">
-              <span>Roof pitch (tilt)</span>
-              <span class="ctrl-val" id="val-tilt">30°</span>
-            </div>
-            <input type="range" id="ctrl-tilt" min="0" max="60" value="30" step="1">
-            <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · typical UK roof is 30–40°</div>
-          </div>
-
-          <!-- Multiple roofs -->
-          <div id="panel-multi" style="display:none">
-            <div id="arrays-container"></div>
-            <div class="arrays-footer">
-              <button id="add-array-btn" class="add-arr-btn">+ Add array</button>
-              <span class="array-total-label">Total: <strong id="arr-total-gen">—</strong></span>
-            </div>
-            <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · max 10 arrays</div>
-          </div>
+        <!-- Mode toggle -->
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="mode-simple">Simple</button>
+          <button class="mode-btn" id="mode-detailed">Detailed</button>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Battery storage</span></div>
-          <select id="ctrl-battery" class="ctrl-select">
-            <option value="0">No battery</option>
-            <option value="2.5">2.5 kWh battery</option>
-            <option value="5">5 kWh battery</option>
-            <option value="7.5">7.5 kWh battery</option>
-            <option value="10" selected>10 kWh battery</option>
-            <option value="13.5">13.5 kWh battery</option>
-          </select>
+        <!-- ── Simple panel ── -->
+        <div id="simple-panel">
+          <div class="easy-section-label">House size</div>
+          <div class="easy-cards" id="house-size-cards">
+            <button class="easy-card" data-panels="6">
+              <span class="easy-card-title">Small</span>
+              <span class="easy-card-sub">2–3 bed terraced</span>
+            </button>
+            <button class="easy-card selected" data-panels="10">
+              <span class="easy-card-title">Medium</span>
+              <span class="easy-card-sub">3–4 bed semi</span>
+            </button>
+            <button class="easy-card" data-panels="14">
+              <span class="easy-card-title">Large</span>
+              <span class="easy-card-sub">4–5 bed detached</span>
+            </button>
+            <button class="easy-card" data-panels="20">
+              <span class="easy-card-title">Very large</span>
+              <span class="easy-card-sub">5+ bed detached</span>
+            </button>
+          </div>
+
+          <div class="easy-section-label">Which way does your main roof face?</div>
+          <div class="easy-cards" id="roof-dir-cards">
+            <button class="easy-card" data-az="0">
+              <span class="easy-card-title">South-facing</span>
+              <span class="easy-card-sub">Best for solar</span>
+            </button>
+            <button class="easy-card" data-az="45">
+              <span class="easy-card-title">SE or SW</span>
+              <span class="easy-card-sub">Still very good</span>
+            </button>
+            <button class="easy-card" data-az="90">
+              <span class="easy-card-title">East or West</span>
+              <span class="easy-card-sub">Moderate yield</span>
+            </button>
+            <button class="easy-card selected" data-az="45">
+              <span class="easy-card-title">Not sure</span>
+              <span class="easy-card-sub">We'll assume SE/SW</span>
+            </button>
+          </div>
+
+          <p class="easy-mode-hint">For battery, tariffs, and roof detail — switch to Detailed above.</p>
         </div>
 
+        <!-- ── Shared: demand (always visible) ── -->
         <div class="ctrl-group">
           <div class="ctrl-label">
             <span>Annual electricity use</span>
@@ -474,46 +530,104 @@
           <div class="ctrl-hint">UK average is ~3,500 kWh/year</div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Occupancy pattern</span></div>
-          <select id="ctrl-archetype" class="ctrl-select">
-            <option value="homeallday">Home all day</option>
-            <option value="inhalftheday" selected>In half the day</option>
-            <option value="outallday">Out all day (working day)</option>
-          </select>
-          <div class="ctrl-hint">Affects how much solar you use directly vs export</div>
+        <!-- ── Detailed panel ── -->
+        <div id="detailed-panel" style="display:none">
+          <div class="ctrl-group">
+            <div class="ctrl-label">
+              <span>Solar panels</span>
+              <span class="ctrl-val" id="val-total-kwp">3.80 kWp</span>
+            </div>
+
+            <div class="roof-tabs">
+              <button class="roof-tab active" id="tab-single">Single roof</button>
+              <button class="roof-tab" id="tab-multi">Multiple roofs</button>
+            </div>
+
+            <!-- Single roof -->
+            <div id="panel-single">
+              <div class="ctrl-label" style="margin-top:8px">
+                <span>Number of panels</span>
+                <span class="ctrl-val" id="val-panels">10 panels</span>
+              </div>
+              <input type="range" id="ctrl-panels" min="1" max="30" value="10" step="1">
+              <div class="ctrl-label" style="margin-top:10px">
+                <span>Orientation</span>
+                <span class="ctrl-val" id="val-orient">SE / SW (45°)</span>
+              </div>
+              <input type="range" id="ctrl-orient" min="0" max="175" value="45" step="5">
+              <div class="ctrl-label" style="margin-top:10px">
+                <span>Roof pitch (tilt)</span>
+                <span class="ctrl-val" id="val-tilt">35°</span>
+              </div>
+              <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · typical UK roof is 30–40°</div>
+            </div>
+
+            <!-- Multiple roofs -->
+            <div id="panel-multi" style="display:none">
+              <div id="arrays-container"></div>
+              <div class="arrays-footer">
+                <button id="add-array-btn" class="add-arr-btn">+ Add array</button>
+                <span class="array-total-label">Total: <strong id="arr-total-gen">—</strong></span>
+              </div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · max 10 arrays</div>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Battery storage</span></div>
+            <select id="ctrl-battery" class="ctrl-select">
+              <option value="0" selected>No battery</option>
+              <option value="2.5">2.5 kWh battery</option>
+              <option value="5">5 kWh battery</option>
+              <option value="7.5">7.5 kWh battery</option>
+              <option value="10">10 kWh battery</option>
+              <option value="13.5">13.5 kWh battery</option>
+            </select>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Occupancy pattern</span></div>
+            <select id="ctrl-archetype" class="ctrl-select">
+              <option value="homeallday">Home all day</option>
+              <option value="inhalftheday" selected>In half the day</option>
+              <option value="outallday">Out all day (working day)</option>
+            </select>
+            <div class="ctrl-hint">Affects how much solar you use directly vs export</div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Electricity tariff rates</span></div>
+            <div class="rates-row">
+              <div class="rate-input-wrap">
+                <label class="rate-label" for="ctrl-import">Import (p/kWh)</label>
+                <input id="ctrl-import" class="rate-input" type="number" value="20" min="1" max="100" step="0.5">
+              </div>
+              <div class="rate-input-wrap">
+                <label class="rate-label" for="ctrl-export">Export (p/kWh)</label>
+                <input id="ctrl-export" class="rate-input" type="number" value="5" min="0" max="50" step="0.5">
+              </div>
+              <div class="rate-input-wrap">
+                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
+                <input id="ctrl-cheap" class="rate-input" type="number" value="7.5" min="0" max="50" step="0.5">
+              </div>
+            </div>
+            <div class="ctrl-hint">Import = standard rate; overnight = off-peak tariff (e.g. Octopus Go); export = SEG rate</div>
+            <div class="ctrl-label" style="margin-top:12px">
+              <span>Electricity price inflation</span>
+              <span class="ctrl-val" id="val-inflation">2.1% / yr</span>
+            </div>
+            <input type="range" id="ctrl-inflation" min="0" max="10" value="2.1" step="0.1">
+            <div class="ctrl-hint">Applied to import savings &amp; arbitrage in payback model; export rate kept flat</div>
+            <div class="ctrl-label" style="margin-top:12px">
+              <span>Addition to house value</span>
+              <span class="ctrl-val" id="val-houseval">£0</span>
+            </div>
+            <input type="range" id="ctrl-houseval" min="0" max="15000" value="0" step="500">
+            <div class="ctrl-hint">Deducted from effective cost in payback calculation; evidence varies — set to zero if unsure</div>
+          </div>
         </div>
 
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Electricity tariff rates</span></div>
-          <div class="rates-row">
-            <div class="rate-input-wrap">
-              <label class="rate-label" for="ctrl-import">Import (p/kWh)</label>
-              <input id="ctrl-import" class="rate-input" type="number" value="20" min="1" max="100" step="0.5">
-            </div>
-            <div class="rate-input-wrap">
-              <label class="rate-label" for="ctrl-export">Export (p/kWh)</label>
-              <input id="ctrl-export" class="rate-input" type="number" value="5" min="0" max="50" step="0.5">
-            </div>
-            <div class="rate-input-wrap">
-              <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
-              <input id="ctrl-cheap" class="rate-input" type="number" value="7.5" min="0" max="50" step="0.5">
-            </div>
-          </div>
-          <div class="ctrl-hint">Import = standard rate; overnight = off-peak tariff (e.g. Octopus Go); export = SEG rate</div>
-          <div class="ctrl-label" style="margin-top:12px">
-            <span>Electricity price inflation</span>
-            <span class="ctrl-val" id="val-inflation">2.1% / yr</span>
-          </div>
-          <input type="range" id="ctrl-inflation" min="0" max="10" value="2.1" step="0.1">
-          <div class="ctrl-hint">Applied to import savings &amp; arbitrage in payback model; export rate kept flat</div>
-          <div class="ctrl-label" style="margin-top:12px">
-            <span>Addition to house value</span>
-            <span class="ctrl-val" id="val-houseval">£0</span>
-          </div>
-          <input type="range" id="ctrl-houseval" min="0" max="15000" value="0" step="500">
-          <div class="ctrl-hint">Deducted from effective cost in payback calculation; evidence varies — set to zero if unsure</div>
-        </div>
       </div>
 
       <!-- Right: Results -->
@@ -743,6 +857,62 @@ async function lookupPostcode() {
 
 pcBtn.addEventListener('click', lookupPostcode);
 pcInput.addEventListener('keydown', e => { if (e.key === 'Enter') lookupPostcode(); });
+
+// ── Mode: Simple / Detailed ───────────────────────────────────────────────────
+let currentMode = 'simple';
+let easyPanels  = 10;   // Medium default
+let easyAzimuth = 45;   // "Not sure" → SE/SW default
+
+function applyEasyConfig() {
+  arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+}
+
+// Card click helpers
+function bindCards(containerID, stateKey, callback) {
+  document.getElementById(containerID).addEventListener('click', e => {
+    const card = e.target.closest('.easy-card');
+    if (!card) return;
+    document.querySelectorAll(`#${containerID} .easy-card`).forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    if (stateKey === 'panels') easyPanels = +card.dataset.panels;
+    if (stateKey === 'az')     easyAzimuth = +card.dataset.az;
+    callback();
+  });
+}
+
+bindCards('house-size-cards', 'panels', () => { applyEasyConfig(); calculate(); });
+bindCards('roof-dir-cards',   'az',     () => { applyEasyConfig(); calculate(); });
+
+// Mode toggle
+document.getElementById('mode-simple').addEventListener('click', () => {
+  if (currentMode === 'simple') return;
+  currentMode = 'simple';
+  document.getElementById('mode-simple').classList.add('active');
+  document.getElementById('mode-detailed').classList.remove('active');
+  document.getElementById('simple-panel').style.display = '';
+  document.getElementById('detailed-panel').style.display = 'none';
+  applyEasyConfig();
+  calculate();
+});
+
+document.getElementById('mode-detailed').addEventListener('click', () => {
+  if (currentMode === 'detailed') return;
+  currentMode = 'detailed';
+  document.getElementById('mode-detailed').classList.add('active');
+  document.getElementById('mode-simple').classList.remove('active');
+  document.getElementById('detailed-panel').style.display = '';
+  document.getElementById('simple-panel').style.display = 'none';
+  // Sync detailed sliders to current easy state
+  ctrlPanels.value = easyPanels;
+  ctrlOrient.value = easyAzimuth;
+  ctrlTilt.value   = 35;
+  arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+  updateSingleLabels();
+  calculate();
+});
+
+// Init easy mode
+applyEasyConfig();
 
 // ── Orientation helpers ────────────────────────────────────────────────────────
 const ORIENT_OPTIONS = [
