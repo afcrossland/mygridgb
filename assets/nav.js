@@ -1,5 +1,18 @@
 /* nav.js — injects header + footer into every page */
 
+// ── Google Analytics ──────────────────────────────────────────────────────────
+(function() {
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=G-XL1J7KET34';
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', 'G-XL1J7KET34');
+})();
+
 const NAV_HTML = `
 <header id="site-header">
   <div class="header-inner">
