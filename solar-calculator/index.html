@@ -688,7 +688,7 @@
             <div class="rates-row">
               <div class="rate-input-wrap">
                 <label class="rate-label" for="ctrl-import">Import (p/kWh)</label>
-                <input id="ctrl-import" class="rate-input" type="number" value="20" min="1" max="100" step="0.5">
+                <input id="ctrl-import" class="rate-input" type="number" value="24.7" min="1" max="100" step="0.5">
               </div>
               <div class="rate-input-wrap">
                 <label class="rate-label" for="ctrl-export">Export (p/kWh)</label>
@@ -696,15 +696,15 @@
               </div>
               <div class="rate-input-wrap">
                 <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
-                <input id="ctrl-cheap" class="rate-input" type="number" value="7.5" min="0" max="50" step="0.5">
+                <input id="ctrl-cheap" class="rate-input" type="number" value="10" min="0" max="50" step="0.5">
               </div>
             </div>
             <div class="ctrl-hint">Import = standard rate; overnight = off-peak tariff (e.g. Octopus Go); export = SEG rate</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Electricity price inflation</span>
-              <span class="ctrl-val" id="val-inflation">2.1% / yr</span>
+              <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
             </div>
-            <input type="range" id="ctrl-inflation" min="0" max="10" value="2.1" step="0.1">
+            <input type="range" id="ctrl-inflation" min="0" max="10" value="3" step="0.1">
             <div class="ctrl-hint">Applied to import savings &amp; arbitrage in payback model; export rate kept flat</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Addition to house value</span>
