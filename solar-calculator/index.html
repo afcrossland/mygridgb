@@ -727,7 +727,7 @@
         <!-- Placeholder state (no postcode yet) -->
         <div id="results-placeholder" class="results-placeholder">
           <span class="placeholder-icon">☀️</span>
-          Enter your postcode to see how much electricity your solar system could generate based on local irradiance data.
+          Use your postcode to estimate your solar potential.
         </div>
 
         <!-- Results (hidden until postcode entered) -->
@@ -985,7 +985,7 @@ async function lookupPostcode() {
     foundLat = latitude;
     foundLon = longitude;
 
-    pcStatus.innerHTML = `<span class="pc-zone">${displayCode} → MCS zone: <strong>${zone.label}</strong></span>`;
+    pcStatus.innerHTML = `<span class="pc-zone">${displayCode}</span>`;
     document.getElementById('results-placeholder').style.display = 'none';
     document.getElementById('results-content').style.display  = 'block';
   } catch (e) {
