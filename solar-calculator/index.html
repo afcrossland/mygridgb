@@ -1363,16 +1363,16 @@ function calculate() {
     `Your system could cover <strong>${gridReduction}%</strong> of your home's electricity,`,
     `cutting your grid bills by <strong>£${importSaved.toLocaleString()}</strong> a year`
   ];
-  if (exportEarned > 0) summaryParts.push(`and earning <strong>£${exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
+  if (exportEarned > 0) summaryParts.push(`earning <strong>£${exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
   if (arbitrageSaving > 0) summaryParts.push(`plus <strong>£${arbitrageSaving.toLocaleString()}</strong> from overnight battery charging`);
-  document.getElementById('stat-summary').innerHTML = summaryParts.join(' ') + '.';
+  document.getElementById('stat-summary').innerHTML = summaryParts.join(', ') + '.';
 
   document.getElementById('stat-gen').textContent    = generation.toLocaleString();
   document.getElementById('stat-saving').textContent = '£' + totalSaving.toLocaleString();
   document.getElementById('stat-import-line').textContent    = `£${importSaved.toLocaleString()} import saved`;
   document.getElementById('stat-export-line').textContent    = `£${exportEarned.toLocaleString()} export earned`;
   document.getElementById('stat-arbitrage-line').textContent = battery >= 1.1
-    ? `£${arbitrageSaving.toLocaleString()} battery arbitrage (${Math.round(arbitrageCycles)} cycles)`
+    ? `£${arbitrageSaving.toLocaleString()} battery arbitrage`
     : '';
   document.getElementById('stat-self').textContent   = selfConsumed.toLocaleString();
   document.getElementById('stat-export').textContent = exported.toLocaleString();
