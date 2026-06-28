@@ -16,40 +16,40 @@
 const NAV_HTML = `
 <header id="site-header">
   <div class="header-inner">
-    <a class="logo" href="/index.html">MyGrid<span class="logo-accent">GB</span> 🇬🇧</a>
+    <a class="logo" href="/">MyGrid<span class="logo-accent">GB</span> 🇬🇧</a>
     <button id="nav-toggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
     <nav id="main-nav">
       <ul>
         <li>
-          <a href="/last-28-days/index.html">Electricity Data ▾</a>
+          <a href="/last-28-days/">Electricity Data ▾</a>
           <ul>
-            <li><a href="/last-28-days/index.html">Last 28 Days</a></li>
-            <li><a href="/last-12-months/index.html">Last 12 Months</a></li>
-            <li><a href="/historicaldata/index.html">Generation History</a></li>
-            <li><a href="/carbon-tracker/index.html">Carbon Tracker</a></li>
+            <li><a href="/last-28-days/">Last 28 Days</a></li>
+            <li><a href="/last-12-months/">Last 12 Months</a></li>
+            <li><a href="/historicaldata/">Generation History</a></li>
+            <li><a href="/carbon-tracker/">Carbon Tracker</a></li>
           </ul>
         </li>
-        <li><a href="/2030grid/index.html">The 2030 Blueprint</a></li>
-        <li><a href="/solar-calculator/index.html" class="nav-solar">☀️ Solar Calculator</a></li>
+        <li><a href="/2030grid/">The 2030 Blueprint</a></li>
+        <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
         <li>
-          <a href="/map/index.html">Resources ▾</a>
+          <a href="/map/">Resources ▾</a>
           <ul>
-            <li><a href="/blog/index.html">Blog</a></li>
-            <li><a href="/map/index.html">UK Renewable Energy Map</a></li>
+            <li><a href="/blog/">Blog</a></li>
+            <li><a href="/map/">UK Renewable Energy Map</a></li>
             <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
-            <li><a href="/educational-resources/index.html">Educational Resources</a></li>
+            <li><a href="/educational-resources/">Educational Resources</a></li>
             <li><a href="https://substack.com/@afcrossland" target="_blank">Substack</a></li>
           </ul>
         </li>
 
-        <li><a href="/podcast/index.html">In the Media</a></li>
+        <li><a href="/podcast/">In the Media</a></li>
         <li>
-          <a href="/about/index.html">About ▾</a>
+          <a href="/about/">About ▾</a>
           <ul>
-            <li><a href="/about/index.html">About MyGridGB</a></li>
-            <li><a href="/about-me/index.html">About Me</a></li>
+            <li><a href="/about/">About MyGridGB</a></li>
+            <li><a href="/about-me/">About Me</a></li>
           </ul>
         </li>
       </ul>
