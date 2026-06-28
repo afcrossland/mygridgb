@@ -589,17 +589,24 @@
     }
     .shared-assumptions-title {
       font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
+      letter-spacing: .07em; color: var(--muted); margin-bottom: 4px;
+    }
+    .shared-assumptions-note {
+      font-size: 12px; color: var(--muted); margin-bottom: 12px;
+      background: #f8fafc; border-radius: 6px; padding: 6px 10px;
+      border-left: 3px solid #93c5fd;
     }
     .shared-inputs-grid {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 10px; align-items: end;
     }
-    .shared-label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .shared-input-wrap { display: flex; flex-direction: column; }
+    .shared-label { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
     .shared-hint { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; opacity: .8; }
     .shared-input {
       font-family: 'DM Sans', sans-serif; font-size: 13px;
       padding: 6px 10px; border: 1px solid var(--border);
-      border-radius: 7px; width: 100%;
+      border-radius: 7px; width: 100%; margin-top: auto;
     }
     .shared-input:focus { outline: none; border-color: var(--brand); }
     @media (max-width: 900px) {
@@ -1116,7 +1123,7 @@
                 <input id="ctrl-cheap" class="rate-input" type="number" value="10" min="0" max="50" step="0.5">
               </div>
             </div>
-            <div class="ctrl-hint">Check your electricity bill for the import rate. The export rate (SEG) is what your energy supplier pays for surplus solar. The overnight rate only applies if you're on a time-of-use tariff like Octopus Go — leave at 10p if unsure.</div>
+            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for the import rate. The export rate (SEG) is what your energy supplier pays for surplus solar. The overnight rate only applies if you're on a time-of-use tariff like Octopus Go — leave at 10p if unsure.</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Electricity price rises</span>
               <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
@@ -1253,6 +1260,7 @@
       <!-- Shared assumptions (always visible in Compare mode) -->
       <div class="shared-assumptions">
         <div class="shared-assumptions-title">Shared assumptions</div>
+        <div class="shared-assumptions-note">💡 We've pre-filled typical UK values — you only need to change these if you know your exact figures.</div>
         <div class="shared-inputs-grid">
           <div class="shared-input-wrap">
             <label class="shared-label">Annual electricity use (kWh)</label>
@@ -1280,7 +1288,7 @@
           <div class="shared-input-wrap">
             <label class="shared-label">Overnight cheap rate (p/kWh)</label>
             <input type="number" id="sa-overnight" class="shared-input" min="0" max="50" step="0.5">
-            <div class="shared-hint">Only if on a tariff like Octopus Go.</div>
+            <div class="shared-hint">If you have cheaper electricity overnight (Economy 7, Octopus Go, etc.) your battery can charge cheaply.</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Electricity price rises (%/yr)</label>
