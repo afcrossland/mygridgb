@@ -629,6 +629,20 @@
       .shared-inputs-grid { grid-template-columns: 1fr 1fr; }
     }
 
+    .inline-add-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 700;
+      color: var(--brand); background: none; border: none; cursor: pointer;
+      padding: 0; text-decoration: underline;
+    }
+    .inline-add-btn:hover { color: var(--brand-dark); }
+    .quotes-table-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 18px 0 8px;
+    }
+    .quotes-table-heading {
+      font-size: 13px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .06em; margin: 0;
+    }
     .quotes-empty-hint {
       text-align: center;
       padding: 32px 20px;
@@ -978,7 +992,7 @@
 
     <!-- Postcode lookup — hidden until a mode is chosen -->
     <div class="postcode-row" style="display:none">
-      <label class="postcode-label">Enter your postcode — we use it to look up how much sunshine your area gets</label>
+      <label class="postcode-label">First, enter your postcode — we use it to look up how much sunshine your area gets</label>
       <div class="postcode-input-row">
         <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or DN22" maxlength="8" autocomplete="postal-code">
         <button id="pc-btn" class="pc-btn">Find location</button>
@@ -998,7 +1012,7 @@
         <div class="config-section-heading">Your solar system</div>
         <div class="mode-toggle">
           <button class="mode-btn active" id="mode-explore">Explore</button>
-          <button class="mode-btn" id="mode-detailed">Detailed</button>
+          <button class="mode-btn" id="mode-detailed">Expert designer</button>
           <button class="mode-btn" id="mode-compare" style="display:none">Compare quotes</button>
         </div>
 
@@ -1124,7 +1138,7 @@
             <div class="ctrl-label"><span>Your electricity rates</span></div>
             <div class="rates-row">
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-import">What you pay (p/kWh)</label>
+                <label class="rate-label" for="ctrl-import">Day rate (p/kWh)</label>
                 <input id="ctrl-import" class="rate-input" type="number" value="24.7" min="1" max="100" step="0.5">
               </div>
               <div class="rate-input-wrap">
@@ -1260,19 +1274,17 @@
 
     <div id="quotes-panel" class="quotes-panel" style="display:none">
       <div class="quotes-panel-header">
-        <h3 class="quotes-panel-title">Your quotes</h3>
+        <h3 class="quotes-panel-title">Compare quotes</h3>
         <div class="quotes-panel-actions">
-          <button id="qf-open-btn" class="quotes-action-btn quotes-add-btn">+ Add quote</button>
           <button id="quotes-download-btn" class="quotes-action-btn">↓ Save for Later</button>
           <label class="quotes-action-btn" style="cursor:pointer">↑ Upload save file
             <input type="file" id="quotes-upload-input" accept=".json" style="display:none">
           </label>
-          <button id="quotes-clear-btn" class="quotes-action-btn quotes-clear-btn">Clear all</button>
         </div>
       </div>
       <!-- Shared assumptions (always visible in Compare mode) -->
       <div class="shared-assumptions">
-        <div class="shared-assumptions-title">Shared assumptions</div>
+        <div class="shared-assumptions-title">About your home</div>
         <div class="shared-assumptions-note">💡 We've pre-filled typical UK values — you only need to change these if you know your exact figures.</div>
         <div class="shared-inputs-grid">
           <div class="shared-input-wrap">
@@ -1289,7 +1301,7 @@
             </select>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">What you pay (p/kWh)</label>
+            <label class="shared-label">Day rate — what you pay (p/kWh)</label>
             <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
             <div class="shared-hint">Your standard electricity rate. Check your bill.</div>
           </div>
@@ -1310,6 +1322,7 @@
           </div>
         </div>
       </div>
+
 
       <!-- Inline add/edit form -->
       <div id="quote-add-form" class="quote-add-form" style="display:none">
@@ -1335,8 +1348,10 @@
         <div id="qf-arrays-list"></div>
 
         <!-- Battery -->
-        <div class="qf-field qf-field--battery" style="margin-top:10px">
-          <label class="qf-label">Battery size (kWh) — set to 0 if no battery included</label>
+        <div class="qf-arrays-header" style="margin-top:12px">
+          <span class="qf-arrays-label">Battery size — set to 0 if no battery included</span>
+        </div>
+        <div style="max-width:50%">
           <div class="battery-slider-wrap battery-slider-wrap--sm">
             <input type="range" id="qf-battery-slider" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
             <input type="number" id="qf-battery" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
@@ -1349,6 +1364,13 @@
         </div>
       </div>
 
+      <div class="quotes-table-header-row">
+        <h3 class="quotes-table-heading">Quotes</h3>
+        <div style="display:flex;gap:8px">
+          <button id="qf-open-btn" class="quotes-action-btn quotes-add-btn">+ Add quote</button>
+          <button id="quotes-clear-btn" class="quotes-action-btn quotes-clear-btn">Clear all</button>
+        </div>
+      </div>
       <div id="quotes-table-wrap"></div>
 
     </div>
@@ -1564,7 +1586,7 @@ async function lookupPostcode() {
   if (foundLat !== undefined) {
     showPcMap(foundLat, foundLon);
     setMapLocation(foundLat, foundLon);
-    calculate();
+    revealCurrentMode();
   }
 }
 
@@ -1644,13 +1666,34 @@ renderHouseCards();
 bindCards('house-size-cards', 'panels', () => { applyEasyConfig(); calculate(); });
 bindCards('roof-dir-cards',   'az',     () => { applyEasyConfig(); calculate(); });
 
+function revealCurrentMode() {
+  const mode = currentMode;
+  if (!mode || !currentZoneKey) return;
+  const inCompare = mode === 'compare';
+
+  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+
+  if (inCompare) {
+    initSharedAssumptions();
+    renderQuotesTable();
+  } else if (mode === 'explore') {
+    applyEasyConfig();
+    calculate();
+  } else {
+    calculate();
+  }
+}
+
 function setMode(mode) {
   if (currentMode === mode) return;
   const prevMode  = currentMode;
   currentMode     = mode;
   const inCompare = mode === 'compare';
 
-  // First time a card is chosen — reveal postcode row
+  // First time — reveal postcode row only; everything else waits for postcode
   if (prevMode === null) {
     document.querySelector('.postcode-row').style.display = '';
   }
@@ -1658,14 +1701,16 @@ function setMode(mode) {
   ['explore','detailed','compare'].forEach(m =>
     document.getElementById(`mode-${m}`).classList.toggle('active', m === mode)
   );
-
   document.getElementById('hero-explore').classList.toggle('active', !inCompare);
   document.getElementById('hero-compare').classList.toggle('active',  inCompare);
 
-  document.getElementById('calc-grid').style.display     = inCompare ? 'none' : '';
-  document.getElementById('explore-panel').style.display = mode === 'explore'  ? '' : 'none';
-  document.getElementById('detailed-panel').style.display= mode === 'detailed' ? '' : 'none';
-  document.getElementById('quotes-panel').style.display  = (inCompare || quotes.length > 0) ? '' : 'none';
+  // Don't reveal calculator panels until a postcode has been looked up
+  if (!currentZoneKey) return;
+
+  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
 
   if (inCompare) {
     initSharedAssumptions();
@@ -1982,12 +2027,12 @@ function calculate() {
 
   // Plain-language summary
   const summaryParts = [
-    `Your system could cover <strong>${r.pctMet}%</strong> of your home's electricity,`,
     `cutting your grid bills by <strong>£${r.importSaved.toLocaleString()}</strong> a year`
   ];
   if (r.exportEarned   > 0) summaryParts.push(`earning <strong>£${r.exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
   if (r.arbitrageSaving > 0) summaryParts.push(`plus <strong>£${r.arbitrageSaving.toLocaleString()}</strong> from overnight battery charging`);
-  document.getElementById('stat-summary').innerHTML = summaryParts.join(', ') + '.';
+  document.getElementById('stat-summary').innerHTML =
+    `Solar could cover <strong>${r.pctMet}%</strong> of your home's electricity, ` + summaryParts.join(', ') + '.';
 
   document.getElementById('stat-gen').textContent             = r.generation.toLocaleString();
   document.getElementById('stat-saving').textContent          = '£' + r.totalSaving.toLocaleString();
@@ -2213,7 +2258,7 @@ function getSharedParams() {
 function renderQuotesTable() {
   if (quotes.length === 0) {
     document.getElementById('quotes-table-wrap').innerHTML =
-      `<div class="quotes-empty-hint">No quotes yet — click <strong>+ Add quote</strong> above to enter your first one.</div>`;
+      `<div class="quotes-empty-hint">No quotes yet — <button class="inline-add-btn" onclick="openQF(null)">+ Add your first quote</button></div>`;
     return;
   }
   const shared = getSharedParams();
@@ -2226,10 +2271,11 @@ function renderQuotesTable() {
     const arrDesc     = q.arrays.length > 1 ? ` (${q.arrays.length} arrays)` : '';
     const sysDesc     = `${totalPanels} panels${arrDesc}` + (q.batteryKwh >= 1.1 ? ` + ${q.batteryKwh} kWh` : '');
 
-    const effectiveCost = q.quotedPrice != null ? q.quotedPrice : (r ? r.estimatedCost : null);
-    const costHtml = effectiveCost != null
-      ? `£${effectiveCost.toLocaleString()} <span class="q-tag">${q.quotedPrice != null ? 'quoted' : 'est.'}</span>`
-      : '—';
+    // Estimate cost even without postcode — it only depends on system size
+    const rawCostEst    = 170 * totalPanels + (q.batteryKwh >= 1.1 ? 1000 + 200 * q.batteryKwh : 0) + 4000;
+    const estCostNoZone = Math.round(rawCostEst / 1000) * 1000;
+    const effectiveCost = q.quotedPrice != null ? q.quotedPrice : (r ? r.estimatedCost : estCostNoZone);
+    const costHtml = `£${effectiveCost.toLocaleString()} <span class="q-tag">${q.quotedPrice != null ? 'quoted' : 'est.'}</span>`;
 
     let pb = '—';
     if (r && effectiveCost != null) {
@@ -2255,20 +2301,23 @@ function renderQuotesTable() {
     </tr>`;
   }).join('');
 
+  const noZoneNote = !shared.zoneKey
+    ? `<tr><td colspan="7" class="q-no-zone-note">📍 Enter your postcode above to see estimated savings and payback</td></tr>`
+    : '';
+
   document.getElementById('quotes-table-wrap').innerHTML = `
     <table class="quotes-table">
       <thead><tr>
         <th>Quote</th><th>System</th><th>Cost</th>
         <th>Yr 1 saving</th><th>Yr 5 saving</th><th>Payback</th><th></th>
       </tr></thead>
-      <tbody>${rows}</tbody>
+      <tbody>${noZoneNote}${rows}</tbody>
     </table>`;
 
   document.querySelectorAll('.q-del-btn').forEach(btn =>
     btn.addEventListener('click', () => {
       quotes = quotes.filter(q => q.id !== +btn.dataset.qid);
-      if (quotes.length === 0) document.getElementById('quotes-panel').style.display = 'none';
-      else renderQuotesTable();
+      renderQuotesTable();
     })
   );
 
@@ -2315,7 +2364,8 @@ document.getElementById('quotes-clear-btn').addEventListener('click', () => {
   if (confirm('Clear all saved quotes?')) {
     quotes = [];
     quoteCounter = 0;
-    document.getElementById('quotes-panel').style.display = 'none';
+    closeQF();
+    renderQuotesTable();
   }
 });
 </script>
