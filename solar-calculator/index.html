@@ -597,18 +597,31 @@
       border-left: 3px solid #93c5fd;
     }
     .shared-inputs-grid {
-      display: grid; grid-template-columns: repeat(6, 1fr);
-      gap: 10px; align-items: end;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: auto auto auto;
+      gap: 4px 10px;
     }
-    .shared-input-wrap { display: flex; flex-direction: column; }
-    .shared-label { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    .shared-hint { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; opacity: .8; }
+    .shared-input-wrap {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      align-items: start;
+    }
+    .shared-label {
+      font-size: 11.5px; font-weight: 600; color: var(--muted);
+      align-self: start;
+    }
     .shared-input {
       font-family: 'DM Sans', sans-serif; font-size: 13px;
       padding: 6px 10px; border: 1px solid var(--border);
-      border-radius: 7px; width: 100%; margin-top: auto;
+      border-radius: 7px; width: 100%; align-self: center;
     }
     .shared-input:focus { outline: none; border-color: var(--brand); }
+    .shared-hint {
+      font-size: 10.5px; color: var(--muted); line-height: 1.35;
+      opacity: .8; align-self: start;
+    }
     @media (max-width: 900px) {
       .shared-inputs-grid { grid-template-columns: repeat(3, 1fr); }
     }
