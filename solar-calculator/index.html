@@ -465,6 +465,10 @@
       text-align: center; margin-bottom: 10px; letter-spacing: .01em;
     }
     .hero-card-icon { font-size: 28px; margin-bottom: 6px; }
+    .easy-section-hint {
+      font-size: 12.5px; color: var(--muted); margin: -4px 0 10px;
+      line-height: 1.5;
+    }
 
     /* ── Compare mode ───────────────────────────────────────── */
     main.compare-mode { display: flex; flex-direction: column; }
@@ -588,17 +592,18 @@
       letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
     }
     .shared-inputs-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
     }
     .shared-label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .shared-hint { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; opacity: .8; }
     .shared-input {
       font-family: 'DM Sans', sans-serif; font-size: 13px;
       padding: 6px 10px; border: 1px solid var(--border);
       border-radius: 7px; width: 100%;
     }
     .shared-input:focus { outline: none; border-color: var(--brand); }
-    @media (max-width: 800px) {
-      .shared-inputs-grid { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 900px) {
+      .shared-inputs-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 500px) {
       .shared-inputs-grid { grid-template-columns: 1fr 1fr; }
@@ -953,7 +958,7 @@
 
     <!-- Postcode lookup — hidden until a mode is chosen -->
     <div class="postcode-row" style="display:none">
-      <label class="postcode-label">Enter your postcode to estimate solar potential in your area</label>
+      <label class="postcode-label">Enter your postcode — we use it to look up how much sunshine your area gets</label>
       <div class="postcode-input-row">
         <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or DN22" maxlength="8" autocomplete="postal-code">
         <button id="pc-btn" class="pc-btn">Find location</button>
@@ -979,7 +984,8 @@
 
         <!-- ── Explore panel ── -->
         <div id="explore-panel">
-          <div class="easy-section-label">Let's estimate your roof size</div>
+          <div class="easy-section-label">How big is your roof?</div>
+          <p class="easy-section-hint">The more roof space you have, the more panels you can fit — and the more you can generate. Pick the option that best describes your home.</p>
           <div class="house-mode-toggle">
             <button class="house-mode-btn active" data-hmode="B">By bedrooms</button>
             <button class="house-mode-btn" data-hmode="C">By house type</button>
@@ -987,7 +993,8 @@
           </div>
           <div class="easy-cards" id="house-size-cards"></div>
 
-          <div class="easy-section-label">Which way does your sunniest roof face?</div>
+          <div class="easy-section-label">Which way does your main roof face?</div>
+          <p class="easy-section-hint">South-facing roofs get the most sun and generate the most electricity. Not sure? Pick "Not sure" — we'll use a typical estimate.</p>
           <div class="easy-cards" id="roof-dir-cards">
             <button class="easy-card" data-az="0">
               <span class="easy-card-title">South-facing</span>
@@ -1016,7 +1023,7 @@
             </div>
           </div>
 
-          <p class="easy-mode-hint">For battery, tariffs, and roof detail — switch to Detailed above.</p>
+          <p class="easy-mode-hint">Want to add a battery or enter exact tariff rates? Switch to <strong>Detailed</strong> above.</p>
         </div>
 
         <!-- ── Shared: demand (always visible) ── -->
@@ -1026,7 +1033,7 @@
             <span class="ctrl-val" id="val-demand">3,500 kWh</span>
           </div>
           <input type="range" id="ctrl-demand" min="1000" max="8000" value="3500" step="100">
-          <div class="ctrl-hint">UK average is ~3,500 kWh/year</div>
+          <div class="ctrl-hint">Check your electricity bill or smart meter app. A typical 3-bed home uses around 3,500 kWh/year.</div>
         </div>
 
         <!-- ── Detailed panel ── -->
@@ -1059,7 +1066,7 @@
                 <span class="ctrl-val" id="val-tilt">35°</span>
               </div>
               <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
-              <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · typical UK roof is 30–40°</div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical — a standard pitched roof.</div>
             </div>
 
             <!-- Multiple roofs -->
@@ -1080,48 +1087,48 @@
               <input type="number" id="ctrl-battery-num" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
               <span class="battery-unit">kWh</span>
             </div>
-            <div class="ctrl-hint">0 = no battery</div>
+            <div class="ctrl-hint">A battery stores spare solar energy to use after dark. A 5–10 kWh battery suits most homes. Set to 0 if you don't want a battery.</div>
           </div>
 
           <div class="ctrl-group">
-            <div class="ctrl-label"><span>Occupancy pattern</span></div>
+            <div class="ctrl-label"><span>Are you home during the day?</span></div>
             <select id="ctrl-archetype" class="ctrl-select">
-              <option value="homeallday">Home all day</option>
-              <option value="inhalftheday" selected>In half the day</option>
-              <option value="outallday">Out all day (working day)</option>
+              <option value="homeallday">Yes — home all day (retired, WFH)</option>
+              <option value="inhalftheday" selected>Sometimes — in for part of the day</option>
+              <option value="outallday">No — out all day (commuter household)</option>
             </select>
-            <div class="ctrl-hint">Affects how much solar you use directly vs export</div>
+            <div class="ctrl-hint">If you're home during the day you'll use more solar electricity directly, so you save more. If you're out, more gets exported to the grid.</div>
           </div>
 
           <div class="ctrl-group">
-            <div class="ctrl-label"><span>Electricity tariff rates</span></div>
+            <div class="ctrl-label"><span>Your electricity rates</span></div>
             <div class="rates-row">
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-import">Import (p/kWh)</label>
+                <label class="rate-label" for="ctrl-import">What you pay (p/kWh)</label>
                 <input id="ctrl-import" class="rate-input" type="number" value="24.7" min="1" max="100" step="0.5">
               </div>
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-export">Export/SEG (p/kWh)</label>
+                <label class="rate-label" for="ctrl-export">What you earn exporting (p/kWh)</label>
                 <input id="ctrl-export" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
               </div>
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-cheap">Overnight rate (p/kWh)</label>
+                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
                 <input id="ctrl-cheap" class="rate-input" type="number" value="10" min="0" max="50" step="0.5">
               </div>
             </div>
-            <div class="ctrl-hint">Import = standard rate; overnight = off-peak tariff (e.g. Octopus Go); export = SEG rate</div>
+            <div class="ctrl-hint">Check your electricity bill for the import rate. The export rate (SEG) is what your energy supplier pays for surplus solar. The overnight rate only applies if you're on a time-of-use tariff like Octopus Go — leave at 10p if unsure.</div>
             <div class="ctrl-label" style="margin-top:12px">
-              <span>Electricity price inflation</span>
+              <span>Electricity price rises</span>
               <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
             </div>
             <input type="range" id="ctrl-inflation" min="0" max="10" value="3" step="0.1">
-            <div class="ctrl-hint">Applied to import savings &amp; arbitrage in payback model; export rate kept flat</div>
+            <div class="ctrl-hint">Electricity prices tend to rise over time. This adjusts future savings to account for likely increases — making solar even more valuable in later years.</div>
             <div class="ctrl-label" style="margin-top:12px">
-              <span>Addition to house value</span>
+              <span>Boost to home value</span>
               <span class="ctrl-val" id="val-houseval">£0</span>
             </div>
             <input type="range" id="ctrl-houseval" min="0" max="15000" value="0" step="500">
-            <div class="ctrl-hint">Deducted from effective cost in payback calculation; evidence varies — set to zero if unsure</div>
+            <div class="ctrl-hint">Solar panels can add value when you sell your home. Evidence varies — leave at £0 if you'd rather not include this.</div>
           </div>
         </div>
 
@@ -1248,24 +1255,37 @@
         <div class="shared-assumptions-title">Shared assumptions</div>
         <div class="shared-inputs-grid">
           <div class="shared-input-wrap">
-            <label class="shared-label">Annual demand (kWh)</label>
+            <label class="shared-label">Annual electricity use (kWh)</label>
             <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
+            <div class="shared-hint">From your bill or smart meter. ~3,500 kWh is typical.</div>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">Import (p/kWh)</label>
+            <label class="shared-label">Home during the day?</label>
+            <select id="sa-archtype" class="shared-input">
+              <option value="homeallday">Home all day</option>
+              <option value="inhalftheday" selected>In half the day</option>
+              <option value="outallday">Out all day</option>
+            </select>
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">What you pay (p/kWh)</label>
             <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
+            <div class="shared-hint">Your standard electricity rate. Check your bill.</div>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">Export/SEG (p/kWh)</label>
+            <label class="shared-label">What you earn exporting (p/kWh)</label>
             <input type="number" id="sa-export" class="shared-input" min="0" max="50" step="0.5">
+            <div class="shared-hint">SEG rate from your energy supplier.</div>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">Overnight (p/kWh)</label>
+            <label class="shared-label">Overnight cheap rate (p/kWh)</label>
             <input type="number" id="sa-overnight" class="shared-input" min="0" max="50" step="0.5">
+            <div class="shared-hint">Only if on a tariff like Octopus Go.</div>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">Inflation (%/yr)</label>
+            <label class="shared-label">Electricity price rises (%/yr)</label>
             <input type="number" id="sa-inflation" class="shared-input" min="0" max="10" step="0.1">
+            <div class="shared-hint">How much prices might rise each year.</div>
           </div>
         </div>
       </div>
@@ -1273,40 +1293,34 @@
       <!-- Inline add/edit form -->
       <div id="quote-add-form" class="quote-add-form" style="display:none">
 
-        <!-- Top row: name, battery, occupancy, price -->
+        <!-- Name + price -->
         <div class="qf-grid">
           <div class="qf-field qf-field--wide">
             <label class="qf-label">Quote name</label>
             <input type="text" id="qf-name" class="qf-input" placeholder="e.g. SolarCo quote">
           </div>
-          <div class="qf-field qf-field--battery">
-            <label class="qf-label">Battery (kWh)</label>
-            <div class="battery-slider-wrap battery-slider-wrap--sm">
-              <input type="range" id="qf-battery-slider" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
-              <input type="number" id="qf-battery" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
-            </div>
-          </div>
-          <div class="qf-field">
-            <label class="qf-label">Occupancy</label>
-            <select id="qf-archtype" class="qf-input">
-              <option value="homeallday">Home all day</option>
-              <option value="inhalftheday" selected>In half the day</option>
-              <option value="outallday">Out all day</option>
-            </select>
-          </div>
           <div class="qf-field">
             <label class="qf-label">Quoted price £</label>
             <input type="number" id="qf-price" class="qf-input" placeholder="Optional">
-            <div class="qf-hint">Leave blank to use estimated cost based on average costs</div>
+            <div class="qf-hint">The total price your installer quoted (inc. VAT). Leave blank and we'll estimate from typical costs.</div>
           </div>
         </div>
 
         <!-- Arrays builder -->
         <div class="qf-arrays-header">
-          <span class="qf-arrays-label">Roof arrays</span>
+          <span class="qf-arrays-label">Roof / panels</span>
           <button type="button" id="qf-add-array-btn" class="qf-add-array-btn">+ Add array</button>
         </div>
         <div id="qf-arrays-list"></div>
+
+        <!-- Battery -->
+        <div class="qf-field qf-field--battery" style="margin-top:10px">
+          <label class="qf-label">Battery size (kWh) — set to 0 if no battery included</label>
+          <div class="battery-slider-wrap battery-slider-wrap--sm">
+            <input type="range" id="qf-battery-slider" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
+            <input type="number" id="qf-battery" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
+          </div>
+        </div>
 
         <div class="qf-actions">
           <button id="qf-save" class="qf-save-btn">Save quote</button>
@@ -2050,17 +2064,15 @@ function openQF(prefill) {
   if (!prefill) {
     quoteCounter++;
     qfName.value = `Quote ${quoteCounter}`;
-    document.getElementById('qf-battery').value  = '7.5';
-    document.getElementById('qf-archtype').value = 'inhalftheday';
-    document.getElementById('qf-price').value    = '';
+    document.getElementById('qf-battery').value = '7.5';
+    document.getElementById('qf-price').value   = '';
     document.getElementById('qf-save').textContent = 'Save quote';
     qfArrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
     editingQuoteId = null;
   } else {
     qfName.value = prefill.name;
-    document.getElementById('qf-battery').value  = prefill.batteryKwh || 0;
-    document.getElementById('qf-archtype').value = prefill.archtype || 'inhalftheday';
-    document.getElementById('qf-price').value    = prefill.quotedPrice != null ? prefill.quotedPrice : '';
+    document.getElementById('qf-battery').value = prefill.batteryKwh || 0;
+    document.getElementById('qf-price').value   = prefill.quotedPrice != null ? prefill.quotedPrice : '';
     document.getElementById('qf-save').textContent = 'Update quote';
     qfArrays = prefill.arrays.map(a => ({ ...a }));
     editingQuoteId = prefill.id;
@@ -2089,7 +2101,7 @@ document.getElementById('qf-cancel').addEventListener('click', () => {
 document.getElementById('qf-save').addEventListener('click', () => {
   const name        = qfName.value.trim() || `Quote ${quoteCounter}`;
   const batteryKwh  = parseFloat(document.getElementById('qf-battery').value) || 0;
-  const archtype    = document.getElementById('qf-archtype').value;
+  const archtype    = ctrlArchtype.value;
   const priceVal    = document.getElementById('qf-price').value;
   const quotedPrice = priceVal !== '' ? parseFloat(priceVal) : null;
   const quoteData   = { name, quotedPrice, arrays: readQFArrays(), batteryKwh, archtype };
@@ -2108,19 +2120,21 @@ document.getElementById('qf-save').addEventListener('click', () => {
 // ── Shared assumptions panel ───────────────────────────────────────────────────
 function initSharedAssumptions() {
   document.getElementById('sa-demand').value    = ctrlDemand.value;
+  document.getElementById('sa-archtype').value  = ctrlArchtype.value;
   document.getElementById('sa-import').value    = ctrlImport.value;
   document.getElementById('sa-export').value    = ctrlExport.value;
   document.getElementById('sa-overnight').value = ctrlCheap.value;
   document.getElementById('sa-inflation').value = ctrlInflation.value;
 }
 [
-  ['sa-demand',    ctrlDemand],
-  ['sa-import',    ctrlImport],
-  ['sa-export',    ctrlExport],
-  ['sa-overnight', ctrlCheap],
-  ['sa-inflation', ctrlInflation],
-].forEach(([saId, ctrl]) =>
-  document.getElementById(saId).addEventListener('input', e => {
+  ['sa-demand',    ctrlDemand,    'input'],
+  ['sa-import',    ctrlImport,    'input'],
+  ['sa-export',    ctrlExport,    'input'],
+  ['sa-overnight', ctrlCheap,     'input'],
+  ['sa-inflation', ctrlInflation, 'input'],
+  ['sa-archtype',  ctrlArchtype,  'change'],
+].forEach(([saId, ctrl, evt]) =>
+  document.getElementById(saId).addEventListener(evt, e => {
     ctrl.value = e.target.value;
     renderQuotesTable();
   })
@@ -2184,7 +2198,7 @@ function renderQuotesTable() {
   const shared = getSharedParams();
   const rows = quotes.map(q => {
     const r = shared.zoneKey ? runCalc({
-      arrays: q.arrays, battery: q.batteryKwh, archtype: q.archtype, ...shared,
+      arrays: q.arrays, battery: q.batteryKwh, archtype: ctrlArchtype.value, ...shared,
     }) : null;
 
     const totalPanels = q.arrays.reduce((s, a) => s + a.panels, 0);
