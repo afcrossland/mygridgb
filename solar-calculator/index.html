@@ -1253,17 +1253,6 @@
             </div>
           </div>
 
-          <div class="quote-save-row">
-            <div id="quote-save-form" class="quote-save-form" style="display:none">
-              <input type="text" id="quote-name-input" class="quote-name-input" placeholder="Quote name" maxlength="40">
-              <input type="number" id="quote-price-input" class="quote-price-input" placeholder="Actual quoted price £ — leave blank to use estimate" min="0" step="100">
-              <div class="quote-save-btns">
-                <button class="quote-confirm-btn" id="quote-save-confirm">Save quote</button>
-                <button class="quote-cancel-btn" id="quote-save-cancel">Cancel</button>
-              </div>
-            </div>
-            <button class="quote-add-btn" id="quote-add-btn">+ Save as quote</button>
-          </div>
 
         </div>
       </div>
@@ -2206,42 +2195,6 @@ function initSharedAssumptions() {
   })
 );
 
-// ── Save-as-quote from results panel (Explore / Detailed modes) ───────────────
-const quoteAddBtn     = document.getElementById('quote-add-btn');
-const quoteSaveForm   = document.getElementById('quote-save-form');
-const quoteNameInput  = document.getElementById('quote-name-input');
-const quotePriceInput = document.getElementById('quote-price-input');
-
-quoteAddBtn.addEventListener('click', () => {
-  quoteCounter++;
-  quoteNameInput.value  = `Quote ${quoteCounter}`;
-  quotePriceInput.value = '';
-  quoteSaveForm.style.display  = 'flex';
-  quoteAddBtn.style.display    = 'none';
-  quoteNameInput.focus();
-  quoteNameInput.select();
-});
-
-document.getElementById('quote-save-cancel').addEventListener('click', () => {
-  quoteSaveForm.style.display = 'none';
-  quoteAddBtn.style.display   = '';
-  quoteCounter--;
-});
-
-document.getElementById('quote-save-confirm').addEventListener('click', () => {
-  const name        = quoteNameInput.value.trim() || `Quote ${quoteCounter}`;
-  const quotedPrice = quotePriceInput.value !== '' ? parseFloat(quotePriceInput.value) : null;
-  quotes.push({
-    id: Date.now(), name, quotedPrice,
-    arrays:     JSON.parse(JSON.stringify(arrays)),
-    batteryKwh: +ctrlBattery.value,
-    archtype:   ctrlArchtype.value,
-  });
-  quoteSaveForm.style.display = 'none';
-  quoteAddBtn.style.display   = '';
-  renderQuotesTable();
-  document.getElementById('quotes-panel').style.display = '';
-});
 
 function getSharedParams() {
   return {
