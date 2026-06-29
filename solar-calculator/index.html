@@ -119,6 +119,27 @@
       cursor: pointer;
     }
     .ctrl-hint { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+    .demand-typical-btns { margin-top: 8px; }
+    .demand-typical-label { font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 6px; }
+    .demand-ofgem-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%; background: var(--muted);
+      color: #fff; font-size: 9px; font-weight: 700; text-decoration: none;
+      vertical-align: middle; margin-left: 2px; line-height: 1;
+    }
+    .demand-ofgem-link:hover { background: var(--brand); }
+    .demand-typical-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+    .demand-preset-btn {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+      padding: 7px 9px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: #fff; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 600; color: var(--text); text-align: left;
+      transition: border-color .15s, background .15s; line-height: 1.25;
+    }
+    .demand-preset-btn span { font-size: 11px; font-weight: 500; color: var(--muted); }
+    .demand-preset-btn .demand-preset-sub { font-size: 10px; }
+    .demand-preset-btn:hover { border-color: var(--brand); }
+    .demand-preset-btn.active { border-color: var(--brand); background: #e8f4fd; }
 
     .rates-row {
       display: grid;
@@ -1095,7 +1116,7 @@
               </button>
             </div>
             <div class="easy-section-label" style="margin-top:4px">Plug-in battery</div>
-            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed.</p>
+            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed. We assume a 7p/kWh overnight cheap rate (e.g. Octopus Go, Economy 7) to estimate battery savings.</p>
             <div class="easy-cards" id="plugin-battery-cards">
               <button class="easy-card" data-plugin-batt="0">
                 <span class="easy-card-title">No battery</span>
@@ -1119,10 +1140,17 @@
         <div class="ctrl-group">
           <div class="ctrl-label">
             <span>Annual electricity use</span>
-            <span class="ctrl-val" id="val-demand">3,500 kWh</span>
+            <span class="ctrl-val" id="val-demand">3,300 kWh</span>
           </div>
-          <input type="range" id="ctrl-demand" min="1000" max="8000" value="3500" step="100">
-          <div class="ctrl-hint">Check your electricity bill or smart meter app. A typical 3-bed home uses around 3,500 kWh/year.</div>
+          <input type="range" id="ctrl-demand" min="1000" max="8000" value="3300" step="100">
+          <div class="demand-typical-btns">
+            <span class="demand-typical-label">Not sure? Use Ofgem typical values <a class="demand-ofgem-link" href="https://www.ofgem.gov.uk/consultation/review-typical-domestic-consumption-values" target="_blank" rel="noopener" title="Ofgem typical domestic consumption values">?</a></span>
+            <div class="demand-typical-row">
+              <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="4100">High<span>4,100 kWh</span><span class="demand-preset-sub">4–5 people, 5-bed</span></button>
+            </div>
+          </div>
         </div>
 
         <!-- ── Detailed panel ── -->
@@ -1334,7 +1362,7 @@
           <div class="shared-input-wrap">
             <label class="shared-label">Annual electricity use (kWh)</label>
             <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
-            <div class="shared-hint">From your bill or smart meter. ~3,500 kWh is typical.</div>
+            <div class="shared-hint">From your bill or smart meter. ~3,300 kWh is typical.</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Home during the day?</label>
@@ -2000,10 +2028,23 @@ ctrlHouseval.addEventListener('input', () => {
   calculate();
 });
 
-ctrlDemand.addEventListener('input', () => {
-  document.getElementById('val-demand').textContent =
-    `${Number(ctrlDemand.value).toLocaleString()} kWh`;
-  calculate();
+function updateDemandDisplay() {
+  const v = +ctrlDemand.value;
+  document.getElementById('val-demand').textContent = `${v.toLocaleString()} kWh`;
+  // Highlight matching preset button if any
+  document.querySelectorAll('.demand-preset-btn').forEach(btn =>
+    btn.classList.toggle('active', +btn.dataset.kwh === v)
+  );
+}
+ctrlDemand.addEventListener('input', () => { updateDemandDisplay(); calculate(); });
+
+// Ofgem preset buttons
+document.querySelectorAll('.demand-preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    ctrlDemand.value = btn.dataset.kwh;
+    updateDemandDisplay();
+    calculate();
+  });
 });
 [ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
   el.addEventListener('change', calculate)
@@ -2113,7 +2154,7 @@ function calculate() {
   const archtype = ctrlArchtype.value;
   const importP  = +ctrlImport.value / 100;
   const exportP  = +ctrlExport.value / 100;
-  const cheapP   = ctrlCheap.value === '' ? importP : +ctrlCheap.value / 100;
+  const cheapP   = ctrlCheap.value === '' ? (currentMode === 'explore' && isPlugIn ? 0.07 : importP) : +ctrlCheap.value / 100;
   const inflRate = 1 + (+ctrlInflation.value / 100);
   const houseVal = +ctrlHouseval.value;
 
