@@ -258,6 +258,14 @@
     .easy-card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
     .easy-card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .easy-mode-hint  { font-size: 12px; color: var(--muted); margin-top: 14px; font-style: italic; }
+    .system-type-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
+    .sys-type-btn {
+      flex: 1; padding: 9px 10px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s; text-align: center;
+    }
+    .sys-type-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
     .house-mode-toggle {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -460,6 +468,11 @@
       .calc-hero { grid-template-columns: 1fr; }
     }
 
+    .hero-guide-link {
+      text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 10px;
+    }
+    .hero-guide-link a { color: var(--brand); text-decoration: none; }
+    .hero-guide-link a:hover { text-decoration: underline; }
     .hero-prompt {
       font-size: 15px; font-weight: 600; color: var(--muted);
       text-align: center; margin-bottom: 10px; letter-spacing: .01em;
@@ -981,7 +994,7 @@
       <button class="hero-card" id="hero-explore">
         <div class="hero-card-icon">☀️</div>
         <div class="hero-card-title">I'm just looking</div>
-        <div class="hero-card-sub">See what solar could do for your home — enter a few details and get an instant estimate</div>
+        <div class="hero-card-sub">See what rooftop or plug-in solar could do for your home — enter a few details and get an instant estimate</div>
       </button>
       <button class="hero-card" id="hero-compare">
         <div class="hero-card-icon">📋</div>
@@ -989,6 +1002,7 @@
         <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
       </button>
     </div>
+    <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
 
     <!-- Postcode lookup — hidden until a mode is chosen -->
     <div class="postcode-row" style="display:none">
@@ -1018,46 +1032,87 @@
 
         <!-- ── Explore panel ── -->
         <div id="explore-panel">
-          <div class="easy-section-label">How big is your roof?</div>
-          <p class="easy-section-hint">The more roof space you have, the more panels you can fit — and the more you can generate. Pick the option that best describes your home.</p>
-          <div class="house-mode-toggle">
-            <button class="house-mode-btn active" data-hmode="B">By bedrooms</button>
-            <button class="house-mode-btn" data-hmode="C">By house type</button>
-            <button class="house-mode-btn" data-hmode="A">By roof size</button>
-          </div>
-          <div class="easy-cards" id="house-size-cards"></div>
-
-          <div class="easy-section-label">Which way does your main roof face?</div>
-          <p class="easy-section-hint">South-facing roofs get the most sun and generate the most electricity. Not sure? Pick "Not sure" — we'll use a typical estimate.</p>
-          <div class="easy-cards" id="roof-dir-cards">
-            <button class="easy-card" data-az="0">
-              <span class="easy-card-title">South-facing</span>
-              <span class="easy-card-sub">Best for solar</span>
-            </button>
-            <button class="easy-card" data-az="45">
-              <span class="easy-card-title">SE or SW</span>
-              <span class="easy-card-sub">Still very good</span>
-            </button>
-            <button class="easy-card" data-az="90">
-              <span class="easy-card-title">East or West</span>
-              <span class="easy-card-sub">Moderate yield</span>
-            </button>
-            <button class="easy-card selected" data-az="45">
-              <span class="easy-card-title">Not sure</span>
-              <span class="easy-card-sub">We'll assume SE/SW</span>
-            </button>
+          <!-- System type toggle -->
+          <div class="system-type-toggle">
+            <button class="sys-type-btn active" id="sys-rooftop">Rooftop solar</button>
+            <button class="sys-type-btn" id="sys-plugin">Plug-in solar</button>
           </div>
 
-          <!-- Satellite map (appears after postcode lookup) -->
-          <div id="map-section" style="display:none">
-            <button class="map-toggle-btn" id="map-toggle-btn">Need help? Show satellite view ▾</button>
-            <div id="map-wrap" style="display:none">
-              <div id="satellite-map"></div>
-              <p class="map-hint">Find your roof — the N↑ arrow shows north. Use this to judge which way your roof faces, then select above.</p>
+          <!-- Rooftop-specific section -->
+          <div id="rooftop-panel">
+            <div class="easy-section-label">How big is your roof?</div>
+            <p class="easy-section-hint">The more roof space you have, the more panels you can fit — and the more you can generate. Pick the option that best describes your home.</p>
+            <div class="house-mode-toggle">
+              <button class="house-mode-btn active" data-hmode="B">By bedrooms</button>
+              <button class="house-mode-btn" data-hmode="C">By house type</button>
+              <button class="house-mode-btn" data-hmode="A">By roof size</button>
+            </div>
+            <div class="easy-cards" id="house-size-cards"></div>
+
+            <div class="easy-section-label">Which way does your main roof face?</div>
+            <p class="easy-section-hint">South-facing roofs get the most sun and generate the most electricity. Not sure? Pick "Not sure" — we'll use a typical estimate.</p>
+            <div class="easy-cards" id="roof-dir-cards">
+              <button class="easy-card" data-az="0">
+                <span class="easy-card-title">South-facing</span>
+                <span class="easy-card-sub">Best for solar</span>
+              </button>
+              <button class="easy-card" data-az="45">
+                <span class="easy-card-title">SE or SW</span>
+                <span class="easy-card-sub">Still very good</span>
+              </button>
+              <button class="easy-card" data-az="90">
+                <span class="easy-card-title">East or West</span>
+                <span class="easy-card-sub">Moderate yield</span>
+              </button>
+              <button class="easy-card selected" data-az="45">
+                <span class="easy-card-title">Not sure</span>
+                <span class="easy-card-sub">We'll assume SE/SW</span>
+              </button>
+            </div>
+
+            <!-- Satellite map (appears after postcode lookup) -->
+            <div id="map-section" style="display:none">
+              <button class="map-toggle-btn" id="map-toggle-btn">Need help? Show satellite view ▾</button>
+              <div id="map-wrap" style="display:none">
+                <div id="satellite-map"></div>
+                <p class="map-hint">Find your roof — the N↑ arrow shows north. Use this to judge which way your roof faces, then select above.</p>
+              </div>
             </div>
           </div>
 
-          <p class="easy-mode-hint">Want to add a battery or enter exact tariff rates? Switch to <strong>Detailed</strong> above.</p>
+          <!-- Plug-in solar section -->
+          <div id="plugin-panel" style="display:none">
+            <div class="easy-section-label">Number of panels</div>
+            <p class="easy-section-hint">Balcony or plug-in systems use compact 400W panels that clip onto railings or sit on a flat roof. No scaffolding or roof work needed.</p>
+            <div class="easy-cards" id="plugin-panels-cards">
+              <button class="easy-card" data-plugin-panels="1">
+                <span class="easy-card-title">1 panel</span>
+                <span class="easy-card-sub">0.4 kWp</span>
+              </button>
+              <button class="easy-card selected" data-plugin-panels="2">
+                <span class="easy-card-title">2 panels</span>
+                <span class="easy-card-sub">0.8 kWp</span>
+              </button>
+            </div>
+            <div class="easy-section-label" style="margin-top:4px">Plug-in battery</div>
+            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed.</p>
+            <div class="easy-cards" id="plugin-battery-cards">
+              <button class="easy-card" data-plugin-batt="0">
+                <span class="easy-card-title">No battery</span>
+                <span class="easy-card-sub">Export surplus</span>
+              </button>
+              <button class="easy-card selected" data-plugin-batt="2.5">
+                <span class="easy-card-title">1 × 2.5 kWh</span>
+                <span class="easy-card-sub">Typical plug-in size</span>
+              </button>
+              <button class="easy-card" data-plugin-batt="5">
+                <span class="easy-card-title">2 × 2.5 kWh</span>
+                <span class="easy-card-sub">Maximum storage</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="easy-mode-hint" id="easy-mode-hint">Want to add a battery or enter exact tariff rates? Switch to <strong>Detailed</strong> above.</p>
         </div>
 
         <!-- ── Shared: demand (always visible) ── -->
@@ -1590,8 +1645,18 @@ let currentMode = null; // null until hero card is chosen
 let easyPanels  = 10;   // Medium default
 let easyAzimuth = 45;   // "Not sure" → SE/SW default
 
+// ── Plug-in solar state ───────────────────────────────────────────────────────
+let isPlugIn       = false;
+let plugInPanels   = 2;
+let plugInBattery  = 2.5; // kWh
+
 function applyEasyConfig() {
-  arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+  if (isPlugIn) {
+    arrays = [{ panels: plugInPanels, azimuth: 45, tilt: 35 }];
+    ctrlBattery.value = plugInBattery;
+  } else {
+    arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+  }
 }
 
 // Card click helpers
@@ -1655,6 +1720,52 @@ renderHouseCards();
 bindCards('house-size-cards', 'panels', () => { applyEasyConfig(); calculate(); });
 bindCards('roof-dir-cards',   'az',     () => { applyEasyConfig(); calculate(); });
 
+// ── System type toggle (Rooftop ↔ Plug-in) ───────────────────────────────────
+document.getElementById('sys-rooftop').addEventListener('click', () => {
+  if (!isPlugIn) return;
+  isPlugIn = false;
+  document.getElementById('sys-rooftop').classList.add('active');
+  document.getElementById('sys-plugin').classList.remove('active');
+  document.getElementById('rooftop-panel').style.display = '';
+  document.getElementById('plugin-panel').style.display  = 'none';
+  document.getElementById('easy-mode-hint').style.display = '';
+  applyEasyConfig();
+  calculate();
+});
+
+document.getElementById('sys-plugin').addEventListener('click', () => {
+  if (isPlugIn) return;
+  isPlugIn = true;
+  document.getElementById('sys-plugin').classList.add('active');
+  document.getElementById('sys-rooftop').classList.remove('active');
+  document.getElementById('rooftop-panel').style.display = 'none';
+  document.getElementById('plugin-panel').style.display  = '';
+  document.getElementById('easy-mode-hint').style.display = 'none';
+  applyEasyConfig();
+  calculate();
+});
+
+// Plug-in panel card clicks
+document.getElementById('plugin-panels-cards').addEventListener('click', e => {
+  const card = e.target.closest('.easy-card');
+  if (!card) return;
+  document.querySelectorAll('#plugin-panels-cards .easy-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  plugInPanels = +card.dataset.pluginPanels;
+  applyEasyConfig();
+  calculate();
+});
+
+document.getElementById('plugin-battery-cards').addEventListener('click', e => {
+  const card = e.target.closest('.easy-card');
+  if (!card) return;
+  document.querySelectorAll('#plugin-battery-cards .easy-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  plugInBattery = +card.dataset.pluginBatt;
+  applyEasyConfig();
+  calculate();
+});
+
 function revealCurrentMode() {
   const mode = currentMode;
   if (!mode || !currentZoneKey) return;
@@ -1709,10 +1820,12 @@ function setMode(mode) {
     calculate();
   } else {
     if (prevMode === 'explore') {
-      ctrlPanels.value = easyPanels;
-      ctrlOrient.value = easyAzimuth;
+      const seedPanels = isPlugIn ? plugInPanels : easyPanels;
+      const seedAz     = isPlugIn ? 45 : easyAzimuth;
+      ctrlPanels.value = seedPanels;
+      ctrlOrient.value = seedAz;
       ctrlTilt.value   = 35;
-      arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+      arrays = [{ panels: seedPanels, azimuth: seedAz, tilt: 35 }];
       updateSingleLabels();
     }
     calculate();
@@ -1913,9 +2026,10 @@ function batteryCol(kwh) {
 }
 
 // ── Pure calculation (no DOM) ─────────────────────────────────────────────────
-function runCalc({ arrays, battery, archtype, demand, zoneKey, importP, exportP, cheapP, inflRate, houseVal }) {
+function runCalc({ arrays, battery, archtype, demand, zoneKey, importP, exportP, cheapP, inflRate, houseVal, plugIn = false }) {
   if (!irradianceData || !lookupData || !zoneKey) return null;
   const zoneData = irradianceData.zones[zoneKey];
+  const panelKWp = plugIn ? 0.4 : 0.475;
 
   let generation = 0, totalKWp = 0;
   const perArrayGen = arrays.map(arr => {
@@ -1923,7 +2037,7 @@ function runCalc({ arrays, battery, archtype, demand, zoneKey, importP, exportP,
     const tiltKey = String(Math.max(0, Math.min(90, arr.tilt)));
     const row    = zoneData[tiltKey] || zoneData['30'];
     const irr    = row[azIdx] || 0;
-    const kWp    = arr.panels * 0.475;
+    const kWp    = arr.panels * panelKWp;
     const arrGen = Math.round(irr * kWp);
     generation  += arrGen;
     totalKWp    += kWp;
@@ -1959,9 +2073,14 @@ function runCalc({ arrays, battery, archtype, demand, zoneKey, importP, exportP,
   const totalSaving  = importSaved + exportEarned + arbitrageSaving;
 
   const totalPanels    = arrays.reduce((s, a) => s + a.panels, 0);
-  const rawCost        = 170 * totalPanels + (battery >= 1.1 ? 1000 + 200 * battery : 0) + 4000;
-  const estimatedCost  = Math.round(rawCost / 1000) * 1000;
-  const costs          = [estimatedCost - 2000, estimatedCost, estimatedCost + 2000].map(c => Math.max(0, c - houseVal));
+  const rawCost = plugIn
+    ? 275 * totalPanels + (battery >= 1.1 ? Math.round(battery / 2.5) * 700 : 0) + 100
+    : 170 * totalPanels + (battery >= 1.1 ? 1000 + 200 * battery : 0) + 4000;
+  const estimatedCost = plugIn ? Math.round(rawCost / 100) * 100 : Math.round(rawCost / 1000) * 1000;
+  const costSpread    = plugIn ? 200 : 2000;
+  const costs = plugIn
+    ? [estimatedCost - costSpread, estimatedCost, estimatedCost + costSpread].map(c => Math.max(0, c))
+    : [estimatedCost - costSpread, estimatedCost, estimatedCost + costSpread].map(c => Math.max(0, c - houseVal));
 
   const growingAnnual = importSaved + arbitrageSaving;
   const fixedAnnual   = exportEarned;
@@ -1998,7 +2117,7 @@ function calculate() {
   const inflRate = 1 + (+ctrlInflation.value / 100);
   const houseVal = +ctrlHouseval.value;
 
-  const r = runCalc({ arrays, battery, archtype, demand, zoneKey: currentZoneKey, importP, exportP, cheapP, inflRate, houseVal });
+  const r = runCalc({ arrays, battery, archtype, demand, zoneKey: currentZoneKey, importP, exportP, cheapP, inflRate, houseVal, plugIn: currentMode === 'explore' && isPlugIn });
   if (!r) return;
 
   // Per-array generation labels
