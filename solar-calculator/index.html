@@ -1009,7 +1009,7 @@
       <div class="config-panel">
 
         <!-- Mode toggle -->
-        <div class="config-section-heading">Your solar system</div>
+        <div class="config-section-heading">Your solar design</div>
         <div class="mode-toggle">
           <button class="mode-btn active" id="mode-explore">Explore</button>
           <button class="mode-btn" id="mode-detailed">Expert designer</button>
@@ -1146,11 +1146,11 @@
                 <input id="ctrl-export" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
               </div>
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
-                <input id="ctrl-cheap" class="rate-input" type="number" value="10" min="0" max="50" step="0.5">
+                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh) <span style="font-weight:400;color:#94a3b8">(optional)</span></label>
+                <input id="ctrl-cheap" class="rate-input" type="number" placeholder="Leave blank if none" min="0" max="50" step="0.5">
               </div>
             </div>
-            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for the import rate. The export rate (SEG) is what your energy supplier pays for surplus solar. The overnight rate only applies if you're on a time-of-use tariff like Octopus Go — leave at 10p if unsure.</div>
+            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for your import (day) rate. The export rate (SEG) is what your energy supplier pays for surplus solar. <strong>Overnight rate:</strong> only fill this in if you're on Economy 7, Octopus Go, or a similar time-of-use tariff — leave blank if not, and we'll use your day rate.</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Electricity price rises</span>
               <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
@@ -1171,7 +1171,7 @@
       <!-- Right: Results -->
       <div class="results-panel">
         <div class="results-header">
-          <h2>Your estimate</h2>
+          <div class="config-section-heading" style="margin-bottom:0">What this means for you</div>
           <span class="update-flash" id="update-flash">Updated ✓</span>
         </div>
 
@@ -1192,14 +1192,14 @@
               <!-- Fill (dynamic via JS) -->
               <path id="gauge-arc"
                     d="M 15 115 a 95 95 0 0 1 190 0"
-                    fill="none" stroke="#1a4d7a" stroke-width="16"
+                    fill="none" stroke="#f59e0b" stroke-width="16"
                     stroke-linecap="round"
                     stroke-dasharray="0 299"/>
               <!-- Percentage -->
               <text id="gauge-text" x="110" y="90" text-anchor="middle"
-                    font-size="40" font-weight="700" fill="#1a4d7a"
+                    font-size="40" font-weight="700" fill="#0F172A"
                     font-family="DM Sans, sans-serif">--%</text>
-              <text text-anchor="middle" font-size="11" fill="#64748b" font-family="DM Sans, sans-serif">
+              <text text-anchor="middle" font-size="11" fill="#0F172A" font-family="DM Sans, sans-serif">
                 <tspan x="110" y="112">of your home powered</tspan>
                 <tspan x="110" dy="14">by your roof</tspan>
               </text>
@@ -1209,7 +1209,25 @@
           <!-- Plain-language summary -->
           <p id="stat-summary" class="results-summary"></p>
 
-          <!-- Stat cards -->
+          <!-- Payback table -->
+          <div class="payback-section">
+            <div class="payback-heading">Estimated payback</div>
+            <table class="payback-table">
+              <thead>
+                <tr>
+                  <th>Install cost</th>
+                  <th>Yr 1 saving</th>
+                  <th>Yr 5 saving</th>
+                  <th>Payback</th>
+                </tr>
+              </thead>
+              <tbody id="payback-body">
+                <tr><td colspan="3">—</td></tr>
+              </tbody>
+            </table>
+          </div><!-- payback-section -->
+
+          <!-- Stat tiles -->
           <div class="stats-grid">
             <div class="stat-card highlight">
               <div class="stat-label">Generated on your roof</div>
@@ -1234,24 +1252,6 @@
               <div class="stat-sub">kWh surplus exported</div>
             </div>
           </div>
-
-          <!-- Payback table -->
-          <div class="payback-section">
-            <div class="payback-heading">Estimated payback</div>
-            <table class="payback-table">
-              <thead>
-                <tr>
-                  <th>Install cost</th>
-                  <th>Yr 1 saving</th>
-                  <th>Yr 5 saving</th>
-                  <th>Payback</th>
-                </tr>
-              </thead>
-              <tbody id="payback-body">
-                <tr><td colspan="3">—</td></tr>
-              </tbody>
-            </table>
-          </div><!-- payback-section -->
 
           <div class="quote-save-row">
             <div id="quote-save-form" class="quote-save-form" style="display:none">
@@ -1311,9 +1311,9 @@
             <div class="shared-hint">SEG rate from your energy supplier.</div>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">Overnight cheap rate (p/kWh)</label>
-            <input type="number" id="sa-overnight" class="shared-input" min="0" max="50" step="0.5">
-            <div class="shared-hint">If you have cheaper electricity overnight (Economy 7, Octopus Go, etc.) your battery can charge cheaply.</div>
+            <label class="shared-label">Overnight cheap rate (p/kWh) <span style="font-weight:400;opacity:.7">(optional)</span></label>
+            <input type="number" id="sa-overnight" class="shared-input" placeholder="Leave blank if none" min="0" max="50" step="0.5">
+            <div class="shared-hint">Only fill in if you're on Economy 7, Octopus Go, or similar. Leave blank if not — we'll use your day rate instead.</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Electricity price rises (%/yr)</label>
@@ -2005,7 +2005,7 @@ function calculate() {
   const archtype = ctrlArchtype.value;
   const importP  = +ctrlImport.value / 100;
   const exportP  = +ctrlExport.value / 100;
-  const cheapP   = +ctrlCheap.value / 100;
+  const cheapP   = ctrlCheap.value === '' ? importP : +ctrlCheap.value / 100;
   const inflRate = 1 + (+ctrlInflation.value / 100);
   const houseVal = +ctrlHouseval.value;
 
@@ -2249,7 +2249,7 @@ function getSharedParams() {
     zoneKey:  currentZoneKey,
     importP:  +ctrlImport.value / 100,
     exportP:  +ctrlExport.value / 100,
-    cheapP:   +ctrlCheap.value / 100,
+    cheapP:   ctrlCheap.value === '' ? +ctrlImport.value / 100 : +ctrlCheap.value / 100,
     inflRate: 1 + (+ctrlInflation.value / 100),
     houseVal: +ctrlHouseval.value,
   };
