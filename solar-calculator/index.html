@@ -119,6 +119,12 @@
       cursor: pointer;
     }
     .ctrl-hint { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+    .explore-sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; margin-bottom: 4px; }
+    .orient-tilt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .orient-tilt-col { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+    .orient-tilt-col .ctrl-label { width: 100%; }
+    .orient-tilt-col input[type=range] { width: 100%; }
+    .orient-svg { margin-top: 8px; display: block; }
     .demand-typical-btns { margin-top: 8px; }
     .demand-typical-label { font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 6px; }
     .demand-ofgem-link {
@@ -222,30 +228,6 @@
       color: var(--muted);
       margin-bottom: 8px;
     }
-    .mode-toggle {
-      display: flex;
-      gap: 3px;
-      margin-bottom: 18px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-    }
-    .mode-btn {
-      flex: 1;
-      padding: 8px 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      border-radius: 6px;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-    .mode-btn.active { background: var(--brand); color: #fff; }
-
     /* ── Easy mode cards ── */
     .easy-section-label {
       font-size: 12px;
@@ -289,7 +271,7 @@
     .sys-type-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
     .house-mode-toggle {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 6px;
       margin-bottom: 10px;
     }
@@ -430,9 +412,12 @@
     /* ── Intent hero ─────────────────────────────────────────── */
     .calc-hero {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
       margin-bottom: 24px;
+    }
+    @media (max-width: 700px) {
+      .calc-hero { grid-template-columns: 1fr; }
     }
     .hero-card {
       font-family: 'DM Sans', sans-serif;
@@ -475,6 +460,19 @@
     #hero-compare.active .hero-card-title,
     #hero-compare.active .hero-card-sub { color: #fff; }
 
+    /* "Expert designer" — green */
+    #hero-detailed {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border-color: #6ee7b7;
+    }
+    #hero-detailed:hover { border-color: #059669; }
+    #hero-detailed.active {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border-color: #065f46;
+    }
+    #hero-detailed.active .hero-card-title,
+    #hero-detailed.active .hero-card-sub { color: #fff; }
+
     .hero-card-title {
       font-size: 15px;
       font-weight: 700;
@@ -484,9 +482,6 @@
       font-size: 12.5px;
       color: var(--muted);
       line-height: 1.45;
-    }
-    @media (max-width: 560px) {
-      .calc-hero { grid-template-columns: 1fr; }
     }
 
     .hero-guide-link {
@@ -508,12 +503,11 @@
     main.compare-mode { display: flex; flex-direction: column; }
     main.compare-mode .page-title    { order: 1; }
     main.compare-mode .page-intro    { order: 2; }
-    main.compare-mode #calc-hero     { order: 3; }
+    main.compare-mode #hero-section   { order: 3; }
     main.compare-mode #quotes-panel  { order: 4; display: block !important; margin-bottom: 20px; }
     main.compare-mode #calc-grid     { order: 5; }
     main.compare-mode #compare-panel { display: none !important; }
     main.compare-mode .method-details { order: 6; }
-    main.compare-mode .mode-toggle   { display: none; }
     .quotes-add-btn { border-color: var(--brand) !important; color: var(--brand) !important; font-weight: 700 !important; }
     .quotes-add-btn:hover { background: var(--brand) !important; color: #fff !important; }
 
@@ -904,6 +898,16 @@
     #gauge-arc { transition: stroke-dasharray 0.5s ease; }
 
     /* ── Plain-language summary ── */
+    .payback-cost-note { font-size: 11.5px; color: var(--muted); margin: 2px 0 8px; }
+    .results-system-summary {
+      font-size: 12.5px; color: var(--muted); margin-bottom: 10px;
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .results-sys-chip {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3px 10px; font-size: 12px;
+      font-weight: 600; color: var(--text);
+    }
     .results-summary {
       font-size: 14px;
       line-height: 1.65;
@@ -1009,25 +1013,9 @@
     <h1 class="page-title">Home Solar Calculator</h1>
     <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year.</p>
 
-    <!-- Mode chooser -->
-    <p class="hero-prompt">What would you like to do?</p>
-    <div id="calc-hero" class="calc-hero">
-      <button class="hero-card" id="hero-explore">
-        <div class="hero-card-icon">☀️</div>
-        <div class="hero-card-title">I'm just looking</div>
-        <div class="hero-card-sub">See what rooftop or plug-in solar could do for your home — enter a few details and get an instant estimate</div>
-      </button>
-      <button class="hero-card" id="hero-compare">
-        <div class="hero-card-icon">📋</div>
-        <div class="hero-card-title">I have quotes to compare</div>
-        <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
-      </button>
-    </div>
-    <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
-
-    <!-- Postcode lookup — hidden until a mode is chosen -->
-    <div class="postcode-row" style="display:none">
-      <label class="postcode-label">First, enter your postcode — we use it to look up how much sunshine your area gets</label>
+    <!-- Postcode lookup — shown immediately -->
+    <div class="postcode-row">
+      <label class="postcode-label">Enter your postcode — we use it to look up how much sunshine your area gets</label>
       <div class="postcode-input-row">
         <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or DN22" maxlength="8" autocomplete="postal-code">
         <button id="pc-btn" class="pc-btn">Find location</button>
@@ -1038,21 +1026,58 @@
       </div>
     </div>
 
+    <!-- Mode chooser — revealed after postcode -->
+    <div id="hero-section" style="display:none">
+      <p class="hero-prompt">What would you like to do?</p>
+      <div id="calc-hero" class="calc-hero">
+        <button class="hero-card" id="hero-explore">
+          <div class="hero-card-icon">☀️</div>
+          <div class="hero-card-title">I'm just looking</div>
+          <div class="hero-card-sub">See what rooftop or plug-in solar could do for your home — enter a few details and get an instant estimate</div>
+        </button>
+        <button class="hero-card" id="hero-detailed">
+          <div class="hero-card-icon">📐</div>
+          <div class="hero-card-title">I have a good idea of what I want</div>
+          <div class="hero-card-sub">I know roughly how many panels my roof can fit and I want a more bespoke outcome</div>
+        </button>
+        <button class="hero-card" id="hero-compare">
+          <div class="hero-card-icon">📋</div>
+          <div class="hero-card-title">I have quotes to compare</div>
+          <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
+        </button>
+      </div>
+      <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
+    </div>
+
     <div id="calc-grid" class="calc-grid" style="display:none">
 
       <!-- Left: Configuration -->
       <div class="config-panel">
 
-        <!-- Mode toggle -->
         <div class="config-section-heading">Your solar design</div>
-        <div class="mode-toggle">
-          <button class="mode-btn active" id="mode-explore">Explore</button>
-          <button class="mode-btn" id="mode-detailed">Expert designer</button>
-          <button class="mode-btn" id="mode-compare" style="display:none">Compare quotes</button>
+
+        <!-- ── Shared: demand (always visible) ── -->
+        <div class="ctrl-group">
+          <div class="ctrl-label">
+            <span>Annual electricity use</span>
+            <span class="ctrl-val" id="val-demand">2,700 kWh</span>
+          </div>
+          <input type="range" id="ctrl-demand" min="1000" max="8000" value="2700" step="100">
+          <div class="demand-typical-btns">
+            <span class="demand-typical-label">Not sure? Use Ofgem typical values <a class="demand-ofgem-link" href="https://www.ofgem.gov.uk/consultation/review-typical-domestic-consumption-values" target="_blank" rel="noopener" title="Ofgem typical domestic consumption values">?</a></span>
+            <div class="demand-typical-row">
+              <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="4100">High<span>4,100 kWh</span><span class="demand-preset-sub">4–5 people, 5-bed</span></button>
+            </div>
+          </div>
         </div>
 
         <!-- ── Explore panel ── -->
         <div id="explore-panel">
+          <div class="ctrl-label">
+            <span>What type of solar system are you interested in?</span>
+          </div>
           <!-- System type toggle -->
           <div class="system-type-toggle">
             <button class="sys-type-btn active" id="sys-rooftop">Rooftop solar</button>
@@ -1064,9 +1089,8 @@
             <div class="easy-section-label">How big is your roof?</div>
             <p class="easy-section-hint">The more roof space you have, the more panels you can fit — and the more you can generate. Pick the option that best describes your home.</p>
             <div class="house-mode-toggle">
-              <button class="house-mode-btn active" data-hmode="B">By bedrooms</button>
-              <button class="house-mode-btn" data-hmode="C">By house type</button>
-              <button class="house-mode-btn" data-hmode="A">By roof size</button>
+              <button class="house-mode-btn active" data-hmode="C">Estimate from my house type</button>
+              <button class="house-mode-btn" data-hmode="A">I can guess the panel count</button>
             </div>
             <div class="easy-cards" id="house-size-cards"></div>
 
@@ -1116,7 +1140,7 @@
               </button>
             </div>
             <div class="easy-section-label" style="margin-top:4px">Plug-in battery</div>
-            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed. We assume a 7p/kWh overnight cheap rate (e.g. Octopus Go, Economy 7) to estimate battery savings.</p>
+            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed. We assume a 7p/kWh overnight cheap rate (e.g. Economy 7 or similar time-of-use tariff) to estimate battery savings.</p>
             <div class="easy-cards" id="plugin-battery-cards">
               <button class="easy-card" data-plugin-batt="0">
                 <span class="easy-card-title">No battery</span>
@@ -1133,22 +1157,26 @@
             </div>
           </div>
 
-          <p class="easy-mode-hint" id="easy-mode-hint">Want to add a battery or enter exact tariff rates? Switch to <strong>Detailed</strong> above.</p>
+          <p class="easy-mode-hint" id="easy-mode-hint">Want to enter exact tariff rates or configure multiple roof faces? Switch to <strong>Expert designer</strong> above.</p>
         </div>
 
-        <!-- ── Shared: demand (always visible) ── -->
-        <div class="ctrl-group">
-          <div class="ctrl-label">
-            <span>Annual electricity use</span>
-            <span class="ctrl-val" id="val-demand">3,300 kWh</span>
-          </div>
-          <input type="range" id="ctrl-demand" min="1000" max="8000" value="3300" step="100">
-          <div class="demand-typical-btns">
-            <span class="demand-typical-label">Not sure? Use Ofgem typical values <a class="demand-ofgem-link" href="https://www.ofgem.gov.uk/consultation/review-typical-domestic-consumption-values" target="_blank" rel="noopener" title="Ofgem typical domestic consumption values">?</a></span>
-            <div class="demand-typical-row">
-              <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
-              <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
-              <button class="demand-preset-btn" data-kwh="4100">High<span>4,100 kWh</span><span class="demand-preset-sub">4–5 people, 5-bed</span></button>
+        <!-- ── Explore sliders (panels + battery, only in explore mode) ── -->
+        <div id="explore-sliders" style="display:none">
+          <div class="easy-section-label">Want to refine your design?</div>
+          <div class="explore-sliders-grid">
+            <div class="ctrl-group" style="margin-bottom:0">
+              <div class="ctrl-label">
+                <span>Panels</span>
+                <span class="ctrl-val" id="val-explore-panels">10 panels</span>
+              </div>
+              <input type="range" id="explore-panels-slider" min="1" max="30" value="10" step="1">
+            </div>
+            <div class="ctrl-group" style="margin-bottom:0">
+              <div class="ctrl-label">
+                <span>Battery</span>
+                <span class="ctrl-val" id="val-explore-battery">No battery</span>
+              </div>
+              <input type="range" id="explore-battery-slider" min="0" max="13.5" value="0" step="0.5">
             </div>
           </div>
         </div>
@@ -1173,16 +1201,46 @@
                 <span class="ctrl-val" id="val-panels">10 panels</span>
               </div>
               <input type="range" id="ctrl-panels" min="1" max="30" value="10" step="1">
-              <div class="ctrl-label" style="margin-top:10px">
-                <span>Orientation</span>
-                <span class="ctrl-val" id="val-orient">SE / SW (45°)</span>
+              <div class="orient-tilt-row" style="margin-top:10px">
+                <div class="orient-tilt-col">
+                  <div class="ctrl-label">
+                    <span>Orientation</span>
+                    <span class="ctrl-val" id="val-orient">SE / SW (45°)</span>
+                  </div>
+                  <input type="range" id="ctrl-orient" min="0" max="175" value="45" step="5">
+                  <svg id="compass-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                    <circle cx="32" cy="32" r="29" fill="#f8fafc" stroke="var(--border)" stroke-width="1.5"/>
+                    <text x="32" y="9"  text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">N</text>
+                    <text x="32" y="60" text-anchor="middle" font-size="8" font-weight="700" fill="#f59e0b"      font-family="DM Sans,sans-serif">S</text>
+                    <text x="57" y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">E</text>
+                    <text x="7"  y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">W</text>
+                    <!-- Needle: points south (down) at 0°, rotates clockwise. transform origin = centre -->
+                    <g id="compass-needle" transform="rotate(0 32 32)">
+                      <polygon points="32,14 34.5,32 32,38 29.5,32" fill="var(--muted)" opacity="0.4"/>
+                      <polygon points="32,50 34.5,32 32,38 29.5,32" fill="#f59e0b"/>
+                    </g>
+                  </svg>
+                </div>
+                <div class="orient-tilt-col">
+                  <div class="ctrl-label">
+                    <span>Roof pitch</span>
+                    <span class="ctrl-val" id="val-tilt">35°</span>
+                  </div>
+                  <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
+                  <svg id="tilt-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                    <!-- Ground line -->
+                    <line x1="6" y1="52" x2="58" y2="52" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Wall -->
+                    <line x1="14" y1="52" x2="14" y2="28" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                    <!-- Roof surface: pivots at wall top (14,28), initial 35° -->
+                    <line id="tilt-roof-line" x1="14" y1="28" x2="45.1" y2="6.2" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Angle arc from horizontal to roof -->
+                    <path id="tilt-arc" d="M 26 28 A 12 12 0 0 0 23.8 18.8" fill="none" stroke="var(--brand)" stroke-width="1" opacity="0.6"/>
+                    <!-- Angle label -->
+                    <text id="tilt-angle-text" x="28" y="27" font-size="8" fill="var(--brand)" font-family="DM Sans,sans-serif" opacity="0.8">35°</text>
+                  </svg>
+                </div>
               </div>
-              <input type="range" id="ctrl-orient" min="0" max="175" value="45" step="5">
-              <div class="ctrl-label" style="margin-top:10px">
-                <span>Roof pitch (tilt)</span>
-                <span class="ctrl-val" id="val-tilt">35°</span>
-              </div>
-              <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
               <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical — a standard pitched roof.</div>
             </div>
 
@@ -1210,8 +1268,9 @@
           <div class="ctrl-group">
             <div class="ctrl-label"><span>Are you home during the day?</span></div>
             <select id="ctrl-archetype" class="ctrl-select">
+              <option value="inhalftheday" selected>Prefer not to say</option>
               <option value="homeallday">Yes — home all day (retired, WFH)</option>
-              <option value="inhalftheday" selected>Sometimes — in for part of the day</option>
+              <option value="inhalftheday">Sometimes — in for part of the day</option>
               <option value="outallday">No — out all day (commuter household)</option>
             </select>
             <div class="ctrl-hint">If you're home during the day you'll use more solar electricity directly, so you save more. If you're out, more gets exported to the grid.</div>
@@ -1229,11 +1288,11 @@
                 <input id="ctrl-export" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
               </div>
               <div class="rate-input-wrap">
-                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh) <span style="font-weight:400;color:#94a3b8">(optional)</span></label>
-                <input id="ctrl-cheap" class="rate-input" type="number" placeholder="Leave blank if none" min="0" max="50" step="0.5">
+                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
+                <input id="ctrl-cheap" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
               </div>
             </div>
-            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for your import (day) rate. The export rate (SEG) is what your energy supplier pays for surplus solar. <strong>Overnight rate:</strong> only fill this in if you're on Economy 7, Octopus Go, or a similar time-of-use tariff — leave blank if not, and we'll use your day rate.</div>
+            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for your import (day) rate. The export rate (SEG) is what your energy supplier pays for surplus solar. <strong>Overnight rate:</strong> only fill this in if you're on Economy 7 or a similar time-of-use tariff — leave blank if not, and we'll use your day rate.</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Electricity price rises</span>
               <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
@@ -1266,6 +1325,7 @@
 
         <!-- Results (hidden until postcode entered) -->
         <div id="results-content" style="display:none">
+          <div id="results-system-summary" class="results-system-summary"></div>
           <!-- SVG Gauge -->
           <div class="gauge-wrap">
             <svg viewBox="0 0 220 130" role="img" aria-label="Solar self-supply gauge">
@@ -1295,6 +1355,7 @@
           <!-- Payback table -->
           <div class="payback-section">
             <div class="payback-heading">Estimated payback</div>
+            <p class="payback-cost-note" id="payback-cost-note"></p>
             <table class="payback-table">
               <thead>
                 <tr>
@@ -1362,13 +1423,14 @@
           <div class="shared-input-wrap">
             <label class="shared-label">Annual electricity use (kWh)</label>
             <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
-            <div class="shared-hint">From your bill or smart meter. ~3,300 kWh is typical.</div>
+            <div class="shared-hint">From your bill or smart meter. ~2,700 kWh is typical.</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Home during the day?</label>
             <select id="sa-archtype" class="shared-input">
+              <option value="inhalftheday" selected>Prefer not to say</option>
               <option value="homeallday">Home all day</option>
-              <option value="inhalftheday" selected>In half the day</option>
+              <option value="inhalftheday">In half the day</option>
               <option value="outallday">Out all day</option>
             </select>
           </div>
@@ -1380,12 +1442,12 @@
           <div class="shared-input-wrap">
             <label class="shared-label">What you earn exporting (p/kWh)</label>
             <input type="number" id="sa-export" class="shared-input" min="0" max="50" step="0.5">
-            <div class="shared-hint">SEG rate from your energy supplier.</div>
+            <div class="shared-hint">What your supplier pays you for surplus solar sent back to the grid (Smart Export Guarantee).</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Overnight cheap rate (p/kWh) <span style="font-weight:400;opacity:.7">(optional)</span></label>
             <input type="number" id="sa-overnight" class="shared-input" placeholder="Leave blank if none" min="0" max="50" step="0.5">
-            <div class="shared-hint">Only fill in if you're on Economy 7, Octopus Go, or similar. Leave blank if not — we'll use your day rate instead.</div>
+            <div class="shared-hint">Only fill in if you're on Economy 7 or a similar time-of-use tariff. Leave blank if not — we'll use your day rate instead.</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Electricity price rises (%/yr)</label>
@@ -1452,16 +1514,16 @@
       <summary>How this tool works</summary>
       <div class="method-body">
         <h3>Generation estimate</h3>
-        <p>Annual solar generation is calculated using irradiance data from the <strong>MCS MGD003 dataset</strong> — the same data used by certified solar installers in the UK. The dataset provides annual yield figures (kWh per kWp) for 25 climate zones across the UK, at every combination of roof tilt (0–90°) and orientation (0–175° from south). Your postcode is matched to the nearest zone centre. The panel output assumes each panel is rated at <strong>475 Wp</strong>; performance losses (wiring, inverter, temperature) are already embedded in the MCS irradiance figures.</p>
+        <p>Annual solar generation is calculated using solar resource data from the <strong>MCS MGD003 dataset</strong> — the same data used by certified solar installers in the UK. The dataset provides annual yield figures (kWh per kWp) for 25 climate zones across the UK, at every combination of roof tilt (0–90°) and orientation (0–175° from south). Your postcode is matched to the nearest zone centre. The panel output assumes each panel is rated at <strong>475 Wp</strong>; performance losses (wiring, inverter, temperature) are already embedded in the MCS figures.</p>
 
-        <h3>Self-consumption &amp; battery</h3>
-        <p>What fraction of generated electricity is actually used in your home (rather than exported) depends on when you're home and whether you have a battery. These fractions come from the <strong>MCS MGD003 self-consumption lookup tables</strong>, which model three occupancy archetypes and a range of battery sizes against different generation and demand levels. A 90% cap on demand met is applied — it is not practically possible to cover all electricity from solar alone due to overnight and low-irradiance periods.</p>
+        <h3>How much solar you actually use</h3>
+        <p>What fraction of generated electricity is actually used in your home (rather than sent back to the grid) depends on when you're home and whether you have a battery. These fractions come from the <strong>MCS MGD003 lookup tables</strong>, which model three occupancy types and a range of battery sizes against different generation and demand levels. A 90% cap is applied — it is not practically possible to cover all electricity from solar alone due to overnight and low-sunlight periods.</p>
 
         <h3>Financial estimate</h3>
-        <p>Annual saving = (self-consumed kWh × import rate) + (exported kWh × export rate) + battery arbitrage saving. The import rate is what you currently pay per kWh; the export rate is what you receive under the <a href="https://www.ofgem.gov.uk/check-if-energy-price-cap-affects-you" target="_blank">Smart Export Guarantee (SEG)</a> or similar tariff.</p>
+        <p>Annual saving = (solar used in your home × your electricity rate) + (surplus exported × export rate) + overnight battery charging saving. The export rate is what you receive under the <a href="https://www.ofgem.gov.uk/check-if-energy-price-cap-affects-you" target="_blank">Smart Export Guarantee (SEG)</a> or similar tariff.</p>
 
-        <h3>Battery arbitrage</h3>
-        <p>A battery can earn additional value by charging from the grid overnight at a cheap off-peak rate (e.g. Octopus Go at ~7.5p/kWh) and discharging during the day instead of importing at the standard rate. The number of available arbitrage cycles = 365 minus the cycles already used for solar self-consumption. Solar self-consumption cycles are estimated from the uplift in the MCS self-consumption fraction between PV-only and PV-with-battery, divided by battery capacity (accounting for 90% round-trip efficiency). Each arbitrage cycle earns: battery capacity × 90% efficiency × (import rate − overnight rate). Arbitrage saving is set to zero if the overnight rate exceeds the effective discharge value.</p>
+        <h3>Overnight battery charging saving</h3>
+        <p>A battery can earn extra value by charging from the grid overnight at a cheap off-peak rate (e.g. Economy 7 at ~7–8p/kWh) and using that stored energy during the day instead of paying the standard rate. The number of overnight charging cycles available = 365 minus the cycles already used storing solar energy. Each cycle saves: battery capacity × 90% efficiency × (your day rate − overnight rate). This saving is set to zero if the overnight rate is not cheaper than the effective cost of using stored power.</p>
 
         <h3>Limitations</h3>
         <p>The MCS lookup tables cover generation and demand up to 5,999 kWh/year. Very large systems (typically &gt;12 panels) or high-demand homes may approach this boundary; results in those cases are approximations. This tool does not account for shading, soiling, or system degradation over time. Always get a quote from an <a href="https://mcscertified.com/find-an-installer/" target="_blank">MCS-certified installer</a> before making any purchasing decision.</p>
@@ -1658,7 +1720,8 @@ async function lookupPostcode() {
   if (foundLat !== undefined) {
     showPcMap(foundLat, foundLon);
     setMapLocation(foundLat, foundLon);
-    revealCurrentMode();
+    document.getElementById('hero-section').style.display = '';
+    revealCurrentMode(); // no-op if no mode chosen yet; fires correctly on re-lookup
   }
 }
 
@@ -1678,6 +1741,22 @@ let isPlugIn       = false;
 let plugInPanels   = 2;
 let plugInBattery  = 2.5; // kWh
 
+function syncExploreSlidersDisplay() {
+  const epsEl  = document.getElementById('explore-panels-slider');
+  const ebsEl  = document.getElementById('explore-battery-slider');
+  if (!epsEl) return;
+  const panels  = isPlugIn ? plugInPanels : easyPanels;
+  const battEl  = document.getElementById('ctrl-battery');
+  const battery = isPlugIn ? plugInBattery : (battEl ? +battEl.value : 0);
+  epsEl.min   = 1;
+  epsEl.max   = isPlugIn ? 2 : 30;
+  epsEl.value = panels;
+  ebsEl.max   = isPlugIn ? 5 : 13.5;
+  ebsEl.value = battery;
+  document.getElementById('val-explore-panels').textContent = `${panels} panel${panels === 1 ? '' : 's'}`;
+  document.getElementById('val-explore-battery').textContent = battery >= 0.5 ? `${battery} kWh` : 'No battery';
+}
+
 function applyEasyConfig() {
   if (isPlugIn) {
     arrays = [{ panels: plugInPanels, azimuth: 45, tilt: 35 }];
@@ -1685,6 +1764,7 @@ function applyEasyConfig() {
   } else {
     arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
   }
+  syncExploreSlidersDisplay();
 }
 
 // Card click helpers
@@ -1700,14 +1780,8 @@ function bindCards(containerID, stateKey, callback) {
   });
 }
 
-// ── House size mode (A/B/C) ───────────────────────────────────────────────────
+// ── House size mode (A/C) ─────────────────────────────────────────────────────
 const HOUSE_MODES = {
-  B: [
-    { title: '1–2 bed',  sub: 'typical small home',       panels: 6  },
-    { title: '3 bed',    sub: 'typical family home',       panels: 10 },
-    { title: '4 bed',    sub: 'larger family home',        panels: 14 },
-    { title: '5+ bed',   sub: 'large detached',            panels: 20 },
-  ],
   A: [
     { title: '4–6 panels',   sub: '~2 kWp',  panels: 6  },
     { title: '8–12 panels',  sub: '~4 kWp',  panels: 10 },
@@ -1722,14 +1796,14 @@ const HOUSE_MODES = {
   ],
 };
 
-let currentHouseMode = 'B';
+let currentHouseMode = 'C';
 
 function renderHouseCards() {
   const cards = HOUSE_MODES[currentHouseMode];
   document.getElementById('house-size-cards').innerHTML = cards.map(c =>
     `<button class="easy-card${c.panels === easyPanels ? ' selected' : ''}" data-panels="${c.panels}">
       <span class="easy-card-title">${c.title}</span>
-      <span class="easy-card-sub">${c.sub}</span>
+      <span class="easy-card-sub">${c.sub}${currentHouseMode !== 'A' ? ` · ${c.panels} panels` : ''}</span>
     </button>`
   ).join('');
 }
@@ -1754,9 +1828,10 @@ document.getElementById('sys-rooftop').addEventListener('click', () => {
   isPlugIn = false;
   document.getElementById('sys-rooftop').classList.add('active');
   document.getElementById('sys-plugin').classList.remove('active');
-  document.getElementById('rooftop-panel').style.display = '';
-  document.getElementById('plugin-panel').style.display  = 'none';
+  document.getElementById('rooftop-panel').style.display  = '';
+  document.getElementById('plugin-panel').style.display   = 'none';
   document.getElementById('easy-mode-hint').style.display = '';
+  document.getElementById('explore-sliders').style.display = '';
   applyEasyConfig();
   calculate();
 });
@@ -1766,9 +1841,10 @@ document.getElementById('sys-plugin').addEventListener('click', () => {
   isPlugIn = true;
   document.getElementById('sys-plugin').classList.add('active');
   document.getElementById('sys-rooftop').classList.remove('active');
-  document.getElementById('rooftop-panel').style.display = 'none';
-  document.getElementById('plugin-panel').style.display  = '';
+  document.getElementById('rooftop-panel').style.display  = 'none';
+  document.getElementById('plugin-panel').style.display   = '';
   document.getElementById('easy-mode-hint').style.display = 'none';
+  document.getElementById('explore-sliders').style.display = 'none';
   applyEasyConfig();
   calculate();
 });
@@ -1794,15 +1870,48 @@ document.getElementById('plugin-battery-cards').addEventListener('click', e => {
   calculate();
 });
 
+// ── Explore panels + battery sliders ─────────────────────────────────────────
+document.getElementById('explore-panels-slider').addEventListener('input', function() {
+  if (isPlugIn) {
+    plugInPanels = +this.value;
+    // Sync plug-in card selection
+    document.querySelectorAll('#plugin-panels-cards .easy-card').forEach(c =>
+      c.classList.toggle('selected', +c.dataset.pluginPanels === plugInPanels)
+    );
+  } else {
+    easyPanels = +this.value;
+    renderHouseCards(); // re-render to sync selected card
+  }
+  document.getElementById('val-explore-panels').textContent = `${this.value} panel${+this.value === 1 ? '' : 's'}`;
+  applyEasyConfig();
+  calculate();
+});
+
+document.getElementById('explore-battery-slider').addEventListener('input', function() {
+  const v = +this.value;
+  if (isPlugIn) {
+    plugInBattery = v;
+    // Sync plug-in battery card selection
+    document.querySelectorAll('#plugin-battery-cards .easy-card').forEach(c =>
+      c.classList.toggle('selected', +c.dataset.pluginBatt === v)
+    );
+  }
+  ctrlBattery.value = v;
+  document.getElementById('val-explore-battery').textContent = v >= 0.5 ? `${v} kWh` : 'No battery';
+  applyEasyConfig();
+  calculate();
+});
+
 function revealCurrentMode() {
   const mode = currentMode;
   if (!mode || !currentZoneKey) return;
   const inCompare = mode === 'compare';
 
-  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
-  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
-  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
-  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+  document.getElementById('calc-grid').style.display        = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display    = mode === 'explore'  ? '' : 'none';
+  document.getElementById('explore-sliders').style.display  = (mode === 'explore' && !isPlugIn) ? '' : 'none';
+  document.getElementById('detailed-panel').style.display   = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display     = (inCompare || quotes.length > 0) ? '' : 'none';
 
   if (inCompare) {
     initSharedAssumptions();
@@ -1821,24 +1930,18 @@ function setMode(mode) {
   currentMode     = mode;
   const inCompare = mode === 'compare';
 
-  // First time — reveal postcode row only; everything else waits for postcode
-  if (prevMode === null) {
-    document.querySelector('.postcode-row').style.display = '';
-  }
-
-  ['explore','detailed','compare'].forEach(m =>
-    document.getElementById(`mode-${m}`).classList.toggle('active', m === mode)
-  );
-  document.getElementById('hero-explore').classList.toggle('active', !inCompare);
-  document.getElementById('hero-compare').classList.toggle('active',  inCompare);
+  document.getElementById('hero-explore').classList.toggle('active',  mode === 'explore');
+  document.getElementById('hero-detailed').classList.toggle('active', mode === 'detailed');
+  document.getElementById('hero-compare').classList.toggle('active',  mode === 'compare');
 
   // Don't reveal calculator panels until a postcode has been looked up
   if (!currentZoneKey) return;
 
-  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
-  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
-  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
-  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+  document.getElementById('calc-grid').style.display        = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display    = mode === 'explore'  ? '' : 'none';
+  document.getElementById('explore-sliders').style.display  = (mode === 'explore' && !isPlugIn) ? '' : 'none';
+  document.getElementById('detailed-panel').style.display   = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display     = (inCompare || quotes.length > 0) ? '' : 'none';
 
   if (inCompare) {
     initSharedAssumptions();
@@ -1860,12 +1963,10 @@ function setMode(mode) {
   }
 }
 
-document.getElementById('mode-explore').addEventListener('click',  () => setMode('explore'));
-document.getElementById('mode-detailed').addEventListener('click', () => setMode('detailed'));
-document.getElementById('mode-compare').addEventListener('click',  () => setMode('compare'));
 
-document.getElementById('hero-explore').addEventListener('click', () => setMode(currentMode === 'detailed' ? 'detailed' : 'explore'));
-document.getElementById('hero-compare').addEventListener('click', () => setMode('compare'));
+document.getElementById('hero-explore').addEventListener('click',  () => setMode('explore'));
+document.getElementById('hero-detailed').addEventListener('click', () => setMode('detailed'));
+document.getElementById('hero-compare').addEventListener('click',  () => setMode('compare'));
 
 // Init easy mode
 applyEasyConfig();
@@ -1893,11 +1994,31 @@ const ctrlOrient = document.getElementById('ctrl-orient');
 const ctrlTilt   = document.getElementById('ctrl-tilt');
 
 function updateSingleLabels() {
-  const n  = +ctrlPanels.value;
-  const az = +ctrlOrient.value;
+  const n    = +ctrlPanels.value;
+  const az   = +ctrlOrient.value;
+  const tilt = +ctrlTilt.value;
   document.getElementById('val-panels').textContent = `${n} panel${n !== 1 ? 's' : ''}`;
   document.getElementById('val-orient').textContent = `${orientLabel(az)} (${az}°)`;
-  document.getElementById('val-tilt').textContent   = `${ctrlTilt.value}°`;
+  document.getElementById('val-tilt').textContent   = `${tilt}°`;
+
+  // Compass: needle points south (0°) at az=0, rotating clockwise
+  document.getElementById('compass-needle').setAttribute('transform', `rotate(${az} 32 32)`);
+
+  // Roof tilt SVG: pivot at wall top (14,28), roof sweeps upward
+  const rad = tilt * Math.PI / 180;
+  const rx  = 14 + Math.cos(rad) * 38;
+  const ry  = 28 - Math.sin(rad) * 38;
+  document.getElementById('tilt-roof-line').setAttribute('x2', rx.toFixed(1));
+  document.getElementById('tilt-roof-line').setAttribute('y2', ry.toFixed(1));
+  // Arc: from (26,28) [horizontal ref] sweeping to roof angle
+  const ax = 14 + Math.cos(rad) * 12;
+  const ay = 28 - Math.sin(rad) * 12;
+  document.getElementById('tilt-arc').setAttribute('d', `M 26 28 A 12 12 0 0 0 ${ax.toFixed(1)} ${ay.toFixed(1)}`);
+  // Label midway along arc
+  const midRad = rad / 2;
+  document.getElementById('tilt-angle-text').setAttribute('x', (14 + Math.cos(midRad) * 18).toFixed(1));
+  document.getElementById('tilt-angle-text').setAttribute('y', (28 - Math.sin(midRad) * 18 + 3).toFixed(1));
+  document.getElementById('tilt-angle-text').textContent = `${tilt}°`;
 }
 
 [ctrlPanels, ctrlOrient, ctrlTilt].forEach(el =>
@@ -2174,6 +2295,14 @@ function calculate() {
   document.getElementById('gauge-arc').setAttribute('stroke-dasharray', `${arcFill.toFixed(1)} ${ARC_LENGTH.toFixed(1)}`);
   document.getElementById('gauge-text').textContent = r.pctMet + '%';
 
+  // System summary chips
+  const totalPanelsDisplay = arrays.reduce((s, a) => s + a.panels, 0);
+  const panelKWpDisplay    = (currentMode === 'explore' && isPlugIn) ? 0.4 : 0.475;
+  const kWpDisplay         = (totalPanelsDisplay * panelKWpDisplay).toFixed(2);
+  let chips = `<span class="results-sys-chip">${totalPanelsDisplay} panels (${kWpDisplay} kWp)</span>`;
+  if (battery >= 1.1) chips += ` <span class="results-sys-chip">${battery} kWh battery</span>`;
+  document.getElementById('results-system-summary').innerHTML = chips;
+
   // Plain-language summary
   const summaryParts = [
     `cutting your grid bills by <strong>£${r.importSaved.toLocaleString()}</strong> a year`
@@ -2187,11 +2316,15 @@ function calculate() {
   document.getElementById('stat-saving').textContent          = '£' + r.totalSaving.toLocaleString();
   document.getElementById('stat-import-line').textContent     = `£${r.importSaved.toLocaleString()} import saved`;
   document.getElementById('stat-export-line').textContent     = `£${r.exportEarned.toLocaleString()} export earned`;
-  document.getElementById('stat-arbitrage-line').textContent  = battery >= 1.1 ? `£${r.arbitrageSaving.toLocaleString()} battery arbitrage` : '';
+  document.getElementById('stat-arbitrage-line').textContent  = battery >= 1.1 ? `£${r.arbitrageSaving.toLocaleString()} overnight charging saving` : '';
   document.getElementById('stat-self').textContent            = r.selfConsumed.toLocaleString();
   document.getElementById('stat-export').textContent          = r.exported.toLocaleString();
 
   // Payback table
+  const plugInActive = currentMode === 'explore' && isPlugIn;
+  document.getElementById('payback-cost-note').textContent = plugInActive
+    ? 'Cost estimate for panels and battery only — no labour or scaffolding needed.'
+    : 'Cost estimate includes panels, inverter, labour, and scaffolding.';
   document.getElementById('payback-body').innerHTML = r.costs.map((c, i) => {
     const pb  = r.paybacks[i];
     const mid = i === 1 ? ' class="mid-row"' : '';
