@@ -242,6 +242,10 @@
       grid-template-columns: 1fr 1fr;
       gap: 6px;
       margin-bottom: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
     }
     .easy-card {
       display: flex;
@@ -899,6 +903,9 @@
 
     /* ── Plain-language summary ── */
     .payback-cost-note { font-size: 11.5px; color: var(--muted); margin: 2px 0 8px; }
+    .salary-sac-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; cursor: pointer; }
+    .salary-sac-toggle input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
+    .salary-sac-note { font-size: 12px; color: #059669; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 10px; margin: 0 0 8px; }
     .results-system-summary {
       font-size: 12.5px; color: var(--muted); margin-bottom: 10px;
       display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
@@ -1140,7 +1147,7 @@
               </button>
             </div>
             <div class="easy-section-label" style="margin-top:4px">Plug-in battery</div>
-            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed. We assume a 7p/kWh overnight cheap rate (e.g. Economy 7 or similar time-of-use tariff) to estimate battery savings.</p>
+            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed.</p>
             <div class="easy-cards" id="plugin-battery-cards">
               <button class="easy-card" data-plugin-batt="0">
                 <span class="easy-card-title">No battery</span>
@@ -1183,87 +1190,6 @@
 
         <!-- ── Detailed panel ── -->
         <div id="detailed-panel" style="display:none">
-          <div class="ctrl-group">
-            <div class="ctrl-label">
-              <span>Solar panels</span>
-              <span class="ctrl-val" id="val-total-kwp">3.80 kWp</span>
-            </div>
-
-            <div class="roof-tabs">
-              <button class="roof-tab active" id="tab-single">Single roof</button>
-              <button class="roof-tab" id="tab-multi">Multiple roofs</button>
-            </div>
-
-            <!-- Single roof -->
-            <div id="panel-single">
-              <div class="ctrl-label" style="margin-top:8px">
-                <span>Number of panels</span>
-                <span class="ctrl-val" id="val-panels">10 panels</span>
-              </div>
-              <input type="range" id="ctrl-panels" min="1" max="30" value="10" step="1">
-              <div class="orient-tilt-row" style="margin-top:10px">
-                <div class="orient-tilt-col">
-                  <div class="ctrl-label">
-                    <span>Orientation</span>
-                    <span class="ctrl-val" id="val-orient">SE / SW (45°)</span>
-                  </div>
-                  <input type="range" id="ctrl-orient" min="0" max="175" value="45" step="5">
-                  <svg id="compass-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
-                    <circle cx="32" cy="32" r="29" fill="#f8fafc" stroke="var(--border)" stroke-width="1.5"/>
-                    <text x="32" y="9"  text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">N</text>
-                    <text x="32" y="60" text-anchor="middle" font-size="8" font-weight="700" fill="#f59e0b"      font-family="DM Sans,sans-serif">S</text>
-                    <text x="57" y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">E</text>
-                    <text x="7"  y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">W</text>
-                    <!-- Needle: points south (down) at 0°, rotates clockwise. transform origin = centre -->
-                    <g id="compass-needle" transform="rotate(0 32 32)">
-                      <polygon points="32,14 34.5,32 32,38 29.5,32" fill="var(--muted)" opacity="0.4"/>
-                      <polygon points="32,50 34.5,32 32,38 29.5,32" fill="#f59e0b"/>
-                    </g>
-                  </svg>
-                </div>
-                <div class="orient-tilt-col">
-                  <div class="ctrl-label">
-                    <span>Roof pitch</span>
-                    <span class="ctrl-val" id="val-tilt">35°</span>
-                  </div>
-                  <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
-                  <svg id="tilt-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
-                    <!-- Ground line -->
-                    <line x1="6" y1="52" x2="58" y2="52" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
-                    <!-- Wall -->
-                    <line x1="14" y1="52" x2="14" y2="28" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-                    <!-- Roof surface: pivots at wall top (14,28), initial 35° -->
-                    <line id="tilt-roof-line" x1="14" y1="28" x2="45.1" y2="6.2" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-                    <!-- Angle arc from horizontal to roof -->
-                    <path id="tilt-arc" d="M 26 28 A 12 12 0 0 0 23.8 18.8" fill="none" stroke="var(--brand)" stroke-width="1" opacity="0.6"/>
-                    <!-- Angle label -->
-                    <text id="tilt-angle-text" x="28" y="27" font-size="8" fill="var(--brand)" font-family="DM Sans,sans-serif" opacity="0.8">35°</text>
-                  </svg>
-                </div>
-              </div>
-              <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical — a standard pitched roof.</div>
-            </div>
-
-            <!-- Multiple roofs -->
-            <div id="panel-multi" style="display:none">
-              <div id="arrays-container"></div>
-              <div class="arrays-footer">
-                <button id="add-array-btn" class="add-arr-btn">+ Add array</button>
-                <span class="array-total-label">Total: <strong id="arr-total-gen">—</strong></span>
-              </div>
-              <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · max 10 arrays</div>
-            </div>
-          </div>
-
-          <div class="ctrl-group">
-            <div class="ctrl-label"><span>Battery storage</span></div>
-            <div class="battery-slider-wrap">
-              <input type="range" id="ctrl-battery" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
-              <input type="number" id="ctrl-battery-num" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
-              <span class="battery-unit">kWh</span>
-            </div>
-            <div class="ctrl-hint">A battery stores spare solar energy to use after dark. A 5–10 kWh battery suits most homes. Set to 0 if you don't want a battery.</div>
-          </div>
 
           <div class="ctrl-group">
             <div class="ctrl-label"><span>Are you home during the day?</span></div>
@@ -1306,6 +1232,89 @@
             <input type="range" id="ctrl-houseval" min="0" max="15000" value="0" step="500">
             <div class="ctrl-hint">Solar panels can add value when you sell your home. Evidence varies — leave at £0 if you'd rather not include this.</div>
           </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label">
+              <span>Solar panels</span>
+              <span class="ctrl-val" id="val-total-kwp">3.80 kWp</span>
+            </div>
+
+            <div class="roof-tabs">
+              <button class="roof-tab active" id="tab-single">Single roof</button>
+              <button class="roof-tab" id="tab-multi">Multiple roofs</button>
+            </div>
+
+            <!-- Single roof -->
+            <div id="panel-single">
+              <div class="ctrl-label" style="margin-top:8px">
+                <span>Number of panels</span>
+                <span class="ctrl-val" id="val-panels">10 panels</span>
+              </div>
+              <input type="range" id="ctrl-panels" min="1" max="30" value="10" step="1">
+              <div class="orient-tilt-row" style="margin-top:10px">
+                <div class="orient-tilt-col">
+                  <div class="ctrl-label">
+                    <span>Orientation</span>
+                    <span class="ctrl-val" id="val-orient">SE / SW (45°)</span>
+                  </div>
+                  <svg id="compass-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                    <circle cx="32" cy="32" r="29" fill="#f8fafc" stroke="var(--border)" stroke-width="1.5"/>
+                    <text x="32" y="9"  text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">N</text>
+                    <text x="32" y="60" text-anchor="middle" font-size="8" font-weight="700" fill="#f59e0b"      font-family="DM Sans,sans-serif">S</text>
+                    <text x="57" y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">E</text>
+                    <text x="7"  y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">W</text>
+                    <!-- Arrow: shaft from centre, arrowhead pointing south at 0°, rotates clockwise -->
+                    <g id="compass-needle" transform="rotate(0 32 32)">
+                      <line x1="32" y1="32" x2="32" y2="48" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                      <polygon points="32,54 28,46 36,46" fill="#f59e0b"/>
+                    </g>
+                  </svg>
+                  <input type="range" id="ctrl-orient" min="-175" max="175" value="-45" step="5">
+                </div>
+                <div class="orient-tilt-col">
+                  <div class="ctrl-label">
+                    <span>Roof pitch</span>
+                    <span class="ctrl-val" id="val-tilt">35°</span>
+                  </div>
+                  <svg id="tilt-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                    <!-- Ground line -->
+                    <line x1="6" y1="52" x2="58" y2="52" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Wall -->
+                    <line x1="14" y1="52" x2="14" y2="28" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                    <!-- Roof surface: pivots at wall top (14,28), initial 35° -->
+                    <line id="tilt-roof-line" x1="14" y1="28" x2="45.1" y2="6.2" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Angle arc from horizontal to roof -->
+                    <path id="tilt-arc" d="M 26 28 A 12 12 0 0 0 23.8 18.8" fill="none" stroke="var(--brand)" stroke-width="1" opacity="0.6"/>
+                    <!-- Angle label -->
+                    <text id="tilt-angle-text" x="28" y="27" font-size="8" fill="var(--brand)" font-family="DM Sans,sans-serif" opacity="0.8">35°</text>
+                  </svg>
+                  <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
+                </div>
+              </div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical — a standard pitched roof.</div>
+            </div>
+
+            <!-- Multiple roofs -->
+            <div id="panel-multi" style="display:none">
+              <div id="arrays-container"></div>
+              <div class="arrays-footer">
+                <button id="add-array-btn" class="add-arr-btn">+ Add array</button>
+                <span class="array-total-label">Total: <strong id="arr-total-gen">—</strong></span>
+              </div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · max 10 arrays</div>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Battery storage</span></div>
+            <div class="battery-slider-wrap">
+              <input type="range" id="ctrl-battery" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
+              <input type="number" id="ctrl-battery-num" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
+              <span class="battery-unit">kWh</span>
+            </div>
+            <div class="ctrl-hint">A battery stores spare solar energy to use after dark. A 5–10 kWh battery suits most homes. Set to 0 if you don't want a battery.</div>
+          </div>
+
         </div>
 
       </div>
@@ -1355,6 +1364,11 @@
           <!-- Payback table -->
           <div class="payback-section">
             <div class="payback-heading">Estimated payback</div>
+            <label class="salary-sac-toggle">
+              <input type="checkbox" id="salary-sac-chk">
+              <span>Paying via salary sacrifice?</span>
+            </label>
+            <p class="salary-sac-note" id="salary-sac-note" style="display:none"></p>
             <p class="payback-cost-note" id="payback-cost-note"></p>
             <table class="payback-table">
               <thead>
@@ -1446,8 +1460,8 @@
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Overnight cheap rate (p/kWh) <span style="font-weight:400;opacity:.7">(optional)</span></label>
-            <input type="number" id="sa-overnight" class="shared-input" placeholder="Leave blank if none" min="0" max="50" step="0.5">
-            <div class="shared-hint">Only fill in if you're on Economy 7 or a similar time-of-use tariff. Leave blank if not — we'll use your day rate instead.</div>
+            <input type="number" id="sa-overnight" class="shared-input" value="7" min="0" max="50" step="0.5">
+            <div class="shared-hint">Default is 7p (Economy 7 or similar time-of-use tariff). Adjust if your tariff differs, or set to 0 if you have no cheap overnight rate.</div>
           </div>
           <div class="shared-input-wrap">
             <label class="shared-label">Electricity price rises (%/yr)</label>
@@ -1972,20 +1986,24 @@ document.getElementById('hero-compare').addEventListener('click',  () => setMode
 applyEasyConfig();
 
 // ── Orientation helpers ────────────────────────────────────────────────────────
-const ORIENT_OPTIONS = [
-  { label: 'South',       az:   0 },
-  { label: 'SSE / SSW',   az:  20 },
-  { label: 'SE / SW',     az:  45 },
-  { label: 'ESE / WSW',   az:  65 },
-  { label: 'East / West', az:  90 },
-  { label: 'ENE / WNW',   az: 110 },
-  { label: 'NE / NW',     az: 135 },
-  { label: 'NNE / NNW',   az: 155 },
-  { label: 'North',       az: 175 },
+// Slider runs -175 (east) to +175 (west), 0 = south.
+// Negative = east side, positive = west side. Math.abs() maps to irradiance table.
+const ORIENT_LABELS = [
+  { abs:   0, negLabel: 'South',   posLabel: 'South'   },
+  { abs:  20, negLabel: 'SSE',     posLabel: 'SSW'     },
+  { abs:  45, negLabel: 'SE',      posLabel: 'SW'      },
+  { abs:  65, negLabel: 'ESE',     posLabel: 'WSW'     },
+  { abs:  90, negLabel: 'East',    posLabel: 'West'    },
+  { abs: 110, negLabel: 'ENE',     posLabel: 'WNW'     },
+  { abs: 135, negLabel: 'NE',      posLabel: 'NW'      },
+  { abs: 155, negLabel: 'NNE',     posLabel: 'NNW'     },
+  { abs: 175, negLabel: 'North',   posLabel: 'North'   },
 ];
 
-function orientLabel(deg) {
-  return (ORIENT_OPTIONS.find(o => o.az >= deg) || ORIENT_OPTIONS.at(-1)).label;
+function orientLabel(sliderVal) {
+  const abs = Math.abs(sliderVal);
+  const entry = ORIENT_LABELS.find(o => o.abs >= abs) || ORIENT_LABELS.at(-1);
+  return sliderVal <= 0 ? entry.negLabel : entry.posLabel;
 }
 
 // ── Single-roof controls ──────────────────────────────────────────────────────
@@ -1994,15 +2012,17 @@ const ctrlOrient = document.getElementById('ctrl-orient');
 const ctrlTilt   = document.getElementById('ctrl-tilt');
 
 function updateSingleLabels() {
-  const n    = +ctrlPanels.value;
-  const az   = +ctrlOrient.value;
-  const tilt = +ctrlTilt.value;
+  const n         = +ctrlPanels.value;
+  const sliderAz  = +ctrlOrient.value;  // -175..175, negative=east, positive=west
+  const az        = Math.abs(sliderAz); // 0..175, used for irradiance lookup
+  const tilt      = +ctrlTilt.value;
   document.getElementById('val-panels').textContent = `${n} panel${n !== 1 ? 's' : ''}`;
-  document.getElementById('val-orient').textContent = `${orientLabel(az)} (${az}°)`;
+  document.getElementById('val-orient').textContent = `${orientLabel(sliderAz)} (${az}°)`;
   document.getElementById('val-tilt').textContent   = `${tilt}°`;
 
-  // Compass: needle points south (0°) at az=0, rotating clockwise
-  document.getElementById('compass-needle').setAttribute('transform', `rotate(${az} 32 32)`);
+  // Compass: arrow points toward selected direction. sliderAz=0 → south (arrow down).
+  // Negative sliderAz = east side → rotate counter-clockwise.
+  document.getElementById('compass-needle').setAttribute('transform', `rotate(${sliderAz} 32 32)`);
 
   // Roof tilt SVG: pivot at wall top (14,28), roof sweeps upward
   const rad = tilt * Math.PI / 180;
@@ -2023,7 +2043,7 @@ function updateSingleLabels() {
 
 [ctrlPanels, ctrlOrient, ctrlTilt].forEach(el =>
   el.addEventListener('input', () => {
-    arrays[0] = { panels: +ctrlPanels.value, azimuth: +ctrlOrient.value, tilt: +ctrlTilt.value };
+    arrays[0] = { panels: +ctrlPanels.value, azimuth: Math.abs(+ctrlOrient.value), tilt: +ctrlTilt.value };
     updateSingleLabels();
     calculate();
   })
@@ -2167,6 +2187,7 @@ document.querySelectorAll('.demand-preset-btn').forEach(btn => {
     calculate();
   });
 });
+document.getElementById('salary-sac-chk').addEventListener('change', calculate);
 [ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
   el.addEventListener('change', calculate)
 );
@@ -2275,7 +2296,7 @@ function calculate() {
   const archtype = ctrlArchtype.value;
   const importP  = +ctrlImport.value / 100;
   const exportP  = +ctrlExport.value / 100;
-  const cheapP   = ctrlCheap.value === '' ? (currentMode === 'explore' && isPlugIn ? 0.07 : importP) : +ctrlCheap.value / 100;
+  const cheapP   = ctrlCheap.value === '' ? 0.07 : +ctrlCheap.value / 100;
   const inflRate = 1 + (+ctrlInflation.value / 100);
   const houseVal = +ctrlHouseval.value;
 
@@ -2325,14 +2346,30 @@ function calculate() {
   document.getElementById('payback-cost-note').textContent = plugInActive
     ? 'Cost estimate for panels and battery only — no labour or scaffolding needed.'
     : 'Cost estimate includes panels, inverter, labour, and scaffolding.';
+
+  const salarySac = document.getElementById('salary-sac-chk').checked;
+  const salarySacMultiplier = 1 - 0.20 - 0.08; // basic rate tax + NI saving = 28%
+  const sacNoteEl = document.getElementById('salary-sac-note');
+  if (salarySac) {
+    const midCost = r.costs[1];
+    const saving = Math.round(midCost * (1 - salarySacMultiplier) / 100) * 100;
+    sacNoteEl.textContent = `Salary sacrifice reduces your effective cost by ~£${saving.toLocaleString()} (income tax + NI saving at basic rate). Payback below reflects this.`;
+    sacNoteEl.style.display = '';
+  } else {
+    sacNoteEl.style.display = 'none';
+  }
+
   document.getElementById('payback-body').innerHTML = r.costs.map((c, i) => {
-    const pb  = r.paybacks[i];
+    const effectiveC = salarySac ? Math.round(c * salarySacMultiplier / 100) * 100 : c;
+    const pb = salarySac
+      ? (typeof r.yr1 === 'number' && r.yr1 > 0 ? Math.round(effectiveC / r.yr1) + ' yrs' : '—')
+      : (typeof r.paybacks[i] === 'number' ? r.paybacks[i] + ' yrs' : r.paybacks[i]);
     const mid = i === 1 ? ' class="mid-row"' : '';
     return `<tr${mid}>
-      <td>£${c.toLocaleString()}</td>
+      <td>£${effectiveC.toLocaleString()}</td>
       <td>£${r.yr1.toLocaleString()}</td>
       <td>£${r.yr5.toLocaleString()}</td>
-      <td class="pb-yrs">${typeof pb === 'number' ? pb + ' yrs' : pb}</td>
+      <td class="pb-yrs">${pb}</td>
     </tr>`;
   }).join('');
 
@@ -2495,7 +2532,7 @@ function getSharedParams() {
     zoneKey:  currentZoneKey,
     importP:  +ctrlImport.value / 100,
     exportP:  +ctrlExport.value / 100,
-    cheapP:   ctrlCheap.value === '' ? +ctrlImport.value / 100 : +ctrlCheap.value / 100,
+    cheapP:   ctrlCheap.value === '' ? 0.07 : +ctrlCheap.value / 100,
     inflRate: 1 + (+ctrlInflation.value / 100),
     houseVal: +ctrlHouseval.value,
   };
