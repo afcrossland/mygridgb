@@ -73,8 +73,7 @@ const hideLoader = id => {
 };
 // ── Absolute TWh chart ───────────────────────────────────────────
 (async () => {
-  const SHEET_ID = '1vWKOAe4-RdCCYmmCiU0CQdYxJmJcBJjCmOPjXfS9Bek';
-  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+  const URL = 'https://www.mygridgb.co.uk/data/historical-twh.json';
 
   const SOURCES = [
     { label: 'Nuclear',     color: '#4ade80', col: 1 },
@@ -164,8 +163,7 @@ const hideLoader = id => {
 
 // ── Mix % chart ──────────────────────────────────────────────────
 (async () => {
-  const SHEET_ID = '1_dUFSVKiTItbbuyQNc2XuhQ1tmkQBBbgvQwqmekdfvU';
-  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+  const URL = 'https://www.mygridgb.co.uk/data/historical-mix-pct.json';
 
   const SOURCES = [
     { label: 'Nuclear',     color: '#4ade80', col: 1 },
@@ -254,8 +252,7 @@ const hideLoader = id => {
 })();
 
 (async () => {
-  const SHEET_ID = '1wg4sY1wskCJtosHtozDqxyudXBDR53LHgQP0Q5Hu_8g';
-  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=0`;
+  const URL = 'https://www.mygridgb.co.uk/data/historical-co2.json';
 
   try {
     const resp = await fetch(URL);

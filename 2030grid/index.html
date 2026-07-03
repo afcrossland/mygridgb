@@ -341,9 +341,10 @@ const hideLoader = id => {
   setTimeout(() => el.remove(), 380);
 };
 (async () => {
-  const MIX_ID        = '1u35y6W2NqBTa5knVrqsYybjIGTPCwjBrIqg0rIZKLes';
-  const TIMESERIES_ID = '1ctbznBuW040HtFabgrTu4qDo2TfbsqPZvDiU8rglNRc';
-  const CURTAIL_ID    = '12Rw_OnA3qKUvMuzcMhfvW0UyAYXxx8HrcHxxk9VidYA';
+  const DATA          = 'https://www.mygridgb.co.uk/data';
+  const MIX_URL        = `${DATA}/2030-mix.json`;
+  const TIMESERIES_URL = `${DATA}/2030-timeseries.json`;
+  const CURTAIL_URL    = `${DATA}/2030-curtailment.json`;
 
   const FONT = "'DM Sans', 'Segoe UI', Arial, sans-serif";
 
@@ -374,8 +375,7 @@ const hideLoader = id => {
     { label: 'Gas',         col: 8, color: '#6b7280' },
   ];
 
-  async function fetchTable(id, gid) {
-    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=${gid ?? 0}`;
+  async function fetchTable(url) {
     const r = await fetch(url);
     const t = await r.text();
     return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
@@ -488,9 +488,9 @@ const hideLoader = id => {
   }
 
   const [mixResult, tsResult, curtailResult] = await Promise.allSettled([
-    fetchTable(MIX_ID),
-    fetchTable(TIMESERIES_ID),
-    fetchTable(CURTAIL_ID),
+    fetchTable(MIX_URL),
+    fetchTable(TIMESERIES_URL),
+    fetchTable(CURTAIL_URL),
   ]);
 
   // ── Mix comparison ────────────────────────────────────────────────

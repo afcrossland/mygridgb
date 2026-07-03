@@ -633,10 +633,11 @@ const hideLoader = id => {
 };
 
 (async () => {
-  const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
+  const DATA = 'https://www.mygridgb.co.uk/data';
+  const SHEET = () => null; // unused, kept to avoid reference errors
 
-  const MIX_ID     = '1v8KovUBgNq6M_WcGiUQi-MdysmsiDKFIfAdg961D1LA';
-  const HISTORY_ID = '1U8ywTGM2IO6Wc4juDb6rMP0me2hd58HEenOSqGpYiNM';
+  const MIX_URL     = `${DATA}/live-mix.json`;
+  const HISTORY_URL = `${DATA}/annual-history.json`;
 
   const PALETTE = {
     'Nuclear':       '#4ade80',
@@ -674,15 +675,15 @@ const hideLoader = id => {
   // Renewables = Wind + Solar + Hydro only (no Biomass per user definition)
   const RENEWABLE  = new Set(['Wind','Wind*','Embedded Wind','Solar','Large Hydro','Hydro']);
 
-  async function fetchSheet(id) {
-    const resp = await fetch(SHEET(id));
+  async function fetchSheet(url) {
+    const resp = await fetch(url);
     const text = await resp.text();
     return JSON.parse(text.slice(text.indexOf('(') + 1, text.lastIndexOf(')'))).table;
   }
 
   const [mixResult, historyResult] = await Promise.allSettled([
-    fetchSheet(MIX_ID),
-    fetchSheet(HISTORY_ID),
+    fetchSheet(MIX_URL),
+    fetchSheet(HISTORY_URL),
   ]);
 
   // ── Stats + pie from mix sheet ───────────────────────────────
@@ -1013,7 +1014,7 @@ const hideLoader = id => {
 
 // ── Last 7 days stacked area ─────────────────────────────────────
 (async () => {
-  const STACK_ID = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
+  const STACK_URL = 'https://www.mygridgb.co.uk/data/stack-timeseries.json';
   const FONT = "'DM Sans','Segoe UI',Arial,sans-serif";
 
   const PALETTE = {
@@ -1036,8 +1037,7 @@ const hideLoader = id => {
   function fmtDate(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${STACK_ID}/gviz/tq?tqx=out:json&gid=0`;
-    const t = await (await fetch(url)).text();
+    const t = await (await fetch(STACK_URL)).text();
     const allRows = JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table.rows;
     const valid = allRows.filter(r => r.c.slice(1).some(c => c && c.v != null));
 
