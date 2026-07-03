@@ -71,11 +71,10 @@ const hideLoader = id => {
   setTimeout(() => el.remove(), 380);
 };
 (async () => {
-  const SHEET = id => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=0`;
-
-  const TREEMAP_ID  = '1nh3oCqRrDg0pyhByZt9Ssga11mV4ptTybTzBIjmTmZw';
-  const STACK_ID    = '136P7ali5jDYLpBgAxLEE0jVrf3A4FljDZF528ftaxeQ';
-  const CARBON_ID   = '1Xx0Crp8hZRWoFOb_NQ6kptP69EplFBjUQnLUekbYJag';
+  const DATA = 'https://www.mygridgb.co.uk/data';
+  const TREEMAP_URL = `${DATA}/28day-treemap.json`;
+  const STACK_URL   = `${DATA}/stack-timeseries.json`;
+  const CARBON_URL  = `${DATA}/28day-carbon.json`;
 
   const PALETTE = {
     'Nuclear':       '#4ade80',
@@ -116,16 +115,16 @@ const hideLoader = id => {
     return d.getDate() + ' ' + MONTHS[d.getMonth()];
   }
 
-  async function fetchTable(id) {
-    const r = await fetch(SHEET(id));
+  async function fetchTable(url) {
+    const r = await fetch(url);
     const t = await r.text();
     return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
   }
 
   const [tmResult, stackResult, carbonResult] = await Promise.allSettled([
-    fetchTable(TREEMAP_ID),
-    fetchTable(STACK_ID),
-    fetchTable(CARBON_ID),
+    fetchTable(TREEMAP_URL),
+    fetchTable(STACK_URL),
+    fetchTable(CARBON_URL),
   ]);
 
   // ── Treemap ─────────────────────────────────────────────────

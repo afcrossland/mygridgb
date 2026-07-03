@@ -124,8 +124,9 @@ const hideLoader = id => {
   setTimeout(() => el.remove(), 380);
 };
 (async () => {
-  const GEN_ID    = '1XmfoB1pj75UMhM9d2r2KbA0P-TAjUddyY0iAuFmgCVw';
-  const CARBON_ID = '1M7mmIpZuKLk2GyRSfsRhQgTQiZoGnLI3P5HRiQWxGoc';
+  const DATA      = 'https://www.mygridgb.co.uk/data';
+  const GEN_URL    = `${DATA}/12month-generation.json`;
+  const CARBON_URL = `${DATA}/12month-carbon.json`;
 
   const PALETTE = {
     'Nuclear':     '#4ade80',
@@ -153,17 +154,15 @@ const hideLoader = id => {
 
   const FONT = "'DM Sans', 'Segoe UI', Arial, sans-serif";
 
-  async function fetchSheet(id, sheetName) {
-    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  async function fetchSheet(url) {
     const r = await fetch(url);
     const t = await r.text();
     return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
   }
 
-  // Fetch the full 36-month tab for both sheets once
   const [genResult, carbonResult] = await Promise.allSettled([
-    fetchSheet(GEN_ID,    'Last 3 years'),
-    fetchSheet(CARBON_ID, 'Last 3 years'),
+    fetchSheet(GEN_URL),
+    fetchSheet(CARBON_URL),
   ]);
 
   const genRows    = genResult.status    === 'fulfilled' ? genResult.value.rows    : [];
