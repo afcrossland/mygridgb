@@ -2,9 +2,12 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Runs on pushes targeting the default branch, ignoring data-only updates
   push:
     branches: ["main"]
+    paths-ignore:
+      - 'data/**'
+      - 'app-scripts/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
