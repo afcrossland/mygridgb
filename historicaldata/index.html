@@ -73,7 +73,7 @@ const hideLoader = id => {
 };
 // ── Absolute TWh chart ───────────────────────────────────────────
 (async () => {
-  const URL = 'https://www.mygridgb.co.uk/data/historical-twh.json';
+  const URL = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data/historical-twh.json';
 
   const SOURCES = [
     { label: 'Nuclear',     color: '#4ade80', col: 1 },
@@ -163,7 +163,7 @@ const hideLoader = id => {
 
 // ── Mix % chart ──────────────────────────────────────────────────
 (async () => {
-  const URL = 'https://www.mygridgb.co.uk/data/historical-mix-pct.json';
+  const URL = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data/historical-mix-pct.json';
 
   const SOURCES = [
     { label: 'Nuclear',     color: '#4ade80', col: 1 },
@@ -252,7 +252,7 @@ const hideLoader = id => {
 })();
 
 (async () => {
-  const URL = 'https://www.mygridgb.co.uk/data/historical-co2.json';
+  const URL = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data/historical-co2.json';
 
   try {
     const resp = await fetch(URL);
