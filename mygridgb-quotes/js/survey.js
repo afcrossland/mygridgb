@@ -118,6 +118,19 @@ function renderSurveyQuote(sq) {
   </article>`;
 }
 
+const ARRIVAL_DELAYS = [4000, 7500];
+
+function renderWaitingSlot(sq) {
+  return `
+  <div class="sq-waiting group-arriving" id="sq-wait-${sq.installer_id}">
+    <div class="waiting-spinner"></div>
+    <div>
+      <div class="sq-wait-name">${sq.installer.name}</div>
+      <div class="sq-wait-label">Survey scheduled — waiting for final quote…</div>
+    </div>
+  </div>`;
+}
+
 fetch('data/survey-quotes.json')
   .then(r => r.json())
   .then(data => {
@@ -125,12 +138,26 @@ fetch('data/survey-quotes.json')
     document.getElementById('room-area').textContent = data.postcode_area + ' area';
     document.getElementById('design-chip').innerHTML = designChipHtml(data.design, data.round_reference);
 
-    const grid = document.getElementById('survey-grid');
-    grid.innerHTML = data.survey_quotes
-      .filter(sq => sq.status === 'submitted')
-      .map(renderSurveyQuote)
-      .join('');
+    const quotes = data.survey_quotes;
+    const grid   = document.getElementById('survey-grid');
 
+    // Start: all slots show as waiting
+    grid.innerHTML = quotes.map(renderWaitingSlot).join('');
+
+    // Arrive one by one
+    quotes.forEach((sq, i) => {
+      const delay = ARRIVAL_DELAYS[i] ?? (ARRIVAL_DELAYS[ARRIVAL_DELAYS.length - 1] + (i - ARRIVAL_DELAYS.length + 1) * 4000);
+      setTimeout(() => {
+        const slot = document.getElementById(`sq-wait-${sq.installer_id}`);
+        if (!slot) return;
+        const html = renderSurveyQuote(sq);
+        const tmp  = document.createElement('div');
+        tmp.innerHTML = html;
+        const card = tmp.firstElementChild;
+        card.classList.add('group-arriving');
+        slot.replaceWith(card);
+      }, delay);
+    });
   })
   .catch(err => {
     document.getElementById('survey-grid').innerHTML =

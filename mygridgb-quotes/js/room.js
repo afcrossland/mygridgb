@@ -206,7 +206,7 @@ function toggleSurvey(btn) {
     btn.classList.add('ghost');
   } else {
     surveySelected.add(id);
-    btn.textContent = '✓ On survey list';
+    btn.textContent = '✓ Survey requested';
     btn.classList.remove('ghost');
   }
   updateSurveyBar();
