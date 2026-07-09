@@ -998,6 +998,46 @@
     }
     .method-body a { font-size: 13.5px; }
 
+    /* ── Easy mode step sections ── */
+    .easy-step-section {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+    .easy-step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .easy-step-num {
+      min-width: 24px; height: 24px; border-radius: 50%;
+      background: var(--brand); color: #fff;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .easy-step-q { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+
+    /* ── Hero result (easy mode) ── */
+    .results-hero {
+      text-align: center; padding: 8px 0 20px;
+      margin-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .results-hero-label { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    .results-hero-amount {
+      font-size: 52px; font-weight: 800; color: var(--brand); line-height: 1; margin-bottom: 2px;
+    }
+    .results-hero-unit { font-size: 15px; color: var(--muted); margin-bottom: 12px; }
+    .results-hero-sentence { font-size: 13.5px; color: var(--text); line-height: 1.65; margin: 0 0 16px; }
+    .results-hero-sentence strong { color: var(--brand); }
+    .results-breakdown-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      color: var(--brand); background: none; border: 1px solid var(--brand);
+      border-radius: 7px; padding: 8px 20px; cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .results-breakdown-btn:hover { background: var(--brand); color: #fff; }
+
     /* ── Placeholder state ── */
     .results-placeholder {
       text-align: center;
@@ -1060,8 +1100,8 @@
 
         <div class="config-section-heading">Your solar design</div>
 
-        <!-- ── Shared: demand (always visible) ── -->
-        <div class="ctrl-group">
+        <!-- ── Shared: demand (expert mode only; explore mode uses step 1) ── -->
+        <div class="ctrl-group" id="demand-ctrl-group">
           <div class="ctrl-label">
             <span>Annual electricity use</span>
             <span class="ctrl-val" id="val-demand">2,700 kWh</span>
@@ -1078,32 +1118,53 @@
           </div>
         </div>
 
-        <!-- ── Explore panel ── -->
+        <!-- ── Explore panel (stepped flow) ── -->
         <div id="explore-panel">
-          <div class="ctrl-label">
-            <span>What type of solar system are you interested in?</span>
-          </div>
-          <!-- System type toggle -->
+          <div class="ctrl-label"><span>What type of solar are you interested in?</span></div>
           <div class="system-type-toggle">
             <button class="sys-type-btn active" id="sys-rooftop">Rooftop solar</button>
             <button class="sys-type-btn" id="sys-plugin">Plug-in solar</button>
           </div>
 
-          <!-- Rooftop-specific section -->
-          <div id="rooftop-panel">
-            <div class="easy-section-label">How big is your roof?</div>
-            <p class="easy-section-hint">The more roof space you have, the more panels you can fit — and the more you can generate. Pick the option that best describes your home.</p>
+          <!-- Step 1: Electricity use -->
+          <div class="easy-step-section" id="easy-s1">
+            <div class="easy-step-header">
+              <span class="easy-step-num">1</span>
+              <span class="easy-step-q">How much electricity does your home use?</span>
+            </div>
+            <p class="easy-section-hint">This is the starting point — we use it to design your system and work out how much solar can cover. Check a recent bill, or use a typical value below.</p>
+            <div class="demand-typical-row">
+              <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="4100">High<span>4,100 kWh</span><span class="demand-preset-sub">4–5 people, 5-bed</span></button>
+            </div>
+          </div>
+
+          <!-- Rooftop path -->
+          <!-- Step 2 RT: House size -->
+          <div class="easy-step-section" id="easy-s2-rt" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">2</span>
+              <span class="easy-step-q">How big is your home?</span>
+            </div>
+            <p class="easy-section-hint">We use this to estimate how many panels your roof can fit.</p>
             <div class="house-mode-toggle">
               <button class="house-mode-btn active" data-hmode="C">Estimate from my house type</button>
               <button class="house-mode-btn" data-hmode="A">I can guess the panel count</button>
             </div>
             <div class="easy-cards" id="house-size-cards"></div>
+          </div>
 
-            <div class="easy-section-label">Which way does your main roof face?</div>
-            <p class="easy-section-hint">South-facing roofs get the most sun and generate the most electricity. Not sure? Pick "Not sure" — we'll use a typical estimate.</p>
+          <!-- Step 3 RT: Roof direction -->
+          <div class="easy-step-section" id="easy-s3-rt" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">3</span>
+              <span class="easy-step-q">Which way does your main roof face?</span>
+            </div>
+            <p class="easy-section-hint">South-facing roofs get the most sun. Not sure? Pick "Not sure" — we'll assume a typical SE/SW facing.</p>
             <div class="easy-cards" id="roof-dir-cards">
               <button class="easy-card" data-az="0">
-                <span class="easy-card-title">South-facing</span>
+                <span class="easy-card-title">South</span>
                 <span class="easy-card-sub">Best for solar</span>
               </button>
               <button class="easy-card" data-az="45">
@@ -1119,8 +1180,6 @@
                 <span class="easy-card-sub">We'll assume SE/SW</span>
               </button>
             </div>
-
-            <!-- Satellite map (appears after postcode lookup) -->
             <div id="map-section" style="display:none">
               <button class="map-toggle-btn" id="map-toggle-btn">Need help? Show satellite view ▾</button>
               <div id="map-wrap" style="display:none">
@@ -1130,10 +1189,37 @@
             </div>
           </div>
 
-          <!-- Plug-in solar section -->
-          <div id="plugin-panel" style="display:none">
-            <div class="easy-section-label">Number of panels</div>
-            <p class="easy-section-hint">Balcony or plug-in systems use compact 400W panels that clip onto railings or sit on a flat roof. No scaffolding or roof work needed.</p>
+          <!-- Step 4 RT: Home during day -->
+          <div class="easy-step-section" id="easy-s4-rt" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">4</span>
+              <span class="easy-step-q">Are you usually home during the day?</span>
+            </div>
+            <p class="easy-section-hint">This affects how much of the solar electricity you use directly — and how much gets exported back to the grid.</p>
+            <div class="easy-cards" id="easy-archetype-cards">
+              <button class="easy-card" data-archetype="outallday">
+                <span class="easy-card-title">Mostly out</span>
+                <span class="easy-card-sub">Commuter — out most of the day</span>
+              </button>
+              <button class="easy-card selected" data-archetype="inhalftheday">
+                <span class="easy-card-title">Sometimes home</span>
+                <span class="easy-card-sub">Mix of home and away</span>
+              </button>
+              <button class="easy-card" data-archetype="homeallday">
+                <span class="easy-card-title">Home all day</span>
+                <span class="easy-card-sub">Retired or working from home</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Plug-in path -->
+          <!-- Step 2 PI: Panels -->
+          <div class="easy-step-section" id="easy-s2-pi" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">2</span>
+              <span class="easy-step-q">How many panels?</span>
+            </div>
+            <p class="easy-section-hint">Balcony or plug-in systems use compact 400W panels that clip onto railings or sit on a flat roof. No scaffolding needed.</p>
             <div class="easy-cards" id="plugin-panels-cards">
               <button class="easy-card" data-plugin-panels="1">
                 <span class="easy-card-title">1 panel</span>
@@ -1144,7 +1230,14 @@
                 <span class="easy-card-sub">0.8 kWp</span>
               </button>
             </div>
-            <div class="easy-section-label" style="margin-top:4px">Plug-in battery</div>
+          </div>
+
+          <!-- Step 3 PI: Battery -->
+          <div class="easy-step-section" id="easy-s3-pi" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">3</span>
+              <span class="easy-step-q">Would you like a plug-in battery?</span>
+            </div>
             <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed.</p>
             <div class="easy-cards" id="plugin-battery-cards">
               <button class="easy-card" data-plugin-batt="0">
@@ -1162,28 +1255,7 @@
             </div>
           </div>
 
-          <p class="easy-mode-hint" id="easy-mode-hint">Want to enter exact tariff rates or configure multiple roof faces? Switch to <strong>Expert designer</strong> above.</p>
-        </div>
-
-        <!-- ── Explore sliders (panels + battery, only in explore mode) ── -->
-        <div id="explore-sliders" style="display:none">
-          <div class="easy-section-label">Want to refine your design?</div>
-          <div class="explore-sliders-grid">
-            <div class="ctrl-group" style="margin-bottom:0">
-              <div class="ctrl-label">
-                <span>Panels</span>
-                <span class="ctrl-val" id="val-explore-panels">10 panels</span>
-              </div>
-              <input type="range" id="explore-panels-slider" min="1" max="30" value="10" step="1">
-            </div>
-            <div class="ctrl-group" style="margin-bottom:0">
-              <div class="ctrl-label">
-                <span>Battery</span>
-                <span class="ctrl-val" id="val-explore-battery">No battery</span>
-              </div>
-              <input type="range" id="explore-battery-slider" min="0" max="13.5" value="0" step="0.5">
-            </div>
-          </div>
+          <p class="easy-mode-hint" id="easy-mode-hint">Want exact tariff rates or multiple roof faces? Switch to <strong>Expert designer</strong> above.</p>
         </div>
 
         <!-- ── Detailed panel ── -->
@@ -1328,6 +1400,15 @@
         <div id="results-placeholder" class="results-placeholder">
           <span class="placeholder-icon">☀️</span>
           Use your postcode to estimate your solar potential.
+        </div>
+
+        <!-- Easy mode hero — shown after step 2+ -->
+        <div id="results-hero" class="results-hero" style="display:none">
+          <div class="results-hero-label">You could save around</div>
+          <div class="results-hero-amount" id="hero-saving-amount">£—</div>
+          <div class="results-hero-unit">per year</div>
+          <p class="results-hero-sentence" id="hero-sentence"></p>
+          <button class="results-breakdown-btn" id="results-breakdown-btn">See full breakdown ↓</button>
         </div>
 
         <!-- Results (hidden until postcode entered) -->
@@ -1719,7 +1800,9 @@ async function lookupPostcode() {
 
     pcStatus.innerHTML = `<span class="pc-zone">${displayCode}</span>`;
     document.getElementById('results-placeholder').style.display = 'none';
-    document.getElementById('results-content').style.display  = 'block';
+    if (currentMode !== 'explore') {
+      document.getElementById('results-content').style.display = 'block';
+    }
   } catch (e) {
     console.error('Postcode lookup error:', e);
     pcStatus.innerHTML = `<span class="pc-error">Postcode not recognised — try a full postcode (e.g. SW1A 1AA) or district code (e.g. DN22)</span>`;
@@ -1831,8 +1914,23 @@ document.querySelectorAll('.house-mode-btn').forEach(btn =>
 
 renderHouseCards();
 
-bindCards('house-size-cards', 'panels', () => { applyEasyConfig(); calculate(); });
-bindCards('roof-dir-cards',   'az',     () => { applyEasyConfig(); calculate(); });
+bindCards('house-size-cards', 'panels', () => {
+  applyEasyConfig(); calculate();
+  if (currentMode === 'explore') easyAdvanceHouseSize();
+});
+bindCards('roof-dir-cards', 'az', () => {
+  applyEasyConfig(); calculate();
+  if (currentMode === 'explore') easyAdvanceRoofDir();
+});
+
+document.getElementById('easy-archetype-cards').addEventListener('click', e => {
+  const card = e.target.closest('.easy-card');
+  if (!card) return;
+  document.querySelectorAll('#easy-archetype-cards .easy-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  ctrlArchtype.value = card.dataset.archetype;
+  calculate();
+});
 
 // ── System type toggle (Rooftop ↔ Plug-in) ───────────────────────────────────
 document.getElementById('sys-rooftop').addEventListener('click', () => {
@@ -1840,10 +1938,11 @@ document.getElementById('sys-rooftop').addEventListener('click', () => {
   isPlugIn = false;
   document.getElementById('sys-rooftop').classList.add('active');
   document.getElementById('sys-plugin').classList.remove('active');
-  document.getElementById('rooftop-panel').style.display  = '';
-  document.getElementById('plugin-panel').style.display   = 'none';
+  // Hide plugin steps, restore rooftop steps that were reached
+  document.getElementById('easy-s2-pi').style.display = 'none';
+  document.getElementById('easy-s3-pi').style.display = 'none';
+  if (easyDemandDone) document.getElementById('easy-s2-rt').style.display = '';
   document.getElementById('easy-mode-hint').style.display = '';
-  document.getElementById('explore-sliders').style.display = '';
   applyEasyConfig();
   calculate();
 });
@@ -1853,10 +1952,12 @@ document.getElementById('sys-plugin').addEventListener('click', () => {
   isPlugIn = true;
   document.getElementById('sys-plugin').classList.add('active');
   document.getElementById('sys-rooftop').classList.remove('active');
-  document.getElementById('rooftop-panel').style.display  = 'none';
-  document.getElementById('plugin-panel').style.display   = '';
+  // Hide rooftop steps, restore plugin steps that were reached
+  document.getElementById('easy-s2-rt').style.display = 'none';
+  document.getElementById('easy-s3-rt').style.display = 'none';
+  document.getElementById('easy-s4-rt').style.display = 'none';
+  if (easyDemandDone) document.getElementById('easy-s2-pi').style.display = '';
   document.getElementById('easy-mode-hint').style.display = 'none';
-  document.getElementById('explore-sliders').style.display = 'none';
   applyEasyConfig();
   calculate();
 });
@@ -1870,6 +1971,7 @@ document.getElementById('plugin-panels-cards').addEventListener('click', e => {
   plugInPanels = +card.dataset.pluginPanels;
   applyEasyConfig();
   calculate();
+  if (currentMode === 'explore') easyAdvancePiPanels();
 });
 
 document.getElementById('plugin-battery-cards').addEventListener('click', e => {
@@ -1880,50 +1982,34 @@ document.getElementById('plugin-battery-cards').addEventListener('click', e => {
   plugInBattery = +card.dataset.pluginBatt;
   applyEasyConfig();
   calculate();
+  if (currentMode === 'explore') easyShowHero();
 });
 
-// ── Explore panels + battery sliders ─────────────────────────────────────────
-document.getElementById('explore-panels-slider').addEventListener('input', function() {
-  if (isPlugIn) {
-    plugInPanels = +this.value;
-    // Sync plug-in card selection
-    document.querySelectorAll('#plugin-panels-cards .easy-card').forEach(c =>
-      c.classList.toggle('selected', +c.dataset.pluginPanels === plugInPanels)
-    );
+
+function applyResultsVisibility(mode) {
+  const inExplore = mode === 'explore';
+  document.getElementById('demand-ctrl-group').style.display = inExplore ? 'none' : '';
+  document.getElementById('results-hero').style.display      = 'none';
+  if (inExplore) {
+    document.getElementById('results-content').style.display = 'none';
+    // Restore hero if steps already completed
+    if (easyHeroShown) document.getElementById('results-hero').style.display = '';
   } else {
-    easyPanels = +this.value;
-    renderHouseCards(); // re-render to sync selected card
+    document.getElementById('results-content').style.display = 'block';
+    document.getElementById('results-placeholder').style.display = 'none';
   }
-  document.getElementById('val-explore-panels').textContent = `${this.value} panel${+this.value === 1 ? '' : 's'}`;
-  applyEasyConfig();
-  calculate();
-});
-
-document.getElementById('explore-battery-slider').addEventListener('input', function() {
-  const v = +this.value;
-  if (isPlugIn) {
-    plugInBattery = v;
-    // Sync plug-in battery card selection
-    document.querySelectorAll('#plugin-battery-cards .easy-card').forEach(c =>
-      c.classList.toggle('selected', +c.dataset.pluginBatt === v)
-    );
-  }
-  ctrlBattery.value = v;
-  document.getElementById('val-explore-battery').textContent = v >= 0.5 ? `${v} kWh` : 'No battery';
-  applyEasyConfig();
-  calculate();
-});
+}
 
 function revealCurrentMode() {
   const mode = currentMode;
   if (!mode || !currentZoneKey) return;
   const inCompare = mode === 'compare';
 
-  document.getElementById('calc-grid').style.display        = inCompare ? 'none' : '';
-  document.getElementById('explore-panel').style.display    = mode === 'explore'  ? '' : 'none';
-  document.getElementById('explore-sliders').style.display  = (mode === 'explore' && !isPlugIn) ? '' : 'none';
-  document.getElementById('detailed-panel').style.display   = mode === 'detailed' ? '' : 'none';
-  document.getElementById('quotes-panel').style.display     = (inCompare || quotes.length > 0) ? '' : 'none';
+  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+  applyResultsVisibility(mode);
 
   if (inCompare) {
     initSharedAssumptions();
@@ -1949,11 +2035,11 @@ function setMode(mode) {
   // Don't reveal calculator panels until a postcode has been looked up
   if (!currentZoneKey) return;
 
-  document.getElementById('calc-grid').style.display        = inCompare ? 'none' : '';
-  document.getElementById('explore-panel').style.display    = mode === 'explore'  ? '' : 'none';
-  document.getElementById('explore-sliders').style.display  = (mode === 'explore' && !isPlugIn) ? '' : 'none';
-  document.getElementById('detailed-panel').style.display   = mode === 'detailed' ? '' : 'none';
-  document.getElementById('quotes-panel').style.display     = (inCompare || quotes.length > 0) ? '' : 'none';
+  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+  applyResultsVisibility(mode);
 
   if (inCompare) {
     initSharedAssumptions();
@@ -2177,18 +2263,91 @@ function updateDemandDisplay() {
 }
 ctrlDemand.addEventListener('input', () => { updateDemandDisplay(); calculate(); });
 
-// Ofgem preset buttons
+// Demand preset buttons (shared between expert demand-ctrl-group and easy mode step 1)
 document.querySelectorAll('.demand-preset-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     ctrlDemand.value = btn.dataset.kwh;
     updateDemandDisplay();
     calculate();
+    if (currentMode === 'explore') easyAdvanceDemand();
   });
 });
 document.getElementById('salary-sac-chk').addEventListener('change', calculate);
 [ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
   el.addEventListener('change', calculate)
 );
+
+// ── Easy mode step reveal ──────────────────────────────────────────────────────
+let easyDemandDone = false;
+let easyHeroShown  = false;
+let breakdownOpen  = false;
+
+function easyAdvanceDemand() {
+  if (easyDemandDone) return;
+  easyDemandDone = true;
+  const nextId = isPlugIn ? 'easy-s2-pi' : 'easy-s2-rt';
+  document.getElementById(nextId).style.display = '';
+  document.getElementById(nextId).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function easyAdvanceHouseSize() {
+  const el = document.getElementById('easy-s3-rt');
+  if (el && el.style.display === 'none') {
+    el.style.display = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  easyShowHero();
+}
+
+function easyAdvanceRoofDir() {
+  const el = document.getElementById('easy-s4-rt');
+  if (el && el.style.display === 'none') {
+    el.style.display = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  easyShowHero();
+}
+
+function easyAdvancePiPanels() {
+  const el = document.getElementById('easy-s3-pi');
+  if (el && el.style.display === 'none') {
+    el.style.display = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  easyShowHero();
+}
+
+function easyShowHero() {
+  if (currentMode !== 'explore') return;
+  easyHeroShown = true;
+  document.getElementById('results-placeholder').style.display = 'none';
+  document.getElementById('results-hero').style.display = '';
+}
+
+function updateHero(r) {
+  if (!r || !easyHeroShown || currentMode !== 'explore') return;
+  const amountEl   = document.getElementById('hero-saving-amount');
+  const sentenceEl = document.getElementById('hero-sentence');
+  if (!amountEl || !sentenceEl) return;
+  amountEl.textContent = '£' + r.totalSaving.toLocaleString();
+  const totalPanels = arrays.reduce((s, a) => s + a.panels, 0);
+  const midCost     = r.costs[1];
+  const midPayback  = r.paybacks[1];
+  const paybackStr  = typeof midPayback === 'number'
+    ? `about ${midPayback} year${midPayback === 1 ? '' : 's'}`
+    : 'over 50 years';
+  sentenceEl.innerHTML =
+    `Your ${totalPanels}-panel system could generate <strong>${r.generation.toLocaleString()} kWh</strong> a year`
+    + ` and cover <strong>${r.pctMet}%</strong> of your electricity.`
+    + ` A typical install costs around <strong>£${midCost.toLocaleString()}</strong>`
+    + ` and pays for itself in <strong>${paybackStr}</strong>.`;
+}
+
+document.getElementById('results-breakdown-btn').addEventListener('click', function() {
+  breakdownOpen = !breakdownOpen;
+  document.getElementById('results-content').style.display = breakdownOpen ? 'block' : 'none';
+  this.textContent = breakdownOpen ? 'Hide breakdown ↑' : 'See full breakdown ↓';
+});
 
 // ── Calculation ───────────────────────────────────────────────────────────────
 const DEMAND_BANDS = [1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500];
@@ -2370,6 +2529,8 @@ function calculate() {
       <td class="pb-yrs">${pb}</td>
     </tr>`;
   }).join('');
+
+  updateHero(r);
 
   // Flash "Updated ✓"
   const flash = document.getElementById('update-flash');
