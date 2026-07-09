@@ -25,10 +25,10 @@
     .postcode-input-row {
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
     }
-    #pc-map-wrap { margin-top: 0; margin-bottom: 20px; }
+    #pc-map-wrap { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .pc-map-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 8px 12px 6px; background: var(--bg); }
     #pc-map {
-      height: 160px; border-radius: 8px;
-      border: 1px solid var(--border);
+      height: 180px;
       overflow: hidden;
     }
     .pc-input {
@@ -42,6 +42,18 @@
       transition: border-color .15s;
     }
     .pc-input:focus { border-color: var(--brand); }
+    .pc-input-wrap { position: relative; display: inline-block; }
+    #pc-ac-dropdown {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; max-width: 420px;
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.12); z-index: 500;
+      max-height: 280px; overflow-y: auto;
+    }
+    .ac-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:hover, .ac-item.focused { background: var(--bg); }
+    .ac-main { font-size: 13.5px; font-weight: 500; color: var(--text); }
+    .ac-sub  { font-size: 12px; color: var(--muted); }
     .pc-btn {
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
@@ -1062,9 +1074,12 @@
 
     <!-- Postcode lookup — shown immediately -->
     <div class="postcode-row">
-      <label class="postcode-label">Enter your postcode — we use it to look up how much sunshine your area gets</label>
+      <label class="postcode-label">Enter your postcode or address — we use it to look up how much sunshine your area gets</label>
       <div class="postcode-input-row">
-        <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or DN22" maxlength="8" autocomplete="postal-code">
+        <div class="pc-input-wrap">
+          <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or 14 Green Lane, Sheffield" autocomplete="off" style="width:280px">
+          <div id="pc-ac-dropdown"></div>
+        </div>
         <button id="pc-btn" class="pc-btn">Find location</button>
         <div id="pc-status"></div>
       </div>
@@ -1088,11 +1103,6 @@
         </button>
       </div>
       <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
-    </div>
-
-    <!-- Postcode confirmation map — below mode chooser -->
-    <div id="pc-map-wrap" style="display:none">
-      <div id="pc-map"></div>
     </div>
 
     <div id="calc-grid" class="calc-grid" style="display:none">
@@ -1152,7 +1162,7 @@
             <p class="easy-section-hint">We use this to estimate how many panels your roof can fit.</p>
             <div class="house-mode-toggle">
               <button class="house-mode-btn active" data-hmode="C">Estimate from my house type</button>
-              <button class="house-mode-btn" data-hmode="A">I can guess the panel count</button>
+              <button class="house-mode-btn" data-hmode="A">I can guess the number of panels</button>
             </div>
             <div class="easy-cards" id="house-size-cards"></div>
           </div>
@@ -1177,7 +1187,7 @@
                 <span class="easy-card-title">East or West</span>
                 <span class="easy-card-sub">Moderate yield</span>
               </button>
-              <button class="easy-card selected" data-az="45">
+              <button class="easy-card" data-az="45">
                 <span class="easy-card-title">Not sure</span>
                 <span class="easy-card-sub">We'll assume SE/SW</span>
               </button>
@@ -1203,7 +1213,7 @@
                 <span class="easy-card-title">Mostly out</span>
                 <span class="easy-card-sub">Commuter — out most of the day</span>
               </button>
-              <button class="easy-card selected" data-archetype="inhalftheday">
+              <button class="easy-card" data-archetype="inhalftheday">
                 <span class="easy-card-title">Sometimes home</span>
                 <span class="easy-card-sub">Mix of home and away</span>
               </button>
@@ -1227,7 +1237,7 @@
                 <span class="easy-card-title">1 panel</span>
                 <span class="easy-card-sub">0.4 kWp</span>
               </button>
-              <button class="easy-card selected" data-plugin-panels="2">
+              <button class="easy-card" data-plugin-panels="2">
                 <span class="easy-card-title">2 panels</span>
                 <span class="easy-card-sub">0.8 kWp</span>
               </button>
@@ -1246,7 +1256,7 @@
                 <span class="easy-card-title">No battery</span>
                 <span class="easy-card-sub">Export surplus</span>
               </button>
-              <button class="easy-card selected" data-plugin-batt="2.5">
+              <button class="easy-card" data-plugin-batt="2.5">
                 <span class="easy-card-title">1 × 2.5 kWh</span>
                 <span class="easy-card-sub">Typical plug-in size</span>
               </button>
@@ -1257,7 +1267,7 @@
             </div>
           </div>
 
-          <p class="easy-mode-hint" id="easy-mode-hint">Want exact tariff rates or multiple roof faces? Switch to <strong>Expert designer</strong> above.</p>
+          <p class="easy-mode-hint" id="easy-mode-hint">Want exact tariff rates or multiple roof faces? <a href="#" id="switch-to-expert-link">Switch to Expert designer</a></p>
         </div>
 
         <!-- ── Detailed panel ── -->
@@ -1393,6 +1403,11 @@
 
       <!-- Right: Results -->
       <div class="results-panel">
+        <!-- Postcode confirmation map -->
+        <div id="pc-map-wrap" style="display:none">
+          <div id="pc-map"></div>
+        </div>
+
         <div class="results-header">
           <div class="config-section-heading" style="margin-bottom:0">What this means for you</div>
           <span class="update-flash" id="update-flash">Updated ✓</span>
@@ -1634,16 +1649,18 @@
 // ── Postcode confirmation map ─────────────────────────────────────────────────
 let pcMap = null, pcMapMarker = null;
 
-function showPcMap(lat, lon) {
+function showPcMap(lat, lon, zoom = 16) {
   document.getElementById('pc-map-wrap').style.display = '';
   if (!pcMap) {
     pcMap = L.map('pc-map', { zoomControl: false, attributionControl: false })
-              .setView([lat, lon], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 })
-     .addTo(pcMap);
+              .setView([lat, lon], zoom);
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 19, attribution: '© Esri' }
+    ).addTo(pcMap);
     pcMapMarker = L.marker([lat, lon]).addTo(pcMap);
   } else {
-    pcMap.setView([lat, lon], 13);
+    pcMap.setView([lat, lon], zoom);
     pcMapMarker.setLatLng([lat, lon]);
     pcMap.invalidateSize();
   }
@@ -1758,72 +1775,128 @@ Promise.all([
 const pcInput  = document.getElementById('pc-input');
 const pcBtn    = document.getElementById('pc-btn');
 const pcStatus = document.getElementById('pc-status');
+const pcAcDrop = document.getElementById('pc-ac-dropdown');
+
+function resolveLocation(lat, lon, displayCode, zoom = 16) {
+  const zone = nearestZone(lat, lon);
+  currentZoneKey = zone.key;
+  pcStatus.innerHTML = `<span class="pc-zone">${displayCode}</span>`;
+  document.getElementById('results-placeholder').style.display = 'none';
+  if (currentMode !== 'explore') document.getElementById('results-content').style.display = 'block';
+  showPcMap(lat, lon, zoom);
+  setMapLocation(lat, lon);
+  document.getElementById('hero-section').style.display = '';
+  revealCurrentMode();
+}
 
 async function lookupPostcode() {
-  const raw = pcInput.value.trim().toUpperCase();
+  const raw = pcInput.value.trim();
   if (!raw) return;
+  hideAcDrop();
   pcBtn.disabled = true;
   pcBtn.textContent = 'Looking up…';
   pcStatus.innerHTML = '';
 
-  // Normalise: strip spaces, detect full postcode vs outward/partial code
-  const stripped = raw.replace(/\s+/g, '');
-  // Full UK postcode without space is 5-7 chars; inward code is always exactly 3 chars
-  // Insert space before last 3 chars to get standard format (e.g. DN226UF → DN22 6UF)
-  const isFullPostcode = stripped.length >= 5;
-  const normalised = isFullPostcode
-    ? stripped.slice(0, -3) + ' ' + stripped.slice(-3)
-    : stripped;
+  const stripped = raw.toUpperCase().replace(/\s+/g, '');
+  const looksLikePostcode = /^[A-Z]{1,2}[0-9]/.test(stripped);
 
-  let foundLat, foundLon;
   try {
-    let latitude, longitude, displayCode;
+    let latitude, longitude, displayCode, zoom = 16;
+    let resolved = false;
 
-    if (isFullPostcode) {
-      const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(normalised)}`);
-      const data = await res.json();
-      if (data.status !== 200) throw new Error('not found');
-      latitude  = data.result.latitude;
-      longitude = data.result.longitude;
-      displayCode = data.result.postcode;
-    } else {
-      const res = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(stripped)}`);
-      const data = await res.json();
-      if (data.status !== 200) throw new Error('not found');
-      latitude  = data.result.latitude;
-      longitude = data.result.longitude;
-      displayCode = data.result.outcode + ' (approximate)';
+    if (looksLikePostcode) {
+      const isFullPostcode = stripped.length >= 5;
+      const normalised = isFullPostcode ? stripped.slice(0, -3) + ' ' + stripped.slice(-3) : stripped;
+      try {
+        if (isFullPostcode) {
+          const d = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(normalised)}`).then(r => r.json());
+          if (d.status === 200) { latitude = d.result.latitude; longitude = d.result.longitude; displayCode = d.result.postcode; zoom = 16; resolved = true; }
+        } else {
+          const d = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(stripped)}`).then(r => r.json());
+          if (d.status === 200) { latitude = d.result.latitude; longitude = d.result.longitude; displayCode = d.result.outcode + ' (approximate)'; zoom = 12; resolved = true; }
+        }
+      } catch (_) {}
     }
 
-    const zone = nearestZone(latitude, longitude);
-    currentZoneKey = zone.key;
-    foundLat = latitude;
-    foundLon = longitude;
-
-    pcStatus.innerHTML = `<span class="pc-zone">${displayCode}</span>`;
-    document.getElementById('results-placeholder').style.display = 'none';
-    if (currentMode !== 'explore') {
-      document.getElementById('results-content').style.display = 'block';
+    if (!resolved) {
+      const geoData = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(raw)}&countrycodes=gb&format=json&limit=1&addressdetails=1`,
+        { headers: { 'Accept-Language': 'en' } }
+      ).then(r => r.json());
+      if (!geoData.length) throw new Error('not found');
+      latitude    = parseFloat(geoData[0].lat);
+      longitude   = parseFloat(geoData[0].lon);
+      displayCode = geoData[0].address?.postcode || geoData[0].display_name.split(',').slice(0, 2).join(', ');
+      zoom = 19;
     }
+
+    resolveLocation(latitude, longitude, displayCode, zoom);
   } catch (e) {
-    console.error('Postcode lookup error:', e);
-    pcStatus.innerHTML = `<span class="pc-error">Postcode not recognised — try a full postcode (e.g. SW1A 1AA) or district code (e.g. DN22)</span>`;
+    console.error('Location lookup error:', e);
+    pcStatus.innerHTML = `<span class="pc-error">Location not recognised — try a postcode (e.g. SW1A 1AA) or a street address</span>`;
   } finally {
     pcBtn.disabled = false;
     pcBtn.textContent = 'Find location';
   }
-
-  // Run outside try/catch so a JS error here doesn't show as a postcode failure
-  if (foundLat !== undefined) {
-    showPcMap(foundLat, foundLon);
-    setMapLocation(foundLat, foundLon);
-    document.getElementById('hero-section').style.display = '';
-    revealCurrentMode(); // no-op if no mode chosen yet; fires correctly on re-lookup
-  }
 }
 
+// ── Address autocomplete ───────────────────────────────────────────────────────
+let acTimer = null, acAbort = null;
+
+function hideAcDrop() {
+  pcAcDrop.style.display = 'none';
+  pcAcDrop.innerHTML = '';
+}
+
+function showAcDrop(results) {
+  if (!results.length) { hideAcDrop(); return; }
+  pcAcDrop.innerHTML = results.map(r => {
+    const parts = r.display_name.split(', ');
+    const main  = parts.slice(0, 2).join(', ');
+    const sub   = parts.slice(2, 5).join(', ');
+    return `<div class="ac-item" data-lat="${r.lat}" data-lon="${r.lon}" data-pc="${r.address?.postcode || ''}" data-main="${main.replace(/"/g,'&quot;')}">
+      <span class="ac-main">${main}</span>${sub ? `<span class="ac-sub">${sub}</span>` : ''}
+    </div>`;
+  }).join('');
+  pcAcDrop.style.display = 'block';
+  pcAcDrop.querySelectorAll('.ac-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const lat  = parseFloat(item.dataset.lat);
+      const lon  = parseFloat(item.dataset.lon);
+      const disp = item.dataset.pc || item.dataset.main;
+      pcInput.value = item.dataset.main;
+      hideAcDrop();
+      resolveLocation(lat, lon, disp, 19);
+    });
+  });
+}
+
+pcInput.addEventListener('input', () => {
+  clearTimeout(acTimer);
+  const val = pcInput.value.trim();
+  const stripped = val.toUpperCase().replace(/\s+/g, '');
+  // Suppress suggestions for postcode-like input (e.g. "SW1A 1AA")
+  if (val.length < 3 || /^[A-Z]{1,2}[0-9]/.test(stripped)) { hideAcDrop(); return; }
+  acTimer = setTimeout(async () => {
+    try {
+      if (acAbort) acAbort.abort();
+      acAbort = new AbortController();
+      const data = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=gb&format=json&limit=5&addressdetails=1`,
+        { headers: { 'Accept-Language': 'en' }, signal: acAbort.signal }
+      ).then(r => r.json());
+      showAcDrop(data);
+    } catch (e) { if (e.name !== 'AbortError') console.error(e); }
+  }, 350);
+});
+
+pcInput.addEventListener('blur', () => setTimeout(hideAcDrop, 150));
 pcBtn.addEventListener('click', lookupPostcode);
-pcInput.addEventListener('keydown', e => { if (e.key === 'Enter') lookupPostcode(); });
+pcInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { hideAcDrop(); lookupPostcode(); }
+  if (e.key === 'Escape') hideAcDrop();
+});
 
 // ── Arrays data model (must be declared before applyEasyConfig is called) ─────
 let arrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
@@ -1898,7 +1971,7 @@ let currentHouseMode = 'C';
 function renderHouseCards() {
   const cards = HOUSE_MODES[currentHouseMode];
   document.getElementById('house-size-cards').innerHTML = cards.map(c =>
-    `<button class="easy-card${c.panels === easyPanels ? ' selected' : ''}" data-panels="${c.panels}">
+    `<button class="easy-card" data-panels="${c.panels}">
       <span class="easy-card-title">${c.title}</span>
       <span class="easy-card-sub">${c.sub}${currentHouseMode !== 'A' ? ` · ${c.panels} panels` : ''}</span>
     </button>`
@@ -1931,6 +2004,7 @@ document.getElementById('easy-archetype-cards').addEventListener('click', e => {
   document.querySelectorAll('#easy-archetype-cards .easy-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   ctrlArchtype.value = card.dataset.archetype;
+  if (currentMode === 'explore') easyShowHero();
   calculate();
 });
 
@@ -1983,8 +2057,8 @@ document.getElementById('plugin-battery-cards').addEventListener('click', e => {
   card.classList.add('selected');
   plugInBattery = +card.dataset.pluginBatt;
   applyEasyConfig();
-  calculate();
   if (currentMode === 'explore') easyShowHero();
+  calculate();
 });
 
 
@@ -2008,6 +2082,7 @@ function revealCurrentMode() {
   const inCompare = mode === 'compare';
 
   document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  if (!inCompare && pcMap) setTimeout(() => pcMap.invalidateSize(), 50);
   document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
   document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
   document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
@@ -2038,6 +2113,7 @@ function setMode(mode) {
   if (!currentZoneKey) return;
 
   document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  if (!inCompare && pcMap) setTimeout(() => pcMap.invalidateSize(), 50);
   document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
   document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
   document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
@@ -2065,6 +2141,7 @@ function setMode(mode) {
 
 
 document.getElementById('hero-explore').addEventListener('click',  () => setMode('explore'));
+document.getElementById('switch-to-expert-link').addEventListener('click', e => { e.preventDefault(); setMode('detailed'); });
 document.getElementById('hero-detailed').addEventListener('click', () => setMode('detailed'));
 document.getElementById('hero-compare').addEventListener('click',  () => setMode('compare'));
 
@@ -2298,7 +2375,6 @@ function easyAdvanceHouseSize() {
     el.style.display = '';
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  easyShowHero();
 }
 
 function easyAdvanceRoofDir() {
@@ -2307,7 +2383,6 @@ function easyAdvanceRoofDir() {
     el.style.display = '';
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  easyShowHero();
 }
 
 function easyAdvancePiPanels() {
@@ -2316,7 +2391,6 @@ function easyAdvancePiPanels() {
     el.style.display = '';
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  easyShowHero();
 }
 
 function easyShowHero() {
