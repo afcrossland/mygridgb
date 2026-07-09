@@ -25,7 +25,7 @@
     .postcode-input-row {
       display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
     }
-    #pc-map-wrap { margin-top: 12px; }
+    #pc-map-wrap { margin-top: 0; margin-bottom: 20px; }
     #pc-map {
       height: 160px; border-radius: 8px;
       border: 1px solid var(--border);
@@ -1068,9 +1068,6 @@
         <button id="pc-btn" class="pc-btn">Find location</button>
         <div id="pc-status"></div>
       </div>
-      <div id="pc-map-wrap" style="display:none">
-        <div id="pc-map"></div>
-      </div>
     </div>
 
     <!-- Mode chooser — revealed after postcode -->
@@ -1091,6 +1088,11 @@
         </button>
       </div>
       <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
+    </div>
+
+    <!-- Postcode confirmation map — below mode chooser -->
+    <div id="pc-map-wrap" style="display:none">
+      <div id="pc-map"></div>
     </div>
 
     <div id="calc-grid" class="calc-grid" style="display:none">
