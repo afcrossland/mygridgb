@@ -1,0 +1,2913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Solar Calculator — MyGridGB</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/nav.js" defer></script>
+  <style>
+    /* ── Layout ── */
+    .postcode-row {
+      margin-bottom: 28px;
+      padding: 16px 20px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .postcode-label {
+      display: block;
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .postcode-input-row {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    #pc-map-wrap { margin-bottom: 20px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .pc-map-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 8px 12px 6px; background: var(--bg); }
+    #pc-map {
+      height: 180px;
+      overflow: hidden;
+    }
+    .pc-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      padding: 10px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      width: 180px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .pc-input:focus { border-color: var(--brand); }
+    .pc-input-wrap { position: relative; display: inline-block; }
+    #pc-ac-dropdown {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; max-width: 420px;
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.12); z-index: 500;
+      max-height: 280px; overflow-y: auto;
+    }
+    .ac-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 2px; }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:hover, .ac-item.focused { background: var(--bg); }
+    .ac-main { font-size: 13.5px; font-weight: 500; color: var(--text); }
+    .ac-sub  { font-size: 12px; color: var(--muted); }
+    .pc-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 20px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .pc-btn:hover { background: var(--brand-dark); }
+    .pc-zone {
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .pc-zone strong { color: var(--brand); }
+    .pc-error { font-size: 13.5px; color: #dc2626; }
+
+    /* ── Calculator grid ── */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 820px) {
+      .calc-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Config panel ── */
+    .config-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+    }
+    .config-panel h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--brand);
+      margin-bottom: 20px;
+    }
+    .ctrl-group {
+      margin-bottom: 18px;
+    }
+    .ctrl-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .ctrl-val {
+      font-weight: 700;
+      color: var(--brand);
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--brand);
+      cursor: pointer;
+    }
+    select.ctrl-select {
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: white;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .ctrl-hint { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+    .explore-sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; margin-bottom: 4px; }
+    .orient-tilt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .orient-tilt-col { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+    .orient-tilt-col .ctrl-label { width: 100%; }
+    .orient-tilt-col input[type=range] { width: 100%; }
+    .orient-svg { margin-top: 8px; display: block; }
+    .demand-typical-btns { margin-top: 8px; }
+    .demand-typical-label { font-size: 11.5px; color: var(--muted); display: block; margin-bottom: 6px; }
+    .demand-ofgem-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%; background: var(--muted);
+      color: #fff; font-size: 9px; font-weight: 700; text-decoration: none;
+      vertical-align: middle; margin-left: 2px; line-height: 1;
+    }
+    .demand-ofgem-link:hover { background: var(--brand); }
+    .demand-typical-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+    .demand-preset-btn {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+      padding: 7px 9px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: #fff; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 12px; font-weight: 600; color: var(--text); text-align: left;
+      transition: border-color .15s, background .15s; line-height: 1.25;
+    }
+    .demand-preset-btn span { font-size: 11px; font-weight: 500; color: var(--muted); }
+    .demand-preset-btn .demand-preset-sub { font-size: 10px; }
+    .demand-preset-btn:hover { border-color: var(--brand); }
+    .demand-preset-btn.active { border-color: var(--brand); background: #e8f4fd; }
+
+    .rates-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .rate-input-wrap { display: flex; flex-direction: column; gap: 4px; justify-content: flex-end; }
+    .rate-label { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .rate-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 100%;
+    }
+
+    /* ── Results panel ── */
+    .results-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+    }
+    .results-panel h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--brand);
+      margin-bottom: 20px;
+    }
+
+    /* ── Satellite map ── */
+    #map-section { margin: 12px 0 18px; }
+    .map-toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brand);
+      cursor: pointer;
+      transition: background .15s;
+      margin-bottom: 8px;
+    }
+    .map-toggle-btn:hover { background: #e8f4fd; }
+    #satellite-map {
+      height: 260px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .map-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 7px;
+      font-style: italic;
+    }
+    .map-north {
+      background: rgba(255,255,255,.9) !important;
+      border-radius: 6px !important;
+      padding: 5px 9px !important;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.3;
+      pointer-events: none;
+      box-shadow: 0 1px 5px rgba(0,0,0,.2) !important;
+    }
+
+    /* ── Simple / Detailed mode toggle ── */
+    .config-section-heading {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    /* ── Easy mode cards ── */
+    .easy-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 8px;
+    }
+    .easy-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .easy-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color .15s, background .15s;
+    }
+    .easy-card:hover { border-color: var(--brand); }
+    .easy-card.selected { border-color: var(--brand); background: #e8f4fd; }
+    .easy-card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .easy-card-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .easy-mode-hint  { font-size: 12px; color: var(--muted); margin-top: 14px; font-style: italic; }
+    .system-type-toggle { display: flex; gap: 6px; margin-bottom: 16px; }
+    .sys-type-btn {
+      flex: 1; padding: 9px 10px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s; text-align: center;
+    }
+    .sys-type-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .house-mode-toggle {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .house-mode-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 9px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .12s, background .12s, color .12s;
+    }
+    .house-mode-btn:hover { border-color: var(--brand); color: var(--brand); }
+    .house-mode-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+    /* ── Roof mode tabs ── */
+    .roof-tabs {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .roof-tab {
+      flex: 1;
+      padding: 6px 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-align: center;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .roof-tab.active {
+      background: var(--surface);
+      color: var(--brand);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+
+    /* ── Array rows ── */
+    .array-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+    .array-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .array-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand);
+      flex: 1;
+    }
+    .array-gen-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .arr-remove {
+      background: none;
+      border: 1px solid #e5e7eb;
+      border-radius: 5px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1;
+      padding: 2px 7px;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .arr-remove:hover { border-color: #dc2626; color: #dc2626; }
+    .array-controls {
+      display: grid;
+      grid-template-columns: 60px 1fr 60px;
+      gap: 8px;
+      align-items: end;
+    }
+    .arr-field { display: flex; flex-direction: column; gap: 3px; }
+    .arr-field label { font-size: 11px; font-weight: 600; color: var(--muted); }
+    .arr-field input[type=number],
+    .arr-field select {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 5px 7px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      width: 100%;
+      background: white;
+    }
+    .arrays-footer {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 6px;
+    }
+    .add-arr-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1px dashed var(--brand);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--brand);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .add-arr-btn:hover { background: #e8f4fd; }
+    .add-arr-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .array-total-label {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .array-total-label strong { color: var(--brand); }
+
+    /* ── Payback table ── */
+    .payback-section {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Intent hero ─────────────────────────────────────────── */
+    .calc-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 700px) {
+      .calc-hero { grid-template-columns: 1fr; }
+    }
+    .hero-card {
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 20px 24px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform .15s, box-shadow .15s, border-color .15s;
+    }
+    .hero-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+    /* "I'm just looking" — warm amber/solar */
+    #hero-explore {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-color: #fcd34d;
+    }
+    #hero-explore:hover { border-color: #f59e0b; }
+    #hero-explore.active {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-color: #b45309;
+    }
+    #hero-explore.active .hero-card-title,
+    #hero-explore.active .hero-card-sub { color: #fff; }
+
+    /* "I have quotes" — cool blue/brand */
+    #hero-compare {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-color: #93c5fd;
+    }
+    #hero-compare:hover { border-color: #3b82f6; }
+    #hero-compare.active {
+      background: linear-gradient(135deg, #1a4d7a 0%, #1e3a5f 100%);
+      border-color: #143d61;
+    }
+    #hero-compare.active .hero-card-title,
+    #hero-compare.active .hero-card-sub { color: #fff; }
+
+    /* "Expert designer" — green */
+    #hero-detailed {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border-color: #6ee7b7;
+    }
+    #hero-detailed:hover { border-color: #059669; }
+    #hero-detailed.active {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border-color: #065f46;
+    }
+    #hero-detailed.active .hero-card-title,
+    #hero-detailed.active .hero-card-sub { color: #fff; }
+
+    .hero-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hero-card-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .hero-guide-link {
+      text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 10px;
+    }
+    .hero-guide-link a { color: var(--brand); text-decoration: none; }
+    .hero-guide-link a:hover { text-decoration: underline; }
+    .hero-prompt {
+      font-size: 15px; font-weight: 600; color: var(--muted);
+      text-align: center; margin-bottom: 10px; letter-spacing: .01em;
+    }
+    .hero-card-icon { font-size: 28px; margin-bottom: 6px; }
+    .easy-section-hint {
+      font-size: 12.5px; color: var(--muted); margin: -4px 0 10px;
+      line-height: 1.5;
+    }
+
+    /* ── Compare mode ───────────────────────────────────────── */
+    main.compare-mode { display: flex; flex-direction: column; }
+    main.compare-mode .page-title    { order: 1; }
+    main.compare-mode .page-intro    { order: 2; }
+    main.compare-mode #hero-section   { order: 3; }
+    main.compare-mode #quotes-panel  { order: 4; display: block !important; margin-bottom: 20px; }
+    main.compare-mode #calc-grid     { order: 5; }
+    main.compare-mode #compare-panel { display: none !important; }
+    main.compare-mode .method-details { order: 6; }
+    .quotes-add-btn { border-color: var(--brand) !important; color: var(--brand) !important; font-weight: 700 !important; }
+    .quotes-add-btn:hover { background: var(--brand) !important; color: #fff !important; }
+
+    /* ── Battery slider ────────────────────────────────────── */
+    .battery-slider-wrap {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .battery-slider {
+      flex: 1; accent-color: var(--brand); cursor: pointer;
+    }
+    .battery-num-input {
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      width: 64px; padding: 5px 8px;
+      border: 1px solid var(--border); border-radius: 6px;
+      text-align: right;
+    }
+    .battery-num-input:focus { outline: none; border-color: var(--brand); }
+    .battery-unit { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .battery-slider-wrap--sm .battery-num-input { width: 54px; }
+
+    /* ── Inline add-quote form ────────────────────────────── */
+    .quote-add-form {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .qf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .qf-field--wide { grid-column: span 3; }
+    .qf-label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .qf-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 100%;
+      background: #fff;
+    }
+    .qf-actions { display: flex; gap: 8px; }
+    .qf-save-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      padding: 8px 20px;
+      border: none; border-radius: 7px;
+      background: var(--brand); color: #fff; cursor: pointer;
+    }
+    .qf-cancel-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: 7px;
+      background: transparent; color: var(--muted); cursor: pointer;
+    }
+    .qf-hint {
+      font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+    }
+    .qf-field--battery { grid-column: span 3; }
+    @media (max-width: 600px) {
+      .qf-grid { grid-template-columns: 1fr 1fr; }
+      .qf-field--wide { grid-column: span 2; }
+      .qf-field--battery { grid-column: span 2; }
+    }
+
+    /* ── Array builder in quote form ──────────────────────── */
+    .qf-arrays-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 10px 0 6px;
+    }
+    .qf-arrays-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .qf-add-array-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      padding: 4px 10px; border: 1.5px solid var(--brand); border-radius: 6px;
+      background: transparent; color: var(--brand); cursor: pointer;
+    }
+    .qf-add-array-btn:hover { background: var(--brand); color: #fff; }
+    .qf-array-row {
+      display: grid; grid-template-columns: 60px 1fr 1fr 1fr auto;
+      gap: 8px; align-items: end; padding: 8px 0;
+      border-top: 1px solid #f1f5f9;
+    }
+    .qf-array-num { font-size: 12px; font-weight: 700; color: var(--muted); padding-bottom: 8px; }
+    .qf-arr-remove {
+      font-family: 'DM Sans', sans-serif; font-size: 11px;
+      padding: 6px 8px; border: 1px solid #fecaca; border-radius: 6px;
+      background: transparent; color: #dc2626; cursor: pointer; margin-bottom: 1px;
+    }
+    .qf-arr-remove:hover { background: #fef2f2; }
+    #quotes-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    @media (max-width: 640px) {
+      .qf-array-row { grid-template-columns: 1fr 1fr; }
+      .qf-array-num { grid-column: span 2; }
+      .qf-arr-remove { grid-column: span 2; }
+    }
+
+    /* ── Shared assumptions ────────────────────────────────── */
+    .shared-assumptions {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .shared-assumptions-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); margin-bottom: 4px;
+    }
+    .shared-assumptions-note {
+      font-size: 12px; color: var(--muted); margin-bottom: 12px;
+      background: #f8fafc; border-radius: 6px; padding: 6px 10px;
+      border-left: 3px solid #93c5fd;
+    }
+    .shared-inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: auto auto auto;
+      gap: 4px 10px;
+    }
+    .shared-input-wrap {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      align-items: start;
+    }
+    .shared-label {
+      font-size: 11.5px; font-weight: 600; color: var(--muted);
+      align-self: start;
+    }
+    .shared-input {
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      padding: 6px 10px; border: 1px solid var(--border);
+      border-radius: 7px; width: 100%; align-self: center;
+    }
+    .shared-input:focus { outline: none; border-color: var(--brand); }
+    .shared-hint {
+      font-size: 10.5px; color: var(--muted); line-height: 1.35;
+      opacity: .8; align-self: start;
+    }
+    @media (max-width: 900px) {
+      .shared-inputs-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .shared-inputs-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .inline-add-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 700;
+      color: var(--brand); background: none; border: none; cursor: pointer;
+      padding: 0; text-decoration: underline;
+    }
+    .inline-add-btn:hover { color: var(--brand-dark); }
+    .quotes-table-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 18px 0 8px;
+    }
+    .quotes-table-heading {
+      font-size: 13px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .06em; margin: 0;
+    }
+    .quotes-empty-hint {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--muted);
+      font-size: 13.5px;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+    }
+    .compare-config-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin: 20px 0 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Quote save ─────────────────────────────────────────── */
+    .quote-save-row {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .quote-add-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1.5px dashed var(--brand);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--brand);
+      cursor: pointer;
+      width: 100%;
+      transition: background .12s, color .12s;
+    }
+    .quote-add-btn:hover { background: var(--brand); color: #fff; }
+    .quote-save-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .quote-name-input, .quote-price-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 100%;
+    }
+    .quote-save-btns { display: flex; gap: 6px; }
+    .quote-confirm-btn {
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px;
+      border: none;
+      border-radius: 7px;
+      background: var(--brand);
+      color: #fff;
+      cursor: pointer;
+    }
+    .quote-cancel-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    /* ── Quotes comparison panel ────────────────────────────── */
+    .quotes-panel {
+      margin-top: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+    }
+    .quotes-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .quotes-panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .quotes-panel-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .quotes-action-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .12s, color .12s;
+    }
+    .quotes-action-btn:hover { border-color: var(--brand); color: var(--brand); }
+    .quotes-clear-btn:hover { border-color: #dc2626; color: #dc2626; }
+    .quotes-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .quotes-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .quotes-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      padding: 4px 8px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .quotes-table td {
+      padding: 9px 8px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .quotes-table tr:last-child td { border-bottom: none; }
+    .q-name { font-weight: 600; }
+    .q-tag {
+      font-size: 10px;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: var(--muted);
+      border-radius: 3px;
+      padding: 1px 4px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .q-edit-btn, .q-del-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+    }
+    .q-edit-btn { color: var(--brand); }
+    .q-edit-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .q-del-btn { color: #dc2626; margin-left: 3px; }
+    .q-del-btn:hover { background: #fef2f2; border-color: #dc2626; }
+    .payback-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .payback-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .payback-table th {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 3px 6px 6px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .payback-table td {
+      padding: 7px 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .payback-table tr:last-child td { border-bottom: none; }
+    .payback-table .mid-row td { font-weight: 700; }
+    .payback-table .mid-row .pb-yrs { color: var(--brand); }
+    .pb-yrs { font-weight: 600; }
+    .payback-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── Gauge ── */
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .gauge-wrap svg { width: 100%; max-width: 260px; }
+
+    /* ── Results header ── */
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .results-header h2 { margin-bottom: 0; }
+    .update-flash {
+      font-size: 12px;
+      font-weight: 600;
+      color: #0e7a3e;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .update-flash.show { opacity: 1; }
+    #gauge-arc { transition: stroke-dasharray 0.5s ease; }
+
+    /* ── Plain-language summary ── */
+    .payback-cost-note { font-size: 11.5px; color: var(--muted); margin: 2px 0 8px; }
+    .salary-sac-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; cursor: pointer; }
+    .salary-sac-toggle input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
+    .salary-sac-note { font-size: 12px; color: #059669; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 6px 10px; margin: 0 0 8px; }
+    .results-system-summary {
+      font-size: 12.5px; color: var(--muted); margin-bottom: 10px;
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    .results-sys-chip {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3px 10px; font-size: 12px;
+      font-weight: 600; color: var(--text);
+    }
+    .results-summary {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+      margin: -10px 0 18px;
+      text-align: center;
+    }
+    .results-summary strong { color: var(--brand); }
+
+    /* ── Stat cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-card .stat-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .stat-card .stat-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    .stat-card.highlight { background: #e8f4fd; border-color: #b6d8f2; }
+    .stat-card.highlight .stat-val { color: var(--brand); }
+
+    /* ── How this tool works ── */
+    .method-details {
+      margin-top: 28px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .method-details summary {
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--brand);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .method-details summary::-webkit-details-marker { display: none; }
+    .method-details summary::before {
+      content: '▶';
+      font-size: 10px;
+      transition: transform .2s;
+      color: var(--muted);
+    }
+    .method-details[open] summary::before { transform: rotate(90deg); }
+    .method-body {
+      padding: 0 24px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .method-body h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 18px 0 6px;
+    }
+    .method-body p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .method-body a { font-size: 13.5px; }
+
+    /* ── Easy mode step sections ── */
+    .easy-step-section {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+    .easy-step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .easy-step-num {
+      min-width: 24px; height: 24px; border-radius: 50%;
+      background: var(--brand); color: #fff;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .easy-step-q { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+
+    /* ── Hero result (easy mode) ── */
+    .results-hero {
+      text-align: center; padding: 8px 0 20px;
+      margin-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .results-hero-label { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    .results-hero-amount {
+      font-size: 52px; font-weight: 800; color: var(--brand); line-height: 1; margin-bottom: 2px;
+    }
+    .results-hero-unit { font-size: 15px; color: var(--muted); margin-bottom: 12px; }
+    .results-hero-sentence { font-size: 13.5px; color: var(--text); line-height: 1.65; margin: 0 0 16px; }
+    .results-hero-sentence strong { color: var(--brand); }
+    .results-breakdown-btn {
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      color: var(--brand); background: none; border: 1px solid var(--brand);
+      border-radius: 7px; padding: 8px 20px; cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .results-breakdown-btn:hover { background: var(--brand); color: #fff; }
+
+    .quote-cta {
+      margin-top: 20px; padding: 16px 18px;
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 9px;
+    }
+    .quote-cta-heading { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .quote-cta-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .quote-cta-btn {
+      display: inline-block; font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px; font-weight: 700;
+      background: var(--brand); color: #fff;
+      border: none; border-radius: 7px; padding: 10px 20px;
+      cursor: pointer; text-decoration: none; transition: background .15s;
+    }
+    .quote-cta-btn:hover { background: var(--brand-dark); color: #fff; text-decoration: none; }
+
+    /* ── Placeholder state ── */
+    .results-placeholder {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .results-placeholder .placeholder-icon {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <main>
+    <h1 class="page-title">Home Solar Calculator</h1>
+    <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year.</p>
+
+    <!-- Postcode lookup — shown immediately -->
+    <div class="postcode-row">
+      <label class="postcode-label">Enter your postcode or address — we use it to look up how much sunshine your area gets</label>
+      <div class="postcode-input-row">
+        <div class="pc-input-wrap">
+          <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or 14 Green Lane, Sheffield" autocomplete="off" style="width:280px">
+          <div id="pc-ac-dropdown"></div>
+        </div>
+        <button id="pc-btn" class="pc-btn">Find location</button>
+        <div id="pc-status"></div>
+      </div>
+    </div>
+
+    <!-- Mode chooser — revealed after postcode -->
+    <div id="hero-section" style="display:none">
+      <p class="hero-prompt">What would you like to do?</p>
+      <div id="calc-hero" class="calc-hero">
+        <button class="hero-card" id="hero-explore">
+          <div class="hero-card-title">I'm just looking</div>
+          <div class="hero-card-sub">See what rooftop or plug-in solar could do for your home — enter a few details and get an instant estimate</div>
+        </button>
+        <button class="hero-card" id="hero-detailed">
+          <div class="hero-card-title">I have a good idea of what I want</div>
+          <div class="hero-card-sub">I know roughly how many panels my roof can fit and I want a more bespoke outcome</div>
+        </button>
+        <button class="hero-card" id="hero-compare">
+          <div class="hero-card-title">I have quotes to compare</div>
+          <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
+        </button>
+      </div>
+      <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
+    </div>
+
+    <div id="calc-grid" class="calc-grid" style="display:none">
+
+      <!-- Left: Configuration -->
+      <div class="config-panel">
+
+        <div class="config-section-heading">Your solar design</div>
+
+        <!-- ── Shared: demand (expert mode only; explore mode uses step 1) ── -->
+        <div class="ctrl-group" id="demand-ctrl-group">
+          <div class="ctrl-label">
+            <span>Annual electricity use</span>
+            <span class="ctrl-val" id="val-demand">2,700 kWh</span>
+          </div>
+          <p class="easy-section-hint">Your annual electricity use is the amount of energy your home consumes in a year. Your supplier bill will usually estimate the amount or it might be on your smart meter. We have provided typical values to make it easy to get started. One kWh is equivalent to boiling a kettle 10 times.</p>
+          <input type="range" id="ctrl-demand" min="1000" max="8000" value="2700" step="100">
+          <div class="demand-typical-btns">
+            <span class="demand-typical-label">Not sure? Use Ofgem typical values <a class="demand-ofgem-link" href="https://www.ofgem.gov.uk/consultation/review-typical-domestic-consumption-values" target="_blank" rel="noopener" title="Ofgem typical domestic consumption values">?</a></span>
+            <div class="demand-typical-row">
+              <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="4100">High<span>4,100 kWh</span><span class="demand-preset-sub">4–5 people, 5-bed</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Explore panel (stepped flow) ── -->
+        <div id="explore-panel">
+          <div class="ctrl-label"><span>What type of solar are you interested in?</span></div>
+          <div class="system-type-toggle">
+            <button class="sys-type-btn active" id="sys-rooftop">Rooftop solar</button>
+            <button class="sys-type-btn" id="sys-plugin">Plug-in solar</button>
+          </div>
+
+          <!-- Step 1: Electricity use -->
+          <div class="easy-step-section" id="easy-s1">
+            <div class="easy-step-header">
+              <span class="easy-step-num">1</span>
+              <span class="easy-step-q">How much electricity does your home use?</span>
+            </div>
+            <p class="easy-section-hint">This is the starting point — we use it to design your system and work out how much solar can cover. Check a recent bill, or use a typical value below.</p>
+            <div class="demand-typical-row">
+              <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
+              <button class="demand-preset-btn" data-kwh="4100">High<span>4,100 kWh</span><span class="demand-preset-sub">4–5 people, 5-bed</span></button>
+            </div>
+          </div>
+
+          <!-- Rooftop path -->
+          <!-- Step 2 RT: House size -->
+          <div class="easy-step-section" id="easy-s2-rt" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">2</span>
+              <span class="easy-step-q">How big is your home?</span>
+            </div>
+            <p class="easy-section-hint">We use this to estimate how many panels your roof can fit.</p>
+            <div class="house-mode-toggle">
+              <button class="house-mode-btn active" data-hmode="C">Estimate from my house type</button>
+              <button class="house-mode-btn" data-hmode="A">I can guess the number of panels</button>
+            </div>
+            <div class="easy-cards" id="house-size-cards"></div>
+          </div>
+
+          <!-- Step 3 RT: Roof direction -->
+          <div class="easy-step-section" id="easy-s3-rt" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">3</span>
+              <span class="easy-step-q">Which way does your main roof face?</span>
+            </div>
+            <p class="easy-section-hint">South-facing roofs get the most sun. Not sure? Pick "Not sure" — we'll assume a typical SE/SW facing.</p>
+            <div class="easy-cards" id="roof-dir-cards">
+              <button class="easy-card" data-az="0">
+                <span class="easy-card-title">South</span>
+                <span class="easy-card-sub">Best for solar</span>
+              </button>
+              <button class="easy-card" data-az="45">
+                <span class="easy-card-title">SE or SW</span>
+                <span class="easy-card-sub">Still very good</span>
+              </button>
+              <button class="easy-card" data-az="90">
+                <span class="easy-card-title">East or West</span>
+                <span class="easy-card-sub">Moderate yield</span>
+              </button>
+              <button class="easy-card" data-az="45">
+                <span class="easy-card-title">Not sure</span>
+                <span class="easy-card-sub">We'll assume SE/SW</span>
+              </button>
+            </div>
+            <div id="map-section" style="display:none">
+              <button class="map-toggle-btn" id="map-toggle-btn">Need help? Show satellite view ▾</button>
+              <div id="map-wrap" style="display:none">
+                <div id="satellite-map"></div>
+                <p class="map-hint">Find your roof — the N↑ arrow shows north. Use this to judge which way your roof faces, then select above.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 RT: Home during day -->
+          <div class="easy-step-section" id="easy-s4-rt" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">4</span>
+              <span class="easy-step-q">Are you usually home during the day?</span>
+            </div>
+            <p class="easy-section-hint">This affects how much of the solar electricity you use directly — and how much gets exported back to the grid.</p>
+            <div class="easy-cards" id="easy-archetype-cards">
+              <button class="easy-card" data-archetype="outallday">
+                <span class="easy-card-title">Mostly out</span>
+                <span class="easy-card-sub">Commuter — out most of the day</span>
+              </button>
+              <button class="easy-card" data-archetype="inhalftheday">
+                <span class="easy-card-title">Sometimes home</span>
+                <span class="easy-card-sub">Mix of home and away</span>
+              </button>
+              <button class="easy-card" data-archetype="homeallday">
+                <span class="easy-card-title">Home all day</span>
+                <span class="easy-card-sub">Retired or working from home</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Plug-in path -->
+          <!-- Step 2 PI: Panels -->
+          <div class="easy-step-section" id="easy-s2-pi" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">2</span>
+              <span class="easy-step-q">How many panels?</span>
+            </div>
+            <p class="easy-section-hint">Balcony or plug-in systems use compact 400W panels that clip onto railings or sit on a flat roof. No scaffolding needed.</p>
+            <div class="easy-cards" id="plugin-panels-cards">
+              <button class="easy-card" data-plugin-panels="1">
+                <span class="easy-card-title">1 panel</span>
+                <span class="easy-card-sub">0.4 kWp</span>
+              </button>
+              <button class="easy-card" data-plugin-panels="2">
+                <span class="easy-card-title">2 panels</span>
+                <span class="easy-card-sub">0.8 kWp</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3 PI: Battery -->
+          <div class="easy-step-section" id="easy-s3-pi" style="display:none">
+            <div class="easy-step-header">
+              <span class="easy-step-num">3</span>
+              <span class="easy-step-q">Would you like a plug-in battery?</span>
+            </div>
+            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed.</p>
+            <div class="easy-cards" id="plugin-battery-cards">
+              <button class="easy-card" data-plugin-batt="0">
+                <span class="easy-card-title">No battery</span>
+                <span class="easy-card-sub">Export surplus</span>
+              </button>
+              <button class="easy-card" data-plugin-batt="2.5">
+                <span class="easy-card-title">1 × 2.5 kWh</span>
+                <span class="easy-card-sub">Typical plug-in size</span>
+              </button>
+              <button class="easy-card" data-plugin-batt="5">
+                <span class="easy-card-title">2 × 2.5 kWh</span>
+                <span class="easy-card-sub">Maximum storage</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="easy-mode-hint" id="easy-mode-hint">Want exact tariff rates or multiple roof faces? <a href="#" id="switch-to-expert-link">Switch to Expert designer</a></p>
+        </div>
+
+        <!-- ── Detailed panel ── -->
+        <div id="detailed-panel" style="display:none">
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Are you home during the day?</span></div>
+            <select id="ctrl-archetype" class="ctrl-select">
+              <option value="inhalftheday" selected>Prefer not to say</option>
+              <option value="homeallday">Yes — home all day (retired, WFH)</option>
+              <option value="inhalftheday">Sometimes — in for part of the day</option>
+              <option value="outallday">No — out all day (commuter household)</option>
+            </select>
+            <div class="ctrl-hint">If you're home during the day you'll use more solar electricity directly, so you save more. If you're out, more gets exported to the grid.</div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Your electricity rates</span></div>
+            <div class="rates-row">
+              <div class="rate-input-wrap">
+                <label class="rate-label" for="ctrl-import">Day rate (p/kWh)</label>
+                <input id="ctrl-import" class="rate-input" type="number" value="24.7" min="1" max="100" step="0.5">
+              </div>
+              <div class="rate-input-wrap">
+                <label class="rate-label" for="ctrl-export">What you earn exporting (p/kWh)</label>
+                <input id="ctrl-export" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
+              </div>
+              <div class="rate-input-wrap">
+                <label class="rate-label" for="ctrl-cheap">Overnight cheap rate (p/kWh)</label>
+                <input id="ctrl-cheap" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
+              </div>
+            </div>
+            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for your import (day) rate. The export rate (SEG) is what your energy supplier pays for surplus solar. <strong>Overnight rate:</strong> only fill this in if you're on Economy 7 or a similar time-of-use tariff — leave blank if not, and we'll use your day rate.</div>
+            <div class="ctrl-label" style="margin-top:12px">
+              <span>Electricity price rises</span>
+              <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
+            </div>
+            <input type="range" id="ctrl-inflation" min="0" max="10" value="3" step="0.1">
+            <div class="ctrl-hint">Electricity prices tend to rise over time. This adjusts future savings to account for likely increases — making solar even more valuable in later years.</div>
+            <div class="ctrl-label" style="margin-top:12px">
+              <span>Boost to home value</span>
+              <span class="ctrl-val" id="val-houseval">£0</span>
+            </div>
+            <input type="range" id="ctrl-houseval" min="0" max="15000" value="0" step="500">
+            <div class="ctrl-hint">Solar panels can add value when you sell your home. Evidence varies — leave at £0 if you'd rather not include this.</div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label">
+              <span>Solar panels</span>
+              <span class="ctrl-val" id="val-total-kwp">3.80 kWp</span>
+            </div>
+
+            <div class="roof-tabs">
+              <button class="roof-tab active" id="tab-single">Single roof</button>
+              <button class="roof-tab" id="tab-multi">Multiple roofs</button>
+            </div>
+
+            <!-- Single roof -->
+            <div id="panel-single">
+              <div class="ctrl-label" style="margin-top:8px">
+                <span>Number of panels</span>
+                <span class="ctrl-val" id="val-panels">10 panels</span>
+              </div>
+              <input type="range" id="ctrl-panels" min="1" max="30" value="10" step="1">
+              <div class="orient-tilt-row" style="margin-top:10px">
+                <div class="orient-tilt-col">
+                  <div class="ctrl-label">
+                    <span>Orientation</span>
+                    <span class="ctrl-val" id="val-orient">SE / SW (45°)</span>
+                  </div>
+                  <svg id="compass-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                    <circle cx="32" cy="32" r="29" fill="#f8fafc" stroke="var(--border)" stroke-width="1.5"/>
+                    <text x="32" y="9"  text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">N</text>
+                    <text x="32" y="60" text-anchor="middle" font-size="8" font-weight="700" fill="#f59e0b"      font-family="DM Sans,sans-serif">S</text>
+                    <text x="57" y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">E</text>
+                    <text x="7"  y="36" text-anchor="middle" font-size="8" font-weight="700" fill="var(--muted)" font-family="DM Sans,sans-serif">W</text>
+                    <!-- Arrow: shaft from centre, arrowhead pointing south at 0°, rotates clockwise -->
+                    <g id="compass-needle" transform="rotate(0 32 32)">
+                      <line x1="32" y1="32" x2="32" y2="48" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                      <polygon points="32,54 28,46 36,46" fill="#f59e0b"/>
+                    </g>
+                  </svg>
+                  <input type="range" id="ctrl-orient" min="-175" max="175" value="-45" step="5">
+                </div>
+                <div class="orient-tilt-col">
+                  <div class="ctrl-label">
+                    <span>Roof pitch</span>
+                    <span class="ctrl-val" id="val-tilt">35°</span>
+                  </div>
+                  <svg id="tilt-svg" class="orient-svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                    <!-- Ground line -->
+                    <line x1="6" y1="52" x2="58" y2="52" stroke="var(--border)" stroke-width="1.5" stroke-linecap="round"/>
+                    <!-- Wall -->
+                    <line x1="14" y1="52" x2="14" y2="28" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                    <!-- Roof surface: pivots at wall top (14,28), initial 35° -->
+                    <line id="tilt-roof-line" x1="14" y1="28" x2="45.1" y2="6.2" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Angle arc from horizontal to roof -->
+                    <path id="tilt-arc" d="M 26 28 A 12 12 0 0 0 23.8 18.8" fill="none" stroke="var(--brand)" stroke-width="1" opacity="0.6"/>
+                    <!-- Angle label -->
+                    <text id="tilt-angle-text" x="28" y="27" font-size="8" fill="var(--brand)" font-family="DM Sans,sans-serif" opacity="0.8">35°</text>
+                  </svg>
+                  <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
+                </div>
+              </div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical — a standard pitched roof.</div>
+            </div>
+
+            <!-- Multiple roofs -->
+            <div id="panel-multi" style="display:none">
+              <div id="arrays-container"></div>
+              <div class="arrays-footer">
+                <button id="add-array-btn" class="add-arr-btn">+ Add array</button>
+                <span class="array-total-label">Total: <strong id="arr-total-gen">—</strong></span>
+              </div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is 475 Wp · max 10 arrays</div>
+            </div>
+          </div>
+
+          <div class="ctrl-group">
+            <div class="ctrl-label"><span>Battery storage</span></div>
+            <div class="battery-slider-wrap">
+              <input type="range" id="ctrl-battery" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
+              <input type="number" id="ctrl-battery-num" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
+              <span class="battery-unit">kWh</span>
+            </div>
+            <div class="ctrl-hint">A battery stores spare solar energy to use after dark. A 5–10 kWh battery suits most homes. Set to 0 if you don't want a battery.</div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Right: Results -->
+      <div class="results-panel">
+        <!-- Postcode confirmation map -->
+        <div id="pc-map-wrap" style="display:none">
+          <div id="pc-map"></div>
+        </div>
+
+        <div class="results-header">
+          <div class="config-section-heading" style="margin-bottom:0">What this means for you</div>
+          <span class="update-flash" id="update-flash">Updated ✓</span>
+        </div>
+
+        <!-- Placeholder state (no postcode yet) -->
+        <div id="results-placeholder" class="results-placeholder">
+          <span class="placeholder-icon">☀️</span>
+          Use your postcode to estimate your solar potential.
+        </div>
+
+        <!-- Easy mode hero — shown after step 2+ -->
+        <div id="results-hero" class="results-hero" style="display:none">
+          <div class="results-hero-label">You could save around</div>
+          <div class="results-hero-amount" id="hero-saving-amount">£—</div>
+          <div class="results-hero-unit">per year</div>
+          <p class="results-hero-sentence" id="hero-sentence"></p>
+          <button class="results-breakdown-btn" id="results-breakdown-btn">See full breakdown ↓</button>
+        </div>
+
+        <!-- Results (hidden until postcode entered) -->
+        <div id="results-content" style="display:none">
+          <div id="results-system-summary" class="results-system-summary"></div>
+          <!-- SVG Gauge -->
+          <div class="gauge-wrap">
+            <svg viewBox="0 0 220 130" role="img" aria-label="Solar self-supply gauge">
+              <!-- Background track -->
+              <path d="M 15 115 a 95 95 0 0 1 190 0"
+                    fill="none" stroke="#e5e7eb" stroke-width="16" stroke-linecap="round"/>
+              <!-- Fill (dynamic via JS) -->
+              <path id="gauge-arc"
+                    d="M 15 115 a 95 95 0 0 1 190 0"
+                    fill="none" stroke="#f59e0b" stroke-width="16"
+                    stroke-linecap="round"
+                    stroke-dasharray="0 299"/>
+              <!-- Percentage -->
+              <text id="gauge-text" x="110" y="90" text-anchor="middle"
+                    font-size="40" font-weight="700" fill="#0F172A"
+                    font-family="DM Sans, sans-serif">--%</text>
+              <text text-anchor="middle" font-size="11" fill="#0F172A" font-family="DM Sans, sans-serif">
+                <tspan x="110" y="112">of your home powered</tspan>
+                <tspan x="110" dy="14">by your roof</tspan>
+              </text>
+            </svg>
+          </div>
+
+          <!-- Plain-language summary -->
+          <p id="stat-summary" class="results-summary"></p>
+
+          <!-- Payback table -->
+          <div class="payback-section">
+            <div class="payback-heading">Estimated payback</div>
+            <label class="salary-sac-toggle">
+              <input type="checkbox" id="salary-sac-chk">
+              <span>Paying via salary sacrifice?</span>
+            </label>
+            <p class="salary-sac-note" id="salary-sac-note" style="display:none"></p>
+            <p class="payback-cost-note" id="payback-cost-note"></p>
+            <table class="payback-table">
+              <thead>
+                <tr>
+                  <th>Install cost</th>
+                  <th>Yr 1 saving</th>
+                  <th>Yr 5 saving</th>
+                  <th>Payback</th>
+                </tr>
+              </thead>
+              <tbody id="payback-body">
+                <tr><td colspan="3">—</td></tr>
+              </tbody>
+            </table>
+          </div><!-- payback-section -->
+
+          <!-- Stat tiles -->
+          <div class="stats-grid">
+            <div class="stat-card highlight">
+              <div class="stat-label">Generated on your roof</div>
+              <div class="stat-val" id="stat-gen">—</div>
+              <div class="stat-sub">kWh / year</div>
+            </div>
+            <div class="stat-card highlight">
+              <div class="stat-label">Annual saving</div>
+              <div class="stat-val" id="stat-saving">—</div>
+              <div class="stat-sub" id="stat-import-line">&nbsp;</div>
+              <div class="stat-sub" id="stat-export-line">&nbsp;</div>
+              <div class="stat-sub" id="stat-arbitrage-line" style="color:#0e7a3e">&nbsp;</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Used from your roof</div>
+              <div class="stat-val" id="stat-self">—</div>
+              <div class="stat-sub">kWh you don't buy from the grid</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Sold back to grid</div>
+              <div class="stat-val" id="stat-export">—</div>
+              <div class="stat-sub">kWh surplus exported</div>
+            </div>
+          </div>
+
+
+          <div class="quote-cta">
+            <div class="quote-cta-heading">Ready to get real prices?</div>
+            <div class="quote-cta-sub">Vetted installers quote against this exact design — fixed format, no phone calls, you stay anonymous until you choose someone.</div>
+            <a href="/mygridgb-quotes/" class="quote-cta-btn">Put this design out to quote →</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- .calc-grid -->
+
+    <div id="compare-panel" style="display:none"></div>
+
+    <div id="quotes-panel" class="quotes-panel" style="display:none">
+      <div class="quotes-panel-header">
+        <h3 class="quotes-panel-title">Compare quotes</h3>
+        <div class="quotes-panel-actions">
+          <button id="quotes-download-btn" class="quotes-action-btn">↓ Save for Later</button>
+          <label class="quotes-action-btn" style="cursor:pointer">↑ Upload save file
+            <input type="file" id="quotes-upload-input" accept=".json" style="display:none">
+          </label>
+        </div>
+      </div>
+      <!-- Shared assumptions (always visible in Compare mode) -->
+      <div class="shared-assumptions">
+        <div class="shared-assumptions-title">About your home</div>
+        <div class="shared-assumptions-note">💡 We've pre-filled typical UK values — you only need to change these if you know your exact figures.</div>
+        <div class="shared-inputs-grid">
+          <div class="shared-input-wrap">
+            <label class="shared-label">Annual electricity use (kWh)</label>
+            <input type="number" id="sa-demand" class="shared-input" min="500" max="10000" step="100">
+            <div class="shared-hint">From your bill or smart meter. ~2,700 kWh is typical.</div>
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Home during the day?</label>
+            <select id="sa-archtype" class="shared-input">
+              <option value="inhalftheday" selected>Prefer not to say</option>
+              <option value="homeallday">Home all day</option>
+              <option value="inhalftheday">In half the day</option>
+              <option value="outallday">Out all day</option>
+            </select>
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Day rate — what you pay (p/kWh)</label>
+            <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
+            <div class="shared-hint">Your standard electricity rate. Check your bill.</div>
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">What you earn exporting (p/kWh)</label>
+            <input type="number" id="sa-export" class="shared-input" min="0" max="50" step="0.5">
+            <div class="shared-hint">What your supplier pays you for surplus solar sent back to the grid (Smart Export Guarantee).</div>
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Overnight cheap rate (p/kWh) <span style="font-weight:400;opacity:.7">(optional)</span></label>
+            <input type="number" id="sa-overnight" class="shared-input" value="7" min="0" max="50" step="0.5">
+            <div class="shared-hint">Default is 7p (Economy 7 or similar time-of-use tariff). Adjust if your tariff differs, or set to 0 if you have no cheap overnight rate.</div>
+          </div>
+          <div class="shared-input-wrap">
+            <label class="shared-label">Electricity price rises (%/yr)</label>
+            <input type="number" id="sa-inflation" class="shared-input" min="0" max="10" step="0.1">
+            <div class="shared-hint">How much prices might rise each year.</div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Inline add/edit form -->
+      <div id="quote-add-form" class="quote-add-form" style="display:none">
+
+        <!-- Name + price -->
+        <div class="qf-grid">
+          <div class="qf-field qf-field--wide">
+            <label class="qf-label">Quote name</label>
+            <input type="text" id="qf-name" class="qf-input" placeholder="e.g. SolarCo quote">
+          </div>
+          <div class="qf-field">
+            <label class="qf-label">Quoted price £</label>
+            <input type="number" id="qf-price" class="qf-input" placeholder="Optional">
+            <div class="qf-hint">The total price your installer quoted (inc. VAT). Leave blank and we'll estimate from typical costs.</div>
+          </div>
+        </div>
+
+        <!-- Arrays builder -->
+        <div class="qf-arrays-header">
+          <span class="qf-arrays-label">Roof / panels</span>
+          <button type="button" id="qf-add-array-btn" class="qf-add-array-btn">+ Add array</button>
+        </div>
+        <div id="qf-arrays-list"></div>
+
+        <!-- Battery -->
+        <div class="qf-arrays-header" style="margin-top:12px">
+          <span class="qf-arrays-label">Battery size — set to 0 if no battery included</span>
+        </div>
+        <div style="max-width:50%">
+          <div class="battery-slider-wrap battery-slider-wrap--sm">
+            <input type="range" id="qf-battery-slider" class="battery-slider" min="0" max="15" step="0.5" value="7.5">
+            <input type="number" id="qf-battery" class="battery-num-input" min="0" max="15" step="0.5" value="7.5">
+          </div>
+        </div>
+
+        <div class="qf-actions">
+          <button id="qf-save" class="qf-save-btn">Save quote</button>
+          <button id="qf-cancel" class="qf-cancel-btn">Cancel</button>
+        </div>
+      </div>
+
+      <div class="quotes-table-header-row">
+        <h3 class="quotes-table-heading">Quotes</h3>
+        <div style="display:flex;gap:8px">
+          <button id="qf-open-btn" class="quotes-action-btn quotes-add-btn">+ Add quote</button>
+          <button id="quotes-clear-btn" class="quotes-action-btn quotes-clear-btn">Clear all</button>
+        </div>
+      </div>
+      <div id="quotes-table-wrap"></div>
+
+    </div>
+
+    <!-- How this tool works -->
+    <details class="method-details">
+      <summary>How this tool works</summary>
+      <div class="method-body">
+        <h3>Generation estimate</h3>
+        <p>Annual solar generation is calculated using solar resource data from the <strong>MCS MGD003 dataset</strong> — the same data used by certified solar installers in the UK. The dataset provides annual yield figures (kWh per kWp) for 25 climate zones across the UK, at every combination of roof tilt (0–90°) and orientation (0–175° from south). Your postcode is matched to the nearest zone centre. The panel output assumes each panel is rated at <strong>475 Wp</strong>; performance losses (wiring, inverter, temperature) are already embedded in the MCS figures.</p>
+
+        <h3>How much solar you actually use</h3>
+        <p>What fraction of generated electricity is actually used in your home (rather than sent back to the grid) depends on when you're home and whether you have a battery. These fractions come from the <strong>MCS MGD003 lookup tables</strong>, which model three occupancy types and a range of battery sizes against different generation and demand levels. A 90% cap is applied — it is not practically possible to cover all electricity from solar alone due to overnight and low-sunlight periods.</p>
+
+        <h3>Financial estimate</h3>
+        <p>Annual saving = (solar used in your home × your electricity rate) + (surplus exported × export rate) + overnight battery charging saving. The export rate is what you receive under the <a href="https://www.ofgem.gov.uk/check-if-energy-price-cap-affects-you" target="_blank">Smart Export Guarantee (SEG)</a> or similar tariff.</p>
+
+        <h3>Overnight battery charging saving</h3>
+        <p>A battery can earn extra value by charging from the grid overnight at a cheap off-peak rate (e.g. Economy 7 at ~7–8p/kWh) and using that stored energy during the day instead of paying the standard rate. The number of overnight charging cycles available = 365 minus the cycles already used storing solar energy. Each cycle saves: battery capacity × 90% efficiency × (your day rate − overnight rate). This saving is set to zero if the overnight rate is not cheaper than the effective cost of using stored power.</p>
+
+        <h3>Limitations</h3>
+        <p>The MCS lookup tables cover generation and demand up to 5,999 kWh/year. Very large systems (typically &gt;12 panels) or high-demand homes may approach this boundary; results in those cases are approximations. This tool does not account for shading, soiling, or system degradation over time. Always get a quote from an <a href="https://mcscertified.com/find-an-installer/" target="_blank">MCS-certified installer</a> before making any purchasing decision.</p>
+      </div>
+    </details>
+
+  </main>
+  <div id="sidebar-placeholder"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── Postcode confirmation map ─────────────────────────────────────────────────
+let pcMap = null, pcMapMarker = null;
+
+function showPcMap(lat, lon, zoom = 16) {
+  document.getElementById('pc-map-wrap').style.display = '';
+  if (!pcMap) {
+    pcMap = L.map('pc-map', { zoomControl: false, attributionControl: false })
+              .setView([lat, lon], zoom);
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 19, attribution: '© Esri' }
+    ).addTo(pcMap);
+    pcMapMarker = L.marker([lat, lon]).addTo(pcMap);
+  } else {
+    pcMap.setView([lat, lon], zoom);
+    pcMapMarker.setLatLng([lat, lon]);
+    pcMap.invalidateSize();
+  }
+}
+
+// ── Satellite map ─────────────────────────────────────────────────────────────
+let satelliteMap = null;
+let mapMarker    = null;
+let mapLat = null, mapLon = null;
+let mapOpen = false;
+
+document.getElementById('map-toggle-btn').addEventListener('click', () => {
+  mapOpen = !mapOpen;
+  const mapWrap = document.getElementById('map-wrap');
+  const btn     = document.getElementById('map-toggle-btn');
+  if (mapOpen) {
+    mapWrap.style.display = '';
+    btn.textContent = 'Hide satellite view ▲';
+    if (!satelliteMap) {
+      satelliteMap = L.map('satellite-map').setView([mapLat, mapLon], 18);
+      L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: '© Esri', maxZoom: 19 }
+      ).addTo(satelliteMap);
+      mapMarker = L.marker([mapLat, mapLon]).addTo(satelliteMap);
+      const NCtrl = L.Control.extend({
+        onAdd() {
+          const d = L.DomUtil.create('div', 'map-north');
+          d.innerHTML = '↑<br>N';
+          return d;
+        }
+      });
+      new NCtrl({ position: 'topright' }).addTo(satelliteMap);
+    } else {
+      satelliteMap.invalidateSize();
+    }
+  } else {
+    mapWrap.style.display = 'none';
+    btn.textContent = 'Show satellite view ▾';
+  }
+});
+
+function setMapLocation(lat, lon) {
+  mapLat = lat; mapLon = lon;
+  document.getElementById('map-section').style.display = '';
+  if (satelliteMap) {
+    satelliteMap.setView([lat, lon], 18);
+    mapMarker.setLatLng([lat, lon]);
+    if (mapOpen) satelliteMap.invalidateSize();
+  }
+}
+
+// ── Zone centres for nearest-zone lookup ─────────────────────────────────────
+const ZONE_CENTRES = [
+  { key: 'Z1 - London',          lat: 51.50, lon: -0.12,  label: 'London'          },
+  { key: 'Z2 - Brighton',        lat: 50.83, lon: -0.14,  label: 'Brighton'        },
+  { key: 'Z3 - Southampton',     lat: 50.90, lon: -1.40,  label: 'Southampton'     },
+  { key: 'Z4 - Plymouth',        lat: 50.38, lon: -4.14,  label: 'Plymouth'        },
+  { key: 'Z5E - Bristol',        lat: 51.45, lon: -2.58,  label: 'Bristol'         },
+  { key: 'Z5W - Cardiff',        lat: 51.48, lon: -3.18,  label: 'Cardiff'         },
+  { key: 'Z6 - Birmingham',      lat: 52.49, lon: -1.90,  label: 'Birmingham'      },
+  { key: 'Z7E - Manchester',     lat: 53.48, lon: -2.24,  label: 'Manchester'      },
+  { key: 'Z7W - Chester',        lat: 53.19, lon: -2.89,  label: 'Chester'         },
+  { key: 'Z8S - Dumfries',       lat: 55.07, lon: -3.61,  label: 'Dumfries'        },
+  { key: 'Z8E - Carlisle',       lat: 54.89, lon: -2.94,  label: 'Carlisle'        },
+  { key: 'Z9E - Newcastle',      lat: 54.97, lon: -1.61,  label: 'Newcastle'       },
+  { key: 'Z9S - Edinburgh',      lat: 55.95, lon: -3.19,  label: 'Edinburgh'       },
+  { key: 'Z10 - Middlesborough', lat: 54.57, lon: -1.23,  label: 'Middlesbrough'   },
+  { key: 'Z11 - Sheffield',      lat: 53.38, lon: -1.47,  label: 'Sheffield'       },
+  { key: 'Z12 - Norwich',        lat: 52.63, lon:  1.30,  label: 'Norwich'         },
+  { key: 'Z13 - Aberystwith',    lat: 52.42, lon: -4.09,  label: 'Aberystwyth'     },
+  { key: 'Z14 - Glasgow',        lat: 55.86, lon: -4.25,  label: 'Glasgow'         },
+  { key: 'Z15 - Dundee',         lat: 56.46, lon: -2.97,  label: 'Dundee'          },
+  { key: 'Z16 - Aberdeen',       lat: 57.15, lon: -2.11,  label: 'Aberdeen'        },
+  { key: 'Z17 - Inverness',      lat: 57.48, lon: -4.22,  label: 'Inverness'       },
+  { key: 'Z18 - Stornoway',      lat: 58.21, lon: -6.39,  label: 'Stornoway'       },
+  { key: 'Z19 - Kirkwall',       lat: 58.98, lon: -2.96,  label: 'Kirkwall'        },
+  { key: 'Z20 - Lerwick',        lat: 60.15, lon: -1.15,  label: 'Lerwick'         },
+  { key: 'Z21 - Belfast',        lat: 54.60, lon: -5.93,  label: 'Belfast'         },
+];
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+function nearestZone(lat, lon) {
+  let best = null, bestD = Infinity;
+  for (const z of ZONE_CENTRES) {
+    const d = haversine(lat, lon, z.lat, z.lon);
+    if (d < bestD) { bestD = d; best = z; }
+  }
+  return best;
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+let irradianceData = null, lookupData = null;
+let currentZoneKey = null;
+
+// ── Load data ────────────────────────────────────────────────────────────────
+Promise.all([
+  fetch('/solar-matcher/data/irradiance.json').then(r => r.json()),
+  fetch('/solar-matcher/data/lookup.json').then(r => r.json()),
+]).then(([irr, lk]) => {
+  irradianceData = irr;
+  lookupData = lk;
+}).catch(err => console.error('Data load error:', err));
+
+// ── Postcode lookup ───────────────────────────────────────────────────────────
+const pcInput  = document.getElementById('pc-input');
+const pcBtn    = document.getElementById('pc-btn');
+const pcStatus = document.getElementById('pc-status');
+const pcAcDrop = document.getElementById('pc-ac-dropdown');
+
+function resolveLocation(lat, lon, displayCode, zoom = 16) {
+  const zone = nearestZone(lat, lon);
+  currentZoneKey = zone.key;
+  pcStatus.innerHTML = `<span class="pc-zone">${displayCode}</span>`;
+  document.getElementById('results-placeholder').style.display = 'none';
+  if (currentMode !== 'explore') document.getElementById('results-content').style.display = 'block';
+  showPcMap(lat, lon, zoom);
+  setMapLocation(lat, lon);
+  document.getElementById('hero-section').style.display = '';
+  revealCurrentMode();
+}
+
+async function lookupPostcode() {
+  const raw = pcInput.value.trim();
+  if (!raw) return;
+  hideAcDrop();
+  pcBtn.disabled = true;
+  pcBtn.textContent = 'Looking up…';
+  pcStatus.innerHTML = '';
+
+  const stripped = raw.toUpperCase().replace(/\s+/g, '');
+  const looksLikePostcode = /^[A-Z]{1,2}[0-9]/.test(stripped);
+
+  try {
+    let latitude, longitude, displayCode, zoom = 16;
+    let resolved = false;
+
+    if (looksLikePostcode) {
+      const isFullPostcode = stripped.length >= 5;
+      const normalised = isFullPostcode ? stripped.slice(0, -3) + ' ' + stripped.slice(-3) : stripped;
+      try {
+        if (isFullPostcode) {
+          const d = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(normalised)}`).then(r => r.json());
+          if (d.status === 200) { latitude = d.result.latitude; longitude = d.result.longitude; displayCode = d.result.postcode; zoom = 16; resolved = true; }
+        } else {
+          const d = await fetch(`https://api.postcodes.io/outcodes/${encodeURIComponent(stripped)}`).then(r => r.json());
+          if (d.status === 200) { latitude = d.result.latitude; longitude = d.result.longitude; displayCode = d.result.outcode + ' (approximate)'; zoom = 12; resolved = true; }
+        }
+      } catch (_) {}
+    }
+
+    if (!resolved) {
+      const geoData = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(raw)}&countrycodes=gb&format=json&limit=1&addressdetails=1`,
+        { headers: { 'Accept-Language': 'en' } }
+      ).then(r => r.json());
+      if (!geoData.length) throw new Error('not found');
+      latitude    = parseFloat(geoData[0].lat);
+      longitude   = parseFloat(geoData[0].lon);
+      displayCode = geoData[0].address?.postcode || geoData[0].display_name.split(',').slice(0, 2).join(', ');
+      zoom = 19;
+    }
+
+    resolveLocation(latitude, longitude, displayCode, zoom);
+  } catch (e) {
+    console.error('Location lookup error:', e);
+    pcStatus.innerHTML = `<span class="pc-error">Location not recognised — try a postcode (e.g. SW1A 1AA) or a street address</span>`;
+  } finally {
+    pcBtn.disabled = false;
+    pcBtn.textContent = 'Find location';
+  }
+}
+
+// ── Address autocomplete ───────────────────────────────────────────────────────
+let acTimer = null, acAbort = null;
+
+function hideAcDrop() {
+  pcAcDrop.style.display = 'none';
+  pcAcDrop.innerHTML = '';
+}
+
+function showAcDrop(results) {
+  if (!results.length) { hideAcDrop(); return; }
+  pcAcDrop.innerHTML = results.map(r => {
+    const parts = r.display_name.split(', ');
+    const main  = parts.slice(0, 2).join(', ');
+    const sub   = parts.slice(2, 5).join(', ');
+    return `<div class="ac-item" data-lat="${r.lat}" data-lon="${r.lon}" data-pc="${r.address?.postcode || ''}" data-main="${main.replace(/"/g,'&quot;')}">
+      <span class="ac-main">${main}</span>${sub ? `<span class="ac-sub">${sub}</span>` : ''}
+    </div>`;
+  }).join('');
+  pcAcDrop.style.display = 'block';
+  pcAcDrop.querySelectorAll('.ac-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const lat  = parseFloat(item.dataset.lat);
+      const lon  = parseFloat(item.dataset.lon);
+      const disp = item.dataset.pc || item.dataset.main;
+      pcInput.value = item.dataset.main;
+      hideAcDrop();
+      resolveLocation(lat, lon, disp, 19);
+    });
+  });
+}
+
+pcInput.addEventListener('input', () => {
+  clearTimeout(acTimer);
+  const val = pcInput.value.trim();
+  const stripped = val.toUpperCase().replace(/\s+/g, '');
+  // Suppress suggestions for postcode-like input (e.g. "SW1A 1AA")
+  if (val.length < 3 || /^[A-Z]{1,2}[0-9]/.test(stripped)) { hideAcDrop(); return; }
+  acTimer = setTimeout(async () => {
+    try {
+      if (acAbort) acAbort.abort();
+      acAbort = new AbortController();
+      const data = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=gb&format=json&limit=5&addressdetails=1`,
+        { headers: { 'Accept-Language': 'en' }, signal: acAbort.signal }
+      ).then(r => r.json());
+      showAcDrop(data);
+    } catch (e) { if (e.name !== 'AbortError') console.error(e); }
+  }, 350);
+});
+
+pcInput.addEventListener('blur', () => setTimeout(hideAcDrop, 150));
+pcBtn.addEventListener('click', lookupPostcode);
+pcInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { hideAcDrop(); lookupPostcode(); }
+  if (e.key === 'Escape') hideAcDrop();
+});
+
+// ── Arrays data model (must be declared before applyEasyConfig is called) ─────
+let arrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
+
+// ── Mode: Simple / Detailed ───────────────────────────────────────────────────
+let currentMode = null; // null until hero card is chosen
+let easyPanels  = 10;   // Medium default
+let easyAzimuth = 45;   // "Not sure" → SE/SW default
+
+// ── Plug-in solar state ───────────────────────────────────────────────────────
+let isPlugIn       = false;
+let plugInPanels   = 2;
+let plugInBattery  = 2.5; // kWh
+
+function syncExploreSlidersDisplay() {
+  const epsEl  = document.getElementById('explore-panels-slider');
+  const ebsEl  = document.getElementById('explore-battery-slider');
+  if (!epsEl) return;
+  const panels  = isPlugIn ? plugInPanels : easyPanels;
+  const battEl  = document.getElementById('ctrl-battery');
+  const battery = isPlugIn ? plugInBattery : (battEl ? +battEl.value : 0);
+  epsEl.min   = 1;
+  epsEl.max   = isPlugIn ? 2 : 30;
+  epsEl.value = panels;
+  ebsEl.max   = isPlugIn ? 5 : 13.5;
+  ebsEl.value = battery;
+  document.getElementById('val-explore-panels').textContent = `${panels} panel${panels === 1 ? '' : 's'}`;
+  document.getElementById('val-explore-battery').textContent = battery >= 0.5 ? `${battery} kWh` : 'No battery';
+}
+
+function applyEasyConfig() {
+  if (isPlugIn) {
+    arrays = [{ panels: plugInPanels, azimuth: 45, tilt: 35 }];
+    ctrlBattery.value = plugInBattery;
+  } else {
+    arrays = [{ panels: easyPanels, azimuth: easyAzimuth, tilt: 35 }];
+  }
+  syncExploreSlidersDisplay();
+}
+
+// Card click helpers
+function bindCards(containerID, stateKey, callback) {
+  document.getElementById(containerID).addEventListener('click', e => {
+    const card = e.target.closest('.easy-card');
+    if (!card) return;
+    document.querySelectorAll(`#${containerID} .easy-card`).forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    if (stateKey === 'panels') easyPanels = +card.dataset.panels;
+    if (stateKey === 'az')     easyAzimuth = +card.dataset.az;
+    callback();
+  });
+}
+
+// ── House size mode (A/C) ─────────────────────────────────────────────────────
+const HOUSE_MODES = {
+  A: [
+    { title: '4–6 panels',   sub: '~2 kWp',  panels: 6  },
+    { title: '8–12 panels',  sub: '~4 kWp',  panels: 10 },
+    { title: '14–18 panels', sub: '~6 kWp',  panels: 14 },
+    { title: '20+ panels',   sub: '~8 kWp',  panels: 20 },
+  ],
+  C: [
+    { title: 'Small',      sub: 'terrace or small semi',   panels: 6  },
+    { title: 'Medium',     sub: '3 bed semi or detached',  panels: 10 },
+    { title: 'Large',      sub: '4+ bed detached',         panels: 14 },
+    { title: 'Very large', sub: 'big detached',            panels: 20 },
+  ],
+};
+
+let currentHouseMode = 'C';
+
+function renderHouseCards() {
+  const cards = HOUSE_MODES[currentHouseMode];
+  document.getElementById('house-size-cards').innerHTML = cards.map(c =>
+    `<button class="easy-card" data-panels="${c.panels}">
+      <span class="easy-card-title">${c.title}</span>
+      <span class="easy-card-sub">${c.sub}${currentHouseMode !== 'A' ? ` · ${c.panels} panels` : ''}</span>
+    </button>`
+  ).join('');
+}
+
+document.querySelectorAll('.house-mode-btn').forEach(btn =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.house-mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentHouseMode = btn.dataset.hmode;
+    renderHouseCards();
+  })
+);
+
+renderHouseCards();
+
+bindCards('house-size-cards', 'panels', () => {
+  applyEasyConfig(); calculate();
+  if (currentMode === 'explore') easyAdvanceHouseSize();
+});
+bindCards('roof-dir-cards', 'az', () => {
+  applyEasyConfig(); calculate();
+  if (currentMode === 'explore') easyAdvanceRoofDir();
+});
+
+document.getElementById('easy-archetype-cards').addEventListener('click', e => {
+  const card = e.target.closest('.easy-card');
+  if (!card) return;
+  document.querySelectorAll('#easy-archetype-cards .easy-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  ctrlArchtype.value = card.dataset.archetype;
+  if (currentMode === 'explore') easyShowHero();
+  calculate();
+});
+
+// ── System type toggle (Rooftop ↔ Plug-in) ───────────────────────────────────
+document.getElementById('sys-rooftop').addEventListener('click', () => {
+  if (!isPlugIn) return;
+  isPlugIn = false;
+  document.getElementById('sys-rooftop').classList.add('active');
+  document.getElementById('sys-plugin').classList.remove('active');
+  // Hide plugin steps, restore rooftop steps that were reached
+  document.getElementById('easy-s2-pi').style.display = 'none';
+  document.getElementById('easy-s3-pi').style.display = 'none';
+  if (easyDemandDone) document.getElementById('easy-s2-rt').style.display = '';
+  document.getElementById('easy-mode-hint').style.display = '';
+  applyEasyConfig();
+  calculate();
+});
+
+document.getElementById('sys-plugin').addEventListener('click', () => {
+  if (isPlugIn) return;
+  isPlugIn = true;
+  document.getElementById('sys-plugin').classList.add('active');
+  document.getElementById('sys-rooftop').classList.remove('active');
+  // Hide rooftop steps, restore plugin steps that were reached
+  document.getElementById('easy-s2-rt').style.display = 'none';
+  document.getElementById('easy-s3-rt').style.display = 'none';
+  document.getElementById('easy-s4-rt').style.display = 'none';
+  if (easyDemandDone) document.getElementById('easy-s2-pi').style.display = '';
+  document.getElementById('easy-mode-hint').style.display = 'none';
+  applyEasyConfig();
+  calculate();
+});
+
+// Plug-in panel card clicks
+document.getElementById('plugin-panels-cards').addEventListener('click', e => {
+  const card = e.target.closest('.easy-card');
+  if (!card) return;
+  document.querySelectorAll('#plugin-panels-cards .easy-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  plugInPanels = +card.dataset.pluginPanels;
+  applyEasyConfig();
+  calculate();
+  if (currentMode === 'explore') easyAdvancePiPanels();
+});
+
+document.getElementById('plugin-battery-cards').addEventListener('click', e => {
+  const card = e.target.closest('.easy-card');
+  if (!card) return;
+  document.querySelectorAll('#plugin-battery-cards .easy-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  plugInBattery = +card.dataset.pluginBatt;
+  applyEasyConfig();
+  if (currentMode === 'explore') easyShowHero();
+  calculate();
+});
+
+
+function applyResultsVisibility(mode) {
+  const inExplore = mode === 'explore';
+  document.getElementById('demand-ctrl-group').style.display = inExplore ? 'none' : '';
+  document.getElementById('results-hero').style.display      = 'none';
+  if (inExplore) {
+    document.getElementById('results-content').style.display = 'none';
+    // Restore hero if steps already completed
+    if (easyHeroShown) document.getElementById('results-hero').style.display = '';
+  } else {
+    document.getElementById('results-content').style.display = 'block';
+    document.getElementById('results-placeholder').style.display = 'none';
+  }
+}
+
+function revealCurrentMode() {
+  const mode = currentMode;
+  if (!mode || !currentZoneKey) return;
+  const inCompare = mode === 'compare';
+
+  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  if (!inCompare && pcMap) setTimeout(() => pcMap.invalidateSize(), 50);
+  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+  applyResultsVisibility(mode);
+
+  if (inCompare) {
+    initSharedAssumptions();
+    renderQuotesTable();
+  } else if (mode === 'explore') {
+    applyEasyConfig();
+    calculate();
+  } else {
+    calculate();
+  }
+}
+
+function setMode(mode) {
+  if (currentMode === mode) return;
+  const prevMode  = currentMode;
+  currentMode     = mode;
+  const inCompare = mode === 'compare';
+
+  document.getElementById('hero-explore').classList.toggle('active',  mode === 'explore');
+  document.getElementById('hero-detailed').classList.toggle('active', mode === 'detailed');
+  document.getElementById('hero-compare').classList.toggle('active',  mode === 'compare');
+
+  // Don't reveal calculator panels until a postcode has been looked up
+  if (!currentZoneKey) return;
+
+  document.getElementById('calc-grid').style.display      = inCompare ? 'none' : '';
+  if (!inCompare && pcMap) setTimeout(() => pcMap.invalidateSize(), 50);
+  document.getElementById('explore-panel').style.display  = mode === 'explore'  ? '' : 'none';
+  document.getElementById('detailed-panel').style.display = mode === 'detailed' ? '' : 'none';
+  document.getElementById('quotes-panel').style.display   = (inCompare || quotes.length > 0) ? '' : 'none';
+  applyResultsVisibility(mode);
+
+  if (inCompare) {
+    initSharedAssumptions();
+    renderQuotesTable();
+  } else if (mode === 'explore') {
+    applyEasyConfig();
+    calculate();
+  } else {
+    if (prevMode === 'explore') {
+      const seedPanels = isPlugIn ? plugInPanels : easyPanels;
+      const seedAz     = isPlugIn ? 45 : easyAzimuth;
+      ctrlPanels.value = seedPanels;
+      ctrlOrient.value = seedAz;
+      ctrlTilt.value   = 35;
+      arrays = [{ panels: seedPanels, azimuth: seedAz, tilt: 35 }];
+      updateSingleLabels();
+    }
+    calculate();
+  }
+}
+
+
+document.getElementById('hero-explore').addEventListener('click',  () => setMode('explore'));
+document.getElementById('switch-to-expert-link').addEventListener('click', e => { e.preventDefault(); setMode('detailed'); });
+document.getElementById('hero-detailed').addEventListener('click', () => setMode('detailed'));
+document.getElementById('hero-compare').addEventListener('click',  () => setMode('compare'));
+
+// Init easy mode
+applyEasyConfig();
+
+// ── Orientation helpers ────────────────────────────────────────────────────────
+// Slider runs -175 (east) to +175 (west), 0 = south.
+// Negative = east side, positive = west side. Math.abs() maps to irradiance table.
+const ORIENT_LABELS = [
+  { abs:   0, negLabel: 'South',   posLabel: 'South'   },
+  { abs:  20, negLabel: 'SSE',     posLabel: 'SSW'     },
+  { abs:  45, negLabel: 'SE',      posLabel: 'SW'      },
+  { abs:  65, negLabel: 'ESE',     posLabel: 'WSW'     },
+  { abs:  90, negLabel: 'East',    posLabel: 'West'    },
+  { abs: 110, negLabel: 'ENE',     posLabel: 'WNW'     },
+  { abs: 135, negLabel: 'NE',      posLabel: 'NW'      },
+  { abs: 155, negLabel: 'NNE',     posLabel: 'NNW'     },
+  { abs: 175, negLabel: 'North',   posLabel: 'North'   },
+];
+
+function orientLabel(sliderVal) {
+  const abs = Math.abs(sliderVal);
+  const entry = ORIENT_LABELS.find(o => o.abs >= abs) || ORIENT_LABELS.at(-1);
+  return sliderVal <= 0 ? entry.negLabel : entry.posLabel;
+}
+
+// ── Single-roof controls ──────────────────────────────────────────────────────
+const ctrlPanels = document.getElementById('ctrl-panels');
+const ctrlOrient = document.getElementById('ctrl-orient');
+const ctrlTilt   = document.getElementById('ctrl-tilt');
+
+function updateSingleLabels() {
+  const n         = +ctrlPanels.value;
+  const sliderAz  = +ctrlOrient.value;  // -175..175, negative=east, positive=west
+  const az        = Math.abs(sliderAz); // 0..175, used for irradiance lookup
+  const tilt      = +ctrlTilt.value;
+  document.getElementById('val-panels').textContent = `${n} panel${n !== 1 ? 's' : ''}`;
+  document.getElementById('val-orient').textContent = `${orientLabel(sliderAz)} (${az}°)`;
+  document.getElementById('val-tilt').textContent   = `${tilt}°`;
+
+  // Compass: arrow points toward selected direction. sliderAz=0 → south (arrow down).
+  // Negative sliderAz = east side → rotate counter-clockwise.
+  document.getElementById('compass-needle').setAttribute('transform', `rotate(${sliderAz} 32 32)`);
+
+  // Roof tilt SVG: pivot at wall top (14,28), roof sweeps upward
+  const rad = tilt * Math.PI / 180;
+  const rx  = 14 + Math.cos(rad) * 38;
+  const ry  = 28 - Math.sin(rad) * 38;
+  document.getElementById('tilt-roof-line').setAttribute('x2', rx.toFixed(1));
+  document.getElementById('tilt-roof-line').setAttribute('y2', ry.toFixed(1));
+  // Arc: from (26,28) [horizontal ref] sweeping to roof angle
+  const ax = 14 + Math.cos(rad) * 12;
+  const ay = 28 - Math.sin(rad) * 12;
+  document.getElementById('tilt-arc').setAttribute('d', `M 26 28 A 12 12 0 0 0 ${ax.toFixed(1)} ${ay.toFixed(1)}`);
+  // Label midway along arc
+  const midRad = rad / 2;
+  document.getElementById('tilt-angle-text').setAttribute('x', (14 + Math.cos(midRad) * 18).toFixed(1));
+  document.getElementById('tilt-angle-text').setAttribute('y', (28 - Math.sin(midRad) * 18 + 3).toFixed(1));
+  document.getElementById('tilt-angle-text').textContent = `${tilt}°`;
+}
+
+[ctrlPanels, ctrlOrient, ctrlTilt].forEach(el =>
+  el.addEventListener('input', () => {
+    arrays[0] = { panels: +ctrlPanels.value, azimuth: Math.abs(+ctrlOrient.value), tilt: +ctrlTilt.value };
+    updateSingleLabels();
+    calculate();
+  })
+);
+
+updateSingleLabels();
+
+// ── Multiple-roof array rows ───────────────────────────────────────────────────
+function arrayRowHTML(idx, arr) {
+  const orientOpts = ORIENT_OPTIONS.map(o =>
+    `<option value="${o.az}"${arr.azimuth === o.az ? ' selected' : ''}>${o.label}</option>`
+  ).join('');
+  const removeBtn = arrays.length > 1
+    ? `<button class="arr-remove" data-idx="${idx}" title="Remove">×</button>`
+    : '';
+  return `
+    <div class="array-row" data-idx="${idx}">
+      <div class="array-header">
+        <span class="array-num">Array ${idx + 1}</span>
+        <span class="array-gen-label" id="arr-gen-${idx}">—</span>
+        ${removeBtn}
+      </div>
+      <div class="array-controls">
+        <div class="arr-field"><label>Panels</label>
+          <input type="number" class="arr-panels" data-idx="${idx}" value="${arr.panels}" min="1" max="30" step="1">
+        </div>
+        <div class="arr-field"><label>Orientation</label>
+          <select class="arr-orient" data-idx="${idx}">${orientOpts}</select>
+        </div>
+        <div class="arr-field"><label>Tilt (°)</label>
+          <input type="number" class="arr-tilt" data-idx="${idx}" value="${arr.tilt}" min="0" max="60" step="1">
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderArrays() {
+  const container = document.getElementById('arrays-container');
+  container.innerHTML = arrays.map((a, i) => arrayRowHTML(i, a)).join('');
+  container.querySelectorAll('.arr-panels').forEach(el =>
+    el.addEventListener('change', e => {
+      const i = +e.target.dataset.idx;
+      arrays[i].panels = Math.max(1, Math.min(30, +e.target.value || 1));
+      e.target.value = arrays[i].panels;
+      calculate();
+    })
+  );
+  container.querySelectorAll('.arr-orient').forEach(el =>
+    el.addEventListener('change', e => { arrays[+e.target.dataset.idx].azimuth = +e.target.value; calculate(); })
+  );
+  container.querySelectorAll('.arr-tilt').forEach(el =>
+    el.addEventListener('change', e => {
+      const i = +e.target.dataset.idx;
+      arrays[i].tilt = Math.max(0, Math.min(60, +e.target.value || 0));
+      e.target.value = arrays[i].tilt;
+      calculate();
+    })
+  );
+  container.querySelectorAll('.arr-remove').forEach(el =>
+    el.addEventListener('click', e => { arrays.splice(+e.target.dataset.idx, 1); renderArrays(); calculate(); })
+  );
+  document.getElementById('add-array-btn').disabled = arrays.length >= 10;
+}
+
+document.getElementById('add-array-btn').addEventListener('click', () => {
+  if (arrays.length < 10) { arrays.push({ panels: 4, azimuth: 0, tilt: 30 }); renderArrays(); calculate(); }
+});
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+const tabSingle   = document.getElementById('tab-single');
+const tabMulti    = document.getElementById('tab-multi');
+const panelSingle = document.getElementById('panel-single');
+const panelMulti  = document.getElementById('panel-multi');
+
+tabSingle.addEventListener('click', () => {
+  tabSingle.classList.add('active'); tabMulti.classList.remove('active');
+  panelSingle.style.display = ''; panelMulti.style.display = 'none';
+  // Keep only the first array; sync sliders to it
+  arrays = [arrays[0]];
+  ctrlPanels.value = arrays[0].panels;
+  ctrlOrient.value = arrays[0].azimuth;
+  ctrlTilt.value   = arrays[0].tilt;
+  updateSingleLabels();
+  calculate();
+});
+
+tabMulti.addEventListener('click', () => {
+  tabMulti.classList.add('active'); tabSingle.classList.remove('active');
+  panelMulti.style.display = ''; panelSingle.style.display = 'none';
+  renderArrays();
+  calculate();
+});
+
+// ── Other controls ────────────────────────────────────────────────────────────
+const ctrlBattery    = document.getElementById('ctrl-battery');
+const ctrlBatteryNum = document.getElementById('ctrl-battery-num');
+ctrlBattery.addEventListener('input', () => { ctrlBatteryNum.value = ctrlBattery.value; calculate(); });
+ctrlBatteryNum.addEventListener('input', () => { ctrlBattery.value = ctrlBatteryNum.value; calculate(); });
+
+// qf-battery slider sync (in inline form)
+document.getElementById('qf-battery-slider').addEventListener('input', e => {
+  document.getElementById('qf-battery').value = e.target.value;
+});
+document.getElementById('qf-battery').addEventListener('input', e => {
+  document.getElementById('qf-battery-slider').value = e.target.value;
+});
+
+const ctrlDemand   = document.getElementById('ctrl-demand');
+const ctrlArchtype = document.getElementById('ctrl-archetype');
+const ctrlImport     = document.getElementById('ctrl-import');
+const ctrlExport     = document.getElementById('ctrl-export');
+const ctrlCheap      = document.getElementById('ctrl-cheap');
+const ctrlInflation  = document.getElementById('ctrl-inflation');
+const ctrlHouseval   = document.getElementById('ctrl-houseval');
+
+ctrlInflation.addEventListener('input', () => {
+  document.getElementById('val-inflation').textContent = `${ctrlInflation.value}% / yr`;
+  calculate();
+});
+ctrlHouseval.addEventListener('input', () => {
+  const v = +ctrlHouseval.value;
+  document.getElementById('val-houseval').textContent = v === 0 ? '£0' : `£${v.toLocaleString()}`;
+  calculate();
+});
+
+function updateDemandDisplay() {
+  const v = +ctrlDemand.value;
+  document.getElementById('val-demand').textContent = `${v.toLocaleString()} kWh`;
+  // Highlight matching preset button if any
+  document.querySelectorAll('.demand-preset-btn').forEach(btn =>
+    btn.classList.toggle('active', +btn.dataset.kwh === v)
+  );
+}
+ctrlDemand.addEventListener('input', () => { updateDemandDisplay(); calculate(); });
+
+// Demand preset buttons (shared between expert demand-ctrl-group and easy mode step 1)
+document.querySelectorAll('.demand-preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    ctrlDemand.value = btn.dataset.kwh;
+    updateDemandDisplay();
+    calculate();
+    if (currentMode === 'explore') easyAdvanceDemand();
+  });
+});
+document.getElementById('salary-sac-chk').addEventListener('change', calculate);
+[ctrlArchtype, ctrlImport, ctrlExport, ctrlCheap].forEach(el =>
+  el.addEventListener('change', calculate)
+);
+
+// ── Easy mode step reveal ──────────────────────────────────────────────────────
+let easyDemandDone = false;
+let easyHeroShown  = false;
+let breakdownOpen  = false;
+
+function easyAdvanceDemand() {
+  if (easyDemandDone) return;
+  easyDemandDone = true;
+  const nextId = isPlugIn ? 'easy-s2-pi' : 'easy-s2-rt';
+  document.getElementById(nextId).style.display = '';
+  document.getElementById(nextId).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function easyAdvanceHouseSize() {
+  const el = document.getElementById('easy-s3-rt');
+  if (el && el.style.display === 'none') {
+    el.style.display = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function easyAdvanceRoofDir() {
+  const el = document.getElementById('easy-s4-rt');
+  if (el && el.style.display === 'none') {
+    el.style.display = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function easyAdvancePiPanels() {
+  const el = document.getElementById('easy-s3-pi');
+  if (el && el.style.display === 'none') {
+    el.style.display = '';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function easyShowHero() {
+  if (currentMode !== 'explore') return;
+  easyHeroShown = true;
+  document.getElementById('results-placeholder').style.display = 'none';
+  document.getElementById('results-hero').style.display = '';
+}
+
+function updateHero(r) {
+  if (!r || !easyHeroShown || currentMode !== 'explore') return;
+  const amountEl   = document.getElementById('hero-saving-amount');
+  const sentenceEl = document.getElementById('hero-sentence');
+  if (!amountEl || !sentenceEl) return;
+  amountEl.textContent = '£' + r.totalSaving.toLocaleString();
+  const totalPanels = arrays.reduce((s, a) => s + a.panels, 0);
+  const midCost     = r.costs[1];
+  const midPayback  = r.paybacks[1];
+  const paybackStr  = typeof midPayback === 'number'
+    ? `about ${midPayback} year${midPayback === 1 ? '' : 's'}`
+    : 'over 50 years';
+  sentenceEl.innerHTML =
+    `Your ${totalPanels}-panel system could generate <strong>${r.generation.toLocaleString()} kWh</strong> a year`
+    + ` and cover <strong>${r.pctMet}%</strong> of your electricity.`
+    + ` A typical install costs around <strong>£${midCost.toLocaleString()}</strong>`
+    + ` and pays for itself in <strong>${paybackStr}</strong>.`;
+}
+
+document.getElementById('results-breakdown-btn').addEventListener('click', function() {
+  breakdownOpen = !breakdownOpen;
+  document.getElementById('results-content').style.display = breakdownOpen ? 'block' : 'none';
+  this.textContent = breakdownOpen ? 'Hide breakdown ↑' : 'See full breakdown ↓';
+});
+
+// ── Calculation ───────────────────────────────────────────────────────────────
+const DEMAND_BANDS = [1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500];
+const ARC_LENGTH = Math.PI * 95; // ≈ 298.5 px (half circumference, r=95)
+
+function demandBand(kWh) {
+  const c = Math.max(1500, Math.min(5999, kWh));
+  let band = 1500;
+  for (const b of DEMAND_BANDS) { if (c >= b) band = b; }
+  return band;
+}
+
+function batteryCol(kwh) {
+  if (kwh < 1.1) return 0;
+  return Math.min(14, Math.floor(kwh - 0.1));
+}
+
+// ── Pure calculation (no DOM) ─────────────────────────────────────────────────
+function runCalc({ arrays, battery, archtype, demand, zoneKey, importP, exportP, cheapP, inflRate, houseVal, plugIn = false }) {
+  if (!irradianceData || !lookupData || !zoneKey) return null;
+  const zoneData = irradianceData.zones[zoneKey];
+  const panelKWp = plugIn ? 0.4 : 0.475;
+
+  let generation = 0, totalKWp = 0;
+  const perArrayGen = arrays.map(arr => {
+    const azIdx  = Math.round(Math.min(175, arr.azimuth) / 5);
+    const tiltKey = String(Math.max(0, Math.min(90, arr.tilt)));
+    const row    = zoneData[tiltKey] || zoneData['30'];
+    const irr    = row[azIdx] || 0;
+    const kWp    = arr.panels * panelKWp;
+    const arrGen = Math.round(irr * kWp);
+    generation  += arrGen;
+    totalKWp    += kWp;
+    return arrGen;
+  });
+
+  const dBand      = demandBand(demand);
+  const genBandIdx = Math.min(19, Math.floor(generation / 300));
+  const bCol       = batteryCol(battery);
+  const table      = lookupData[archtype];
+  const bandKey    = String(dBand);
+  const tableRow   = (table[bandKey] && table[bandKey][genBandIdx]) ? table[bandKey][genBandIdx] : null;
+  const fraction       = tableRow ? (tableRow[bCol] || 0) : 0;
+  const fractionPVOnly = tableRow ? (tableRow[0]    || 0) : 0;
+
+  const selfConsumed = Math.min(Math.round(generation * fraction), Math.floor(demand * 0.90));
+  const exported     = generation - selfConsumed;
+  const pctMet       = Math.round(selfConsumed / demand * 100);
+
+  const BATT_EFFICIENCY = 0.90;
+  let arbitrageSaving = 0;
+  if (battery >= 1.1) {
+    const energyThroughBattery = Math.max(0, generation * (fraction - fractionPVOnly));
+    const scCycles        = energyThroughBattery / (battery * BATT_EFFICIENCY);
+    const arbitrageCycles = Math.max(0, 365 - scCycles);
+    arbitrageSaving = Math.max(0, Math.round(
+      arbitrageCycles * battery * (BATT_EFFICIENCY * importP - cheapP)
+    ));
+  }
+
+  const importSaved  = Math.round(selfConsumed * importP);
+  const exportEarned = Math.round(exported     * exportP);
+  const totalSaving  = importSaved + exportEarned + arbitrageSaving;
+
+  const totalPanels    = arrays.reduce((s, a) => s + a.panels, 0);
+  const rawCost = plugIn
+    ? 275 * totalPanels + (battery >= 1.1 ? Math.round(battery / 2.5) * 700 : 0) + 100
+    : 170 * totalPanels + (battery >= 1.1 ? 1000 + 200 * battery : 0) + 4000;
+  const estimatedCost = plugIn ? Math.round(rawCost / 100) * 100 : Math.round(rawCost / 1000) * 1000;
+  const costSpread    = plugIn ? 200 : 2000;
+  const costs = plugIn
+    ? [estimatedCost - costSpread, estimatedCost, estimatedCost + costSpread].map(c => Math.max(0, c))
+    : [estimatedCost - costSpread, estimatedCost, estimatedCost + costSpread].map(c => Math.max(0, c - houseVal));
+
+  const growingAnnual = importSaved + arbitrageSaving;
+  const fixedAnnual   = exportEarned;
+  const yr1 = fixedAnnual + growingAnnual;
+  const yr5 = fixedAnnual + Math.round(growingAnnual * Math.pow(inflRate, 4));
+
+  function simplePayback(cost) {
+    let cum = 0;
+    for (let y = 1; y <= 50; y++) {
+      cum += fixedAnnual + Math.round(growingAnnual * Math.pow(inflRate, y - 1));
+      if (cum >= cost) return y;
+    }
+    return '>50';
+  }
+
+  return {
+    generation, totalKWp, perArrayGen, selfConsumed, exported, pctMet,
+    importSaved, exportEarned, arbitrageSaving, totalSaving,
+    estimatedCost, costs, yr1, yr5,
+    paybacks: costs.map(simplePayback),
+    growingAnnual, fixedAnnual,
+  };
+}
+
+function calculate() {
+  if (!irradianceData || !lookupData || !currentZoneKey) return;
+
+  const battery  = +ctrlBattery.value;
+  const demand   = +ctrlDemand.value;
+  const archtype = ctrlArchtype.value;
+  const importP  = +ctrlImport.value / 100;
+  const exportP  = +ctrlExport.value / 100;
+  const cheapP   = ctrlCheap.value === '' ? 0.07 : +ctrlCheap.value / 100;
+  const inflRate = 1 + (+ctrlInflation.value / 100);
+  const houseVal = +ctrlHouseval.value;
+
+  const r = runCalc({ arrays, battery, archtype, demand, zoneKey: currentZoneKey, importP, exportP, cheapP, inflRate, houseVal, plugIn: currentMode === 'explore' && isPlugIn });
+  if (!r) return;
+
+  // Per-array generation labels
+  r.perArrayGen.forEach((gen, i) => {
+    const el = document.getElementById(`arr-gen-${i}`);
+    if (el) el.textContent = gen.toLocaleString() + ' kWh';
+  });
+  document.getElementById('arr-total-gen').textContent = r.generation.toLocaleString() + ' kWh';
+  document.getElementById('val-total-kwp').textContent = r.totalKWp.toFixed(2) + ' kWp total';
+
+  // Gauge
+  const arcFill = ARC_LENGTH * Math.min(1, r.selfConsumed / demand);
+  document.getElementById('gauge-arc').setAttribute('stroke-dasharray', `${arcFill.toFixed(1)} ${ARC_LENGTH.toFixed(1)}`);
+  document.getElementById('gauge-text').textContent = r.pctMet + '%';
+
+  // System summary chips
+  const totalPanelsDisplay = arrays.reduce((s, a) => s + a.panels, 0);
+  const panelKWpDisplay    = (currentMode === 'explore' && isPlugIn) ? 0.4 : 0.475;
+  const kWpDisplay         = (totalPanelsDisplay * panelKWpDisplay).toFixed(2);
+  let chips = `<span class="results-sys-chip">${totalPanelsDisplay} panels (${kWpDisplay} kWp)</span>`;
+  if (battery >= 1.1) chips += ` <span class="results-sys-chip">${battery} kWh battery</span>`;
+  document.getElementById('results-system-summary').innerHTML = chips;
+
+  // Plain-language summary
+  const summaryParts = [
+    `cutting your grid bills by <strong>£${r.importSaved.toLocaleString()}</strong> a year`
+  ];
+  if (r.exportEarned   > 0) summaryParts.push(`earning <strong>£${r.exportEarned.toLocaleString()}</strong> selling surplus back to the grid`);
+  if (r.arbitrageSaving > 0) summaryParts.push(`plus <strong>£${r.arbitrageSaving.toLocaleString()}</strong> from overnight battery charging`);
+  document.getElementById('stat-summary').innerHTML =
+    `Solar could cover <strong>${r.pctMet}%</strong> of your home's electricity, ` + summaryParts.join(', ') + '.';
+
+  document.getElementById('stat-gen').textContent             = r.generation.toLocaleString();
+  document.getElementById('stat-saving').textContent          = '£' + r.totalSaving.toLocaleString();
+  document.getElementById('stat-import-line').textContent     = `£${r.importSaved.toLocaleString()} import saved`;
+  document.getElementById('stat-export-line').textContent     = `£${r.exportEarned.toLocaleString()} export earned`;
+  document.getElementById('stat-arbitrage-line').textContent  = battery >= 1.1 ? `£${r.arbitrageSaving.toLocaleString()} overnight charging saving` : '';
+  document.getElementById('stat-self').textContent            = r.selfConsumed.toLocaleString();
+  document.getElementById('stat-export').textContent          = r.exported.toLocaleString();
+
+  // Payback table
+  const plugInActive = currentMode === 'explore' && isPlugIn;
+  document.getElementById('payback-cost-note').textContent = plugInActive
+    ? 'Cost estimate for panels and battery only — no labour or scaffolding needed.'
+    : 'Cost estimate includes panels, inverter, labour, and scaffolding.';
+
+  const salarySac = document.getElementById('salary-sac-chk').checked;
+  const salarySacMultiplier = 1 - 0.20 - 0.08; // basic rate tax + NI saving = 28%
+  const sacNoteEl = document.getElementById('salary-sac-note');
+  if (salarySac) {
+    const midCost = r.costs[1];
+    const saving = Math.round(midCost * (1 - salarySacMultiplier) / 100) * 100;
+    sacNoteEl.textContent = `Salary sacrifice reduces your effective cost by ~£${saving.toLocaleString()} (income tax + NI saving at basic rate). Payback below reflects this.`;
+    sacNoteEl.style.display = '';
+  } else {
+    sacNoteEl.style.display = 'none';
+  }
+
+  document.getElementById('payback-body').innerHTML = r.costs.map((c, i) => {
+    const effectiveC = salarySac ? Math.round(c * salarySacMultiplier / 100) * 100 : c;
+    const pb = salarySac
+      ? (typeof r.yr1 === 'number' && r.yr1 > 0 ? Math.round(effectiveC / r.yr1) + ' yrs' : '—')
+      : (typeof r.paybacks[i] === 'number' ? r.paybacks[i] + ' yrs' : r.paybacks[i]);
+    const mid = i === 1 ? ' class="mid-row"' : '';
+    return `<tr${mid}>
+      <td>£${effectiveC.toLocaleString()}</td>
+      <td>£${r.yr1.toLocaleString()}</td>
+      <td>£${r.yr5.toLocaleString()}</td>
+      <td class="pb-yrs">${pb}</td>
+    </tr>`;
+  }).join('');
+
+  updateHero(r);
+
+  // Flash "Updated ✓"
+  const flash = document.getElementById('update-flash');
+  if (flash) {
+    flash.classList.add('show');
+    clearTimeout(flash._t);
+    flash._t = setTimeout(() => flash.classList.remove('show'), 1500);
+  }
+
+  if (quotes.length > 0) renderQuotesTable();
+}
+
+// ── Quote comparison ───────────────────────────────────────────────────────────
+let quotes = [];
+let quoteCounter = 0;
+let editingQuoteId = null;
+
+// ── Inline add/edit form ───────────────────────────────────────────────────────
+const qfOpenBtn = document.getElementById('qf-open-btn');
+const qfForm    = document.getElementById('quote-add-form');
+const qfName    = document.getElementById('qf-name');
+
+let qfArrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
+
+const AZ_OPTIONS = [
+  { v: '0',  l: 'South' }, { v: '20', l: 'SSE / SSW' },
+  { v: '45', l: 'SE / SW' }, { v: '65', l: 'ESE / WSW' },
+  { v: '90', l: 'East / West' },
+];
+function azOptionsHtml(selected) {
+  return AZ_OPTIONS.map(o =>
+    `<option value="${o.v}"${+o.v === +selected ? ' selected' : ''}>${o.l}</option>`
+  ).join('');
+}
+
+function renderQFArrays() {
+  document.getElementById('qf-arrays-list').innerHTML = qfArrays.map((a, i) => `
+    <div class="qf-array-row">
+      <div class="qf-array-num">Array ${i + 1}</div>
+      <div class="qf-field">
+        <label class="qf-label">Panels</label>
+        <input type="number" class="qf-input qf-arr-panels" value="${a.panels}" min="1" max="50" step="1">
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Orientation</label>
+        <select class="qf-input qf-arr-az">${azOptionsHtml(a.azimuth)}</select>
+      </div>
+      <div class="qf-field">
+        <label class="qf-label">Tilt (°)</label>
+        <input type="number" class="qf-input qf-arr-tilt" value="${a.tilt}" min="0" max="90" step="5">
+      </div>
+      ${qfArrays.length > 1
+        ? `<button type="button" class="qf-arr-remove" data-idx="${i}">Remove</button>`
+        : '<div></div>'}
+    </div>`).join('');
+  document.querySelectorAll('.qf-arr-remove').forEach(btn =>
+    btn.addEventListener('click', () => { qfArrays.splice(+btn.dataset.idx, 1); renderQFArrays(); })
+  );
+}
+
+document.getElementById('qf-add-array-btn').addEventListener('click', () => {
+  qfArrays.push({ panels: 10, azimuth: 45, tilt: 35 });
+  renderQFArrays();
+});
+
+function readQFArrays() {
+  return [...document.querySelectorAll('#qf-arrays-list .qf-array-row')].map(row => ({
+    panels:  Math.max(1, parseInt(row.querySelector('.qf-arr-panels').value) || 10),
+    azimuth: parseInt(row.querySelector('.qf-arr-az').value),
+    tilt:    parseInt(row.querySelector('.qf-arr-tilt').value) || 35,
+  }));
+}
+
+function openQF(prefill) {
+  if (!prefill) {
+    quoteCounter++;
+    qfName.value = `Quote ${quoteCounter}`;
+    document.getElementById('qf-battery').value = '7.5';
+    document.getElementById('qf-price').value   = '';
+    document.getElementById('qf-save').textContent = 'Save quote';
+    qfArrays = [{ panels: 10, azimuth: 45, tilt: 35 }];
+    editingQuoteId = null;
+  } else {
+    qfName.value = prefill.name;
+    document.getElementById('qf-battery').value = prefill.batteryKwh || 0;
+    document.getElementById('qf-price').value   = prefill.quotedPrice != null ? prefill.quotedPrice : '';
+    document.getElementById('qf-save').textContent = 'Update quote';
+    qfArrays = prefill.arrays.map(a => ({ ...a }));
+    editingQuoteId = prefill.id;
+  }
+  renderQFArrays();
+  document.getElementById('qf-battery-slider').value = document.getElementById('qf-battery').value;
+  qfForm.style.display    = '';
+  qfOpenBtn.style.display = 'none';
+  qfForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  qfName.focus(); qfName.select();
+}
+
+function closeQF() {
+  qfForm.style.display    = 'none';
+  qfOpenBtn.style.display = '';
+  editingQuoteId = null;
+}
+
+qfOpenBtn.addEventListener('click', () => openQF(null));
+
+document.getElementById('qf-cancel').addEventListener('click', () => {
+  if (!editingQuoteId) quoteCounter--;
+  closeQF();
+});
+
+document.getElementById('qf-save').addEventListener('click', () => {
+  const name        = qfName.value.trim() || `Quote ${quoteCounter}`;
+  const batteryKwh  = parseFloat(document.getElementById('qf-battery').value) || 0;
+  const archtype    = ctrlArchtype.value;
+  const priceVal    = document.getElementById('qf-price').value;
+  const quotedPrice = priceVal !== '' ? parseFloat(priceVal) : null;
+  const quoteData   = { name, quotedPrice, arrays: readQFArrays(), batteryKwh, archtype };
+
+  if (editingQuoteId) {
+    const idx = quotes.findIndex(q => q.id === editingQuoteId);
+    if (idx !== -1) quotes[idx] = { ...quotes[idx], ...quoteData };
+  } else {
+    quotes.push({ id: Date.now(), ...quoteData });
+  }
+  closeQF();
+  renderQuotesTable();
+  document.getElementById('quotes-panel').style.display = '';
+});
+
+// ── Shared assumptions panel ───────────────────────────────────────────────────
+function initSharedAssumptions() {
+  document.getElementById('sa-demand').value    = ctrlDemand.value;
+  document.getElementById('sa-archtype').value  = ctrlArchtype.value;
+  document.getElementById('sa-import').value    = ctrlImport.value;
+  document.getElementById('sa-export').value    = ctrlExport.value;
+  document.getElementById('sa-overnight').value = ctrlCheap.value;
+  document.getElementById('sa-inflation').value = ctrlInflation.value;
+}
+[
+  ['sa-demand',    ctrlDemand,    'input'],
+  ['sa-import',    ctrlImport,    'input'],
+  ['sa-export',    ctrlExport,    'input'],
+  ['sa-overnight', ctrlCheap,     'input'],
+  ['sa-inflation', ctrlInflation, 'input'],
+  ['sa-archtype',  ctrlArchtype,  'change'],
+].forEach(([saId, ctrl, evt]) =>
+  document.getElementById(saId).addEventListener(evt, e => {
+    ctrl.value = e.target.value;
+    renderQuotesTable();
+  })
+);
+
+
+function getSharedParams() {
+  return {
+    demand:   +ctrlDemand.value,
+    zoneKey:  currentZoneKey,
+    importP:  +ctrlImport.value / 100,
+    exportP:  +ctrlExport.value / 100,
+    cheapP:   ctrlCheap.value === '' ? 0.07 : +ctrlCheap.value / 100,
+    inflRate: 1 + (+ctrlInflation.value / 100),
+    houseVal: +ctrlHouseval.value,
+  };
+}
+
+function renderQuotesTable() {
+  if (quotes.length === 0) {
+    document.getElementById('quotes-table-wrap').innerHTML =
+      `<div class="quotes-empty-hint">No quotes yet — <button class="inline-add-btn" onclick="openQF(null)">+ Add your first quote</button></div>`;
+    return;
+  }
+  const shared = getSharedParams();
+  const rows = quotes.map(q => {
+    const r = shared.zoneKey ? runCalc({
+      arrays: q.arrays, battery: q.batteryKwh, archtype: ctrlArchtype.value, ...shared,
+    }) : null;
+
+    const totalPanels = q.arrays.reduce((s, a) => s + a.panels, 0);
+    const arrDesc     = q.arrays.length > 1 ? ` (${q.arrays.length} arrays)` : '';
+    const sysDesc     = `${totalPanels} panels${arrDesc}` + (q.batteryKwh >= 1.1 ? ` + ${q.batteryKwh} kWh` : '');
+
+    // Estimate cost even without postcode — it only depends on system size
+    const rawCostEst    = 170 * totalPanels + (q.batteryKwh >= 1.1 ? 1000 + 200 * q.batteryKwh : 0) + 4000;
+    const estCostNoZone = Math.round(rawCostEst / 1000) * 1000;
+    const effectiveCost = q.quotedPrice != null ? q.quotedPrice : (r ? r.estimatedCost : estCostNoZone);
+    const costHtml = `£${effectiveCost.toLocaleString()} <span class="q-tag">${q.quotedPrice != null ? 'quoted' : 'est.'}</span>`;
+
+    let pb = '—';
+    if (r && effectiveCost != null) {
+      let cum = 0;
+      for (let y = 1; y <= 50; y++) {
+        cum += r.fixedAnnual + Math.round(r.growingAnnual * Math.pow(shared.inflRate, y - 1));
+        if (cum >= effectiveCost) { pb = y + ' yrs'; break; }
+      }
+      if (pb === '—') pb = '>50 yrs';
+    }
+
+    return `<tr>
+      <td class="q-name">${q.name}</td>
+      <td>${sysDesc}</td>
+      <td>${costHtml}</td>
+      <td>${r ? '£' + r.yr1.toLocaleString() : '—'}</td>
+      <td>${r ? '£' + r.yr5.toLocaleString() : '—'}</td>
+      <td class="pb-yrs">${pb}</td>
+      <td>
+        <button class="q-edit-btn" data-qid="${q.id}">Edit</button>
+        <button class="q-del-btn"  data-qid="${q.id}">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const noZoneNote = !shared.zoneKey
+    ? `<tr><td colspan="7" class="q-no-zone-note">📍 Enter your postcode above to see estimated savings and payback</td></tr>`
+    : '';
+
+  document.getElementById('quotes-table-wrap').innerHTML = `
+    <table class="quotes-table">
+      <thead><tr>
+        <th>Quote</th><th>System</th><th>Cost</th>
+        <th>Yr 1 saving</th><th>Yr 5 saving</th><th>Payback</th><th></th>
+      </tr></thead>
+      <tbody>${noZoneNote}${rows}</tbody>
+    </table>`;
+
+  document.querySelectorAll('.q-del-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      quotes = quotes.filter(q => q.id !== +btn.dataset.qid);
+      renderQuotesTable();
+    })
+  );
+
+  document.querySelectorAll('.q-edit-btn').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const q = quotes.find(q => q.id === +btn.dataset.qid);
+      if (q) openQF(q);
+    })
+  );
+}
+
+document.getElementById('quotes-download-btn').addEventListener('click', () => {
+  const blob = new Blob(
+    [JSON.stringify({ quotes, exportedAt: new Date().toISOString() }, null, 2)],
+    { type: 'application/json' }
+  );
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob), download: 'solar-quotes.json'
+  });
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('quotes-upload-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data.quotes) && data.quotes.length) {
+        quotes = data.quotes;
+        quoteCounter = quotes.length;
+        renderQuotesTable();
+        document.getElementById('quotes-panel').style.display = '';
+      }
+    } catch { alert('Could not read file — please upload a valid solar-quotes.json file.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+document.getElementById('quotes-clear-btn').addEventListener('click', () => {
+  if (confirm('Clear all saved quotes?')) {
+    quotes = [];
+    quoteCounter = 0;
+    closeQF();
+    renderQuotesTable();
+  }
+});
+</script>
+
+</body>
+</html>

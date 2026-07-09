@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your quote room — MyGridGB Solar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/quotes.css">
+</head>
+<body>
+
+<div class="siteband">
+  <div class="inner">
+    <div class="logo">MyGrid<span>GB</span></div>
+    <div class="private mono">PRIVATE LINK · <span id="room-ref">—</span> · <span id="room-area">—</span></div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- State 2: quote room -->
+  <section class="room-head">
+    <div>
+      <h1>Your quote room</h1>
+      <p class="sub">Three installers were invited. Quotes are indicative until a survey — but each firm has your full design, so they should hold close.</p>
+      <p class="window">
+        Quote window closes <span class="mono" id="room-close">—</span> ·
+        <span id="room-ratio">— quotes in</span> ·
+        you'll get one email when the round completes
+      </p>
+    </div>
+    <div class="designchip" id="design-chip">Loading…</div>
+  </section>
+
+  <div class="quotes" id="quote-grid">
+    <p style="padding:20px;color:var(--ink-soft)">Loading quotes…</p>
+  </div>
+
+  <p class="norm-note">
+    <b>How scoring works:</b> every quote is run through the same MyGridGB payback model that produced your original estimate — same MCS irradiance data, same tariff assumptions, over 25 years. That's why a dearer quote can score better. Hardware controllability notes come from our independent <a href="#">inverter &amp; battery reference table</a>.
+  </p>
+
+  <!-- State 3: confirmation (hidden until a firm is chosen) -->
+  <section class="confirm" id="confirm-box" hidden>
+    <h3>✓ <span id="confirm-name"></span> will be in touch to arrange a survey</h3>
+    <p>They now have your name, email and address — no one else does. If the surveyed price moves more than a few percent from the quote here without a clear reason (roof condition, access), tell us: quote accuracy is tracked and shown on installer listings.</p>
+  </section>
+
+</div>
+
+<script src="js/room.js"></script>
+</body>
+</html>

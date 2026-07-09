@@ -1,0 +1,13 @@
+:root {
+  --ink:          #12222e;
+  --ink-soft:     #3d5260;
+  --paper:        #fff;
+  --wash:         #f2f5f7;
+  --line:         #d7dfe4;
+  --amber:        #e8a13a;
+  --amber-deep:   #c07f1d;
+  --verify:       #1e7b4f;
+  --verify-wash:  #e9f4ee;
+  --navy:         #0f2a3c;
+  --radius:       10px;
+}

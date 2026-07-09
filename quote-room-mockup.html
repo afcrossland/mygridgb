@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your quote room — MyGridGB Solar Calculator (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12222e; --ink-soft:#3d5260; --paper:#fff; --wash:#f2f5f7;
+    --line:#d7dfe4; --amber:#e8a13a; --amber-deep:#c07f1d;
+    --verify:#1e7b4f; --verify-wash:#e9f4ee; --navy:#0f2a3c; --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Public Sans',system-ui,sans-serif;color:var(--ink);background:var(--wash);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:var(--navy);}
+  .page{max-width:960px;margin:0 auto;padding:0 20px 80px;}
+
+  .siteband{background:var(--navy);color:#fff;padding:14px 20px;}
+  .siteband .inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;}
+  .siteband .logo{font-weight:800;font-size:17px;letter-spacing:.02em;}
+  .siteband .logo span{color:var(--amber);}
+  .siteband .private{font-family:'IBM Plex Mono',monospace;font-size:12px;opacity:.8;}
+
+  .statelabel{display:inline-block;margin:44px 0 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#8ba0ad;border:1px solid var(--line);border-radius:4px;padding:3px 8px;background:#fff;}
+
+  /* ===== STATE 1: request (email only) ===== */
+  .request{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;margin-top:8px;}
+  .request h1{font-size:28px;font-weight:800;letter-spacing:-.015em;line-height:1.15;}
+  .request .standfirst{font-size:15.5px;color:var(--ink-soft);margin-top:8px;max-width:66ch;}
+  .promises{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;}
+  .promise{border:1px solid var(--line);border-radius:8px;padding:14px;font-size:13px;color:var(--ink-soft);background:var(--wash);}
+  .promise b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:3px;}
+  .reqrow{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;align-items:flex-start;}
+  .reqrow .field{flex:1;min-width:240px;}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;}
+  .field input{width:100%;padding:11px 12px;font-size:15px;font-family:inherit;border:1px solid var(--line);border-radius:7px;}
+  .field input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  .field .hint{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+  .btn{font-family:inherit;font-size:15px;font-weight:700;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:12px 24px;cursor:pointer;}
+  .btn:hover{background:#173d56;}
+  .btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px;}
+  .btn.ghost{background:var(--wash);color:var(--ink);border:1px solid var(--line);}
+  .reqrow .btn{margin-top:24px;}
+  .honesty{margin-top:18px;background:#fdf6e9;border:1px solid #ecd9b3;border-radius:8px;padding:12px 16px;font-size:13px;color:#5c4a22;max-width:74ch;}
+
+  /* ===== quote room header ===== */
+  .room-head{margin-top:8px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:flex-start;}
+  .room-head h1{font-size:24px;font-weight:800;letter-spacing:-.01em;}
+  .room-head .sub{font-size:13.5px;color:var(--ink-soft);margin-top:5px;max-width:56ch;}
+  .designchip{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--navy);color:#fff;border-radius:6px;padding:10px 14px;line-height:1.7;white-space:nowrap;}
+  .designchip .dim{opacity:.65;}
+  .window{margin-top:12px;font-size:13px;color:var(--ink-soft);}
+  .window .mono{font-weight:600;color:var(--ink);}
+
+  /* ===== quote cards ===== */
+  .quotes{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .quote{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
+  .quote.best{border-color:var(--amber-deep);box-shadow:0 0 0 2px rgba(232,161,58,.3);}
+  .q-top{padding:16px 18px 12px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .q-top .who{font-size:16px;font-weight:700;}
+  .q-top .meta{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .bestflag{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--amber);color:#3d2c07;border-radius:4px;padding:3px 8px;white-space:nowrap;}
+  .q-price{padding:0 18px 6px;}
+  .q-price .num{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;letter-spacing:-.01em;}
+  .q-price .vat{font-size:12px;color:var(--ink-soft);}
+  .q-table{margin:10px 0 0;border-top:1px solid var(--line);font-size:13px;flex:1;}
+  .q-table .row{display:flex;justify-content:space-between;gap:12px;padding:8px 18px;border-bottom:1px solid var(--wash);}
+  .q-table .row .k{color:var(--ink-soft);}
+  .q-table .row .v{font-weight:600;text-align:right;}
+  .q-table .row .v .mono{font-weight:500;font-size:12.5px;}
+  .flag-good{color:var(--verify);font-size:12px;}
+  .flag-warn{color:#a4670e;font-size:12px;}
+  .scored{background:var(--verify-wash);border-top:1px solid #cfe5d9;padding:12px 18px;font-size:13px;}
+  .scored .headline{font-weight:700;color:var(--verify);}
+  .scored .why{color:var(--ink-soft);margin-top:3px;font-size:12.5px;}
+  .q-actions{padding:14px 18px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--line);}
+  .q-actions .btn{padding:10px 16px;font-size:14px;}
+  .q-actions .note{font-size:11.5px;color:var(--ink-soft);}
+  .q-pending{border-style:dashed;align-items:center;justify-content:center;display:flex;min-height:280px;color:var(--ink-soft);font-size:13.5px;text-align:center;padding:24px;background:transparent;}
+
+  .norm-note{margin-top:18px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-size:13px;color:var(--ink-soft);max-width:100%;}
+  .norm-note b{color:var(--ink);}
+
+  /* ===== reveal confirmation ===== */
+  .confirm{margin-top:8px;border:1px solid #bcd9c9;background:var(--verify-wash);border-radius:var(--radius);padding:22px 24px;}
+  .confirm h3{font-size:17px;color:var(--verify);}
+  .confirm p{font-size:14px;margin-top:8px;max-width:74ch;}
+
+  /* ===== installer quote form (prescribed format) ===== */
+  .iform{margin-top:8px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px;}
+  .iform h2{font-size:20px;font-weight:800;}
+  .iform .sub{font-size:13.5px;color:var(--ink-soft);margin-top:6px;max-width:70ch;}
+  .iform .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
+  .iform .full{grid-column:1/-1;}
+  .iform select{width:100%;padding:11px 12px;font-size:14.5px;font-family:inherit;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);}
+  .rules{margin-top:16px;font-size:12.5px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:12px;max-width:76ch;}
+  .iform .btn{margin-top:16px;}
+
+  @media (max-width:760px){
+    .promises{grid-template-columns:1fr;}
+    .quotes{grid-template-columns:1fr;}
+    .iform .grid{grid-template-columns:1fr;}
+    .designchip{white-space:normal;}
+  }
+</style>
+</head>
+<body>
+
+<div class="siteband">
+  <div class="inner">
+    <div class="logo">MyGrid<span>GB</span></div>
+    <div class="private">PRIVATE LINK · SC-2026-04182</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ============ STATE 1: request quotes (email only) ============ -->
+  <span class="statelabel">State 1 · Requesting quotes (sits under calculator results)</span>
+  <section class="request">
+    <h1>Put this design out to quote</h1>
+    <p class="standfirst">Vetted installers quote against your design — in a fixed format, through this site. You compare them here, on the same assumptions as your estimate above. No installer gets your name or number unless you choose them.</p>
+
+    <div class="promises">
+      <div class="promise"><b>No phone calls</b>We don't ask for your number, so nobody can ring you. You need one email address for your private link.</div>
+      <div class="promise"><b>Quotes in one format</b>Hardware, price, warranty, lead time — every quote answers the same questions, so they're actually comparable.</div>
+      <div class="promise"><b>You choose who learns your name</b>Contact details are released only to the firm you pick for a survey. The others never know who you are.</div>
+    </div>
+
+    <div class="reqrow">
+      <div class="field">
+        <label for="em">Email address</label>
+        <input id="em" type="email" autocomplete="email">
+        <div class="hint">Used for your private quote-room link and one message when quotes arrive. Nothing else.</div>
+      </div>
+      <div class="field">
+        <label for="pc">Full postcode</label>
+        <input id="pc" type="text" value="NG22 ">
+        <div class="hint">Installers see the postcode area, not your address.</div>
+      </div>
+      <button type="button" class="btn">Open my quote room</button>
+    </div>
+
+    <div class="honesty"><strong>How this is funded:</strong> when you choose an installer, that firm pays MyGridGB a fee. Prices quoted are the same either way, quotes are scored by the same model that produced your estimate, and installers can't pay for a better score or position.</div>
+  </section>
+
+  <!-- ============ STATE 2: the quote room ============ -->
+  <span class="statelabel">State 2 · Your quote room (private magic link)</span>
+
+  <section class="room-head">
+    <div>
+      <h1>Your quote room</h1>
+      <p class="sub">Three installers were invited on 6 July. Quotes are indicative until a survey — but each firm has your full design, so they should hold close.</p>
+      <p class="window">Quote window closes <span class="mono">Mon 13 Jul</span> · 2 of 3 quotes in · you'll get one email when the round completes</p>
+    </div>
+    <div class="designchip">
+      3.80 kWp · 10 × 475 W<br>
+      5.0 kWh battery · SE–SW 35°<br>
+      <span class="dim">est. 3,590 kWh/yr · ref SC-2026-04182</span>
+    </div>
+  </section>
+
+  <div class="quotes">
+
+    <!-- Quote A -->
+    <article class="quote best" aria-label="Quote from Trent Valley Renewables">
+      <div class="q-top">
+        <div>
+          <div class="who">Trent Valley Renewables</div>
+          <div class="meta">MCS <span class="mono">NAP-31097</span> · RECC · ★ 4.9 (96)</div>
+        </div>
+        <span class="bestflag">Best return</span>
+      </div>
+      <div class="q-price"><span class="num">£7,840</span> <span class="vat">inc. VAT, scaffolding &amp; DNO</span></div>
+      <div class="q-table">
+        <div class="row"><span class="k">Panels</span><span class="v">10 × Aiko 475 W <span class="mono">(as designed)</span></span></div>
+        <div class="row"><span class="k">Inverter</span><span class="v">Sungrow SH3.6RS hybrid<br><span class="flag-good">✓ local Modbus control — works with smart tariffs</span></span></div>
+        <div class="row"><span class="k">Battery</span><span class="v">Sungrow SBR 6.4 kWh <span class="mono">(+1.4 vs design)</span></span></div>
+        <div class="row"><span class="k">Workmanship warranty</span><span class="v">10 years, HIES-insured</span></div>
+        <div class="row"><span class="k">Lead time</span><span class="v">4–6 weeks</span></div>
+      </div>
+      <div class="scored">
+        <div class="headline">Payback 8.3 yrs · £14,900 lifetime return</div>
+        <div class="why">Scored by the MyGridGB model on the same MCS solar data as your estimate. Bigger battery raises the price but lifts self-use to 71%.</div>
+      </div>
+      <div class="q-actions">
+        <button type="button" class="btn">Choose for survey</button>
+        <span class="note">Releases your name, email and address to this firm only.</span>
+      </div>
+    </article>
+
+    <!-- Quote B -->
+    <article class="quote" aria-label="Quote from Sherwood Solar Ltd">
+      <div class="q-top">
+        <div>
+          <div class="who">Sherwood Solar Ltd</div>
+          <div class="meta">MCS <span class="mono">NAP-52814</span> · HIES · ★ 4.8 (214)</div>
+        </div>
+      </div>
+      <div class="q-price"><span class="num">£6,990</span> <span class="vat">inc. VAT &amp; scaffolding</span></div>
+      <div class="q-table">
+        <div class="row"><span class="k">Panels</span><span class="v">10 × JA Solar 460 W <span class="mono">(−150 W vs design)</span></span></div>
+        <div class="row"><span class="k">Inverter</span><span class="v">Growatt SPH 3.6<br><span class="flag-warn">△ cloud-only control — limited smart-tariff support</span></span></div>
+        <div class="row"><span class="k">Battery</span><span class="v">Growatt 5.0 kWh <span class="mono">(as designed)</span></span></div>
+        <div class="row"><span class="k">Workmanship warranty</span><span class="v">5 years</span></div>
+        <div class="row"><span class="k">Lead time</span><span class="v">2–3 weeks</span></div>
+      </div>
+      <div class="scored">
+        <div class="headline">Payback 8.1 yrs · £13,200 lifetime return</div>
+        <div class="why">Cheapest and fastest. Slightly lower generation from smaller panels; shorter warranty is the main trade-off.</div>
+      </div>
+      <div class="q-actions">
+        <button type="button" class="btn ghost">Choose for survey</button>
+        <span class="note">Releases your details to this firm only.</span>
+      </div>
+    </article>
+
+    <!-- Pending -->
+    <article class="quote q-pending" aria-label="Awaiting quote">
+      <div>
+        <strong>Beacon Energy Systems</strong><br>
+        invited 6 July — quote not yet in.<br>
+        Firms that miss the window lose their place on future rounds.
+      </div>
+    </article>
+
+  </div>
+
+  <p class="norm-note"><b>How scoring works:</b> every quote is run through the same MyGridGB payback model that produced your original estimate — same MCS irradiance data, same tariff assumptions, over 25 years. That's why a dearer quote can score better. We show our working: tap any score for the full calculation. Hardware controllability notes come from our independent <a href="#">inverter &amp; battery reference table</a>.</p>
+
+  <!-- ============ STATE 3: after choosing ============ -->
+  <span class="statelabel">State 3 · After choosing a firm</span>
+  <section class="confirm">
+    <h3>✓ Trent Valley Renewables will be in touch to arrange a survey</h3>
+    <p>They now have your name, email and address — no one else does, and Beacon's late quote will be declined automatically. If the surveyed price moves more than a few percent from the quote here without a clear reason (roof condition, access), tell us: quote accuracy is tracked and shown on installer listings.</p>
+  </section>
+
+  <!-- ============ STATE 4: installer's side ============ -->
+  <span class="statelabel">State 4 · What the installer sees (prescribed quote form, tokenised link)</span>
+  <section class="iform">
+    <h2>Quote request SC-2026-04182 · NG22 area</h2>
+    <p class="sub">Design attached below. This is a sealed round: you're one of three firms invited, quotes are indicative pending survey, and the homeowner sees every quote in this exact format on MyGridGB. No pitch text, no attachments — the numbers do the talking. Window closes Mon 13 Jul, 17:00.</p>
+    <div class="grid">
+      <div class="field"><label>Panel make &amp; model</label><select><option>Aiko Neostar 2S 475 W</option></select></div>
+      <div class="field"><label>Panel count</label><input type="text" value="10"></div>
+      <div class="field"><label>Inverter make &amp; model</label><select><option>Sungrow SH3.6RS</option></select></div>
+      <div class="field"><label>Battery make &amp; model / capacity</label><select><option>Sungrow SBR 6.4 kWh</option></select></div>
+      <div class="field"><label>Total price inc. VAT (£)</label><input type="text" value="7,840"></div>
+      <div class="field"><label>Includes scaffolding / DNO application?</label><select><option>Yes — both included</option></select></div>
+      <div class="field"><label>Workmanship warranty (years)</label><input type="text" value="10"></div>
+      <div class="field"><label>Lead time</label><select><option>4–6 weeks</option></select></div>
+    </div>
+    <p class="rules">Hardware is selected from the MyGridGB component list so homeowners get consistent spec and controllability information. Quoting a different system size than the design is fine — say so in the substitution field and the comparison will score it fairly. A fee of £X applies only if the homeowner chooses you for a survey.</p>
+    <button type="button" class="btn">Submit sealed quote</button>
+    <button type="button" class="btn ghost">Decline this request</button>
+  </section>
+
+</div>
+</body>
+</html>

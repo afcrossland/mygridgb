@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get quotes — MyGridGB Solar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/quotes.css">
+</head>
+<body>
+
+<div class="siteband">
+  <div class="inner">
+    <div class="logo">MyGrid<span>GB</span></div>
+    <div class="private">Solar Matcher · private</div>
+  </div>
+</div>
+
+<div class="page">
+  <section class="request" style="margin-top:44px">
+    <h1>Put this design out to quote</h1>
+    <p class="standfirst">Vetted installers quote against your design — in a fixed format, through this site. You compare them here, on the same assumptions as your estimate above. No installer gets your name or number unless you choose them.</p>
+
+    <div class="promises">
+      <div class="promise"><b>No phone calls</b>We don't ask for your number, so nobody can ring you. You need one email address for your private link.</div>
+      <div class="promise"><b>Quotes in one format</b>Hardware, price, warranty, lead time — every quote answers the same questions, so they're actually comparable.</div>
+      <div class="promise"><b>You choose who learns your name</b>Contact details are released only to the firm you pick for a survey. The others never know who you are.</div>
+    </div>
+
+    <div class="reqrow">
+      <div class="field">
+        <label for="em">Email address</label>
+        <input id="em" type="email" autocomplete="email" placeholder="you@example.com">
+        <div class="hint">Used for your private quote-room link and one message when quotes arrive. Nothing else.</div>
+      </div>
+      <div class="field">
+        <label for="pc">Full postcode</label>
+        <input id="pc" type="text" placeholder="e.g. NG22 6UF" autocomplete="postal-code">
+        <div class="hint">Installers see the postcode area only, not your address.</div>
+      </div>
+      <button type="button" class="btn" id="open-btn">Open my quote room</button>
+    </div>
+
+    <div class="honesty"><strong>How this is funded:</strong> when you choose an installer, that firm pays MyGridGB a fee. Prices quoted are the same either way, quotes are scored by the same model that produced your estimate, and installers can't pay for a better score or position.</div>
+  </section>
+</div>
+
+<script>
+document.getElementById('open-btn').addEventListener('click', () => {
+  const em = document.getElementById('em').value.trim();
+  const pc = document.getElementById('pc').value.trim();
+  if (!em || !pc) { alert('Please enter your email and postcode.'); return; }
+  // In production: POST to Cloudflare Worker, receive magic link via email.
+  // For prototype: navigate directly to room.html.
+  window.location.href = 'room.html';
+});
+</script>
+</body>
+</html>

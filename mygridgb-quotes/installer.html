@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Submit quote — MyGridGB Solar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/quotes.css">
+</head>
+<body>
+
+<div class="siteband">
+  <div class="inner">
+    <div class="logo">MyGrid<span>GB</span></div>
+    <div class="private mono">INSTALLER PORTAL · SC-2026-04182</div>
+  </div>
+</div>
+
+<div class="page">
+  <section class="iform" style="margin-top:44px">
+    <h2>Quote request SC-2026-04182 · NG22 area</h2>
+    <p class="sub">Design attached below. This is a sealed round: you're one of three firms invited, quotes are indicative pending survey, and the homeowner sees every quote in this exact format on MyGridGB. No pitch text, no attachments — the numbers do the talking. Window closes <strong>Mon 13 Jul, 17:00</strong>.</p>
+
+    <div class="design-summary">
+      3.80 kWp · 10 × 475 W panels · 5.0 kWh battery<br>
+      SE–SW aspect · 35° tilt · est. 3,590 kWh/yr<br>
+      <span class="dim">ref SC-2026-04182 · NG22 postcode area</span>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="panel-model">Panel make &amp; model</label>
+        <select id="panel-model">
+          <option value="">— select from approved list —</option>
+          <option value="aiko-475">Aiko Neostar 2S 475 W</option>
+          <option value="ja-460">JA Solar JAM54S30 460 W</option>
+          <option value="longi-480">LONGi Hi-MO 6 480 W</option>
+          <option value="jinko-470">Jinko Tiger Neo 470 W</option>
+          <option value="rec-405">REC Alpha Pure 405 W</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="panel-count">Panel count</label>
+        <input id="panel-count" type="number" min="1" max="40" placeholder="e.g. 10">
+      </div>
+      <div class="field">
+        <label for="inverter-model">Inverter make &amp; model</label>
+        <select id="inverter-model">
+          <option value="">— select from approved list —</option>
+          <option value="sungrow-sh36">Sungrow SH3.6RS (local Modbus)</option>
+          <option value="sungrow-sh50">Sungrow SH5.0RS (local Modbus)</option>
+          <option value="growatt-sph36">Growatt SPH 3.6 (cloud only)</option>
+          <option value="solaredge-hd">SolarEdge Home Hub (cloud only)</option>
+          <option value="givenergy-5">GivEnergy 5.0 kW (local API)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="battery-model">Battery make &amp; model</label>
+        <select id="battery-model">
+          <option value="">— select from approved list —</option>
+          <option value="sungrow-sbr64">Sungrow SBR 6.4 kWh</option>
+          <option value="sungrow-sbr50">Sungrow SBR 5.0 kWh</option>
+          <option value="growatt-50">Growatt ARK-5.0H-A1 5.0 kWh</option>
+          <option value="givenergy-98">GivEnergy 9.5 kWh</option>
+          <option value="tesla-pw3">Tesla Powerwall 3 13.5 kWh</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="price">Total price inc. VAT (£)</label>
+        <input id="price" type="number" min="1000" placeholder="e.g. 7840">
+      </div>
+      <div class="field">
+        <label for="includes">Includes scaffolding / DNO application?</label>
+        <select id="includes">
+          <option value="both">Yes — both included</option>
+          <option value="scaffolding">Scaffolding included, DNO not included</option>
+          <option value="neither">Neither included — customer to arrange</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="warranty">Workmanship warranty (years)</label>
+        <input id="warranty" type="number" min="1" max="25" placeholder="e.g. 10">
+      </div>
+      <div class="field">
+        <label for="leadtime">Lead time</label>
+        <select id="leadtime">
+          <option value="1-2">1–2 weeks</option>
+          <option value="2-3">2–3 weeks</option>
+          <option value="4-6">4–6 weeks</option>
+          <option value="6-8">6–8 weeks</option>
+          <option value="8-12">8–12 weeks</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label for="substitution">Substitution note <span style="font-weight:400;color:var(--ink-soft)">(leave blank if hardware matches design exactly)</span></label>
+        <textarea id="substitution" placeholder="e.g. Upgraded battery from 5.0 kWh to 6.4 kWh for better self-use. Panel spec identical to design."></textarea>
+        <div class="hint">If you're proposing different panel wattage or battery capacity, explain why here. The comparison table will flag the deviation automatically.</div>
+      </div>
+    </div>
+
+    <p class="rules">Hardware is selected from the MyGridGB component list so homeowners get consistent spec and controllability information. Quoting a different system size than the design is fine — say so in the substitution field and the comparison will score it fairly. A referral fee applies only if the homeowner selects you for a survey.</p>
+
+    <div class="actions">
+      <button type="button" class="btn" id="submit-btn">Submit sealed quote</button>
+      <button type="button" class="btn ghost" id="decline-btn">Decline this request</button>
+    </div>
+  </section>
+</div>
+
+<script>
+document.getElementById('submit-btn').addEventListener('click', () => {
+  // Prototype: just show acknowledgement.
+  // Production: POST to Cloudflare Worker with installer token.
+  alert('Quote submitted. The homeowner will see it in their quote room once the window closes.');
+});
+document.getElementById('decline-btn').addEventListener('click', () => {
+  if (confirm('Decline this quote request? Your place in this round will be released.')) {
+    alert('Declined. Thank you for letting us know.');
+  }
+});
+</script>
+</body>
+</html>

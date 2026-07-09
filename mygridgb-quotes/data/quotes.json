@@ -1,0 +1,122 @@
+{
+  "round": {
+    "reference": "SC-2026-04182",
+    "postcode_area": "NG22",
+    "created_at": "2026-07-06T09:00:00Z",
+    "window_closes_at": "2026-07-13T17:00:00Z",
+    "invited_count": 3,
+    "design": {
+      "panel_watts": 475,
+      "panel_count": 10,
+      "battery_kwh": 5.0,
+      "azimuth_label": "SE–SW",
+      "tilt_deg": 35,
+      "est_generation_kwh_yr": 3590
+    }
+  },
+  "quotes": [
+    {
+      "id": "q-trent",
+      "installer": {
+        "name": "Trent Valley Renewables",
+        "mcs_number": "NAP-31097",
+        "consumer_code": "RECC",
+        "google_rating": 4.9,
+        "review_count": 96
+      },
+      "hardware": {
+        "panels": {
+          "make": "Aiko",
+          "model": "Neostar 2S",
+          "watts": 475,
+          "count": 10
+        },
+        "inverter": {
+          "make": "Sungrow",
+          "model": "SH3.6RS hybrid",
+          "controllability": "local_modbus",
+          "controllability_note": "local Modbus control — works with smart tariffs"
+        },
+        "battery": {
+          "make": "Sungrow",
+          "model": "SBR",
+          "kwh": 6.4
+        }
+      },
+      "price": {
+        "total_inc_vat": 7840,
+        "includes_scaffolding": true,
+        "includes_dno": true
+      },
+      "warranty_years": 10,
+      "lead_time_weeks": { "min": 4, "max": 6 },
+      "substitution_note": "Upgraded to 6.4 kWh battery; same panel spec as design.",
+      "status": "submitted",
+      "computed": {
+        "payback_years": 8.3,
+        "lifetime_return_gbp": 14900,
+        "self_use_pct": 71
+      }
+    },
+    {
+      "id": "q-sherwood",
+      "installer": {
+        "name": "Sherwood Solar Ltd",
+        "mcs_number": "NAP-52814",
+        "consumer_code": "HIES",
+        "google_rating": 4.8,
+        "review_count": 214
+      },
+      "hardware": {
+        "panels": {
+          "make": "JA Solar",
+          "model": "JAM54S30",
+          "watts": 460,
+          "count": 10
+        },
+        "inverter": {
+          "make": "Growatt",
+          "model": "SPH 3.6",
+          "controllability": "cloud_only",
+          "controllability_note": "cloud-only control — limited smart-tariff support"
+        },
+        "battery": {
+          "make": "Growatt",
+          "model": "ARK-5.0H-A1",
+          "kwh": 5.0
+        }
+      },
+      "price": {
+        "total_inc_vat": 6990,
+        "includes_scaffolding": true,
+        "includes_dno": false
+      },
+      "warranty_years": 5,
+      "lead_time_weeks": { "min": 2, "max": 3 },
+      "substitution_note": null,
+      "status": "submitted",
+      "computed": {
+        "payback_years": 8.1,
+        "lifetime_return_gbp": 13200,
+        "self_use_pct": 65
+      }
+    },
+    {
+      "id": "q-beacon",
+      "installer": {
+        "name": "Beacon Energy Systems",
+        "mcs_number": "NAP-78341",
+        "consumer_code": "RECC",
+        "google_rating": 4.7,
+        "review_count": 51
+      },
+      "hardware": null,
+      "price": null,
+      "warranty_years": null,
+      "lead_time_weeks": null,
+      "substitution_note": null,
+      "status": "pending",
+      "computed": null
+    }
+  ]
+}
