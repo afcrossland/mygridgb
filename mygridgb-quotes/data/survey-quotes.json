@@ -1,0 +1,82 @@
+{
+  "round_reference": "SC-2026-04182",
+  "postcode_area": "NG22",
+  "design": {
+    "panel_watts": 475, "panel_count": 10, "battery_kwh": 5.0,
+    "azimuth_label": "SE–SW", "tilt_deg": 35, "est_generation_kwh_yr": 3590
+  },
+  "survey_quotes": [
+    {
+      "installer_id": "ins-trent",
+      "installer": { "name": "Trent Valley Renewables", "mcs_number": "NAP-31097", "consumer_code": "RECC", "google_rating": 4.9, "review_count": 96 },
+      "surveyor": "Sarah Mitchell, MCS Assessor",
+      "survey_date": "2026-07-10",
+      "status": "submitted",
+      "based_on_design_label": "Larger system (6.65 kWp)",
+      "changes_from_quote": [
+        "Roof required 2 additional mounting brackets — added £180",
+        "Battery relocated to garage wall — no cost impact",
+        "Confirmed south-facing pitch is 38° not 35° — marginally better yield"
+      ],
+      "hardware": {
+        "panels":   { "count": 14, "watts": 475, "kwp": 6.65, "make": "Aiko",    "model": "Neostar 2S" },
+        "battery":  { "kwh": 9.6,                              "make": "Sungrow", "model": "SBR 096" },
+        "inverters": [{ "count": 1, "type": "hybrid", "make": "Sungrow", "model": "SH5.0RS" }]
+      },
+      "price": {
+        "total_inc_vat": 10380,
+        "breakdown": [
+          { "item": "Solar panels — 14 × Aiko Neostar 2S 475 W", "gbp": 5600 },
+          { "item": "Sungrow SH5.0RS hybrid inverter",             "gbp": 1200 },
+          { "item": "Sungrow SBR 9.6 kWh battery system",         "gbp": 1800 },
+          { "item": "Mounting, fixings & additional brackets",     "gbp": 680  },
+          { "item": "Electrical work & DNO application",           "gbp": 500  },
+          { "item": "Scaffolding (5 days)",                       "gbp": 400  },
+          { "item": "VAT (0% — energy-saving materials)",         "gbp": 0    }
+        ]
+      },
+      "payment_terms": { "deposit_pct": 10, "on_delivery_pct": 40, "on_completion_pct": 50 },
+      "warranty": { "panel_product_years": 25, "panel_performance_years": 30, "battery_years": 10, "installation_years": 2 },
+      "installation_window": "September 2026",
+      "duration_days": 2,
+      "mcs_certificate": true,
+      "installer_notes": "We'll handle all DNO paperwork and provide MCS certificate on completion. Scaffolding up for 5 days."
+    },
+    {
+      "installer_id": "ins-sherwood",
+      "installer": { "name": "Sherwood Solar Ltd", "mcs_number": "NAP-52814", "consumer_code": "HIES", "google_rating": 4.8, "review_count": 214 },
+      "surveyor": "James Carr, MCS Assessor",
+      "survey_date": "2026-07-11",
+      "status": "submitted",
+      "based_on_design_label": "Standard option (4.75 kWp)",
+      "changes_from_quote": [
+        "Original quote excluded DNO — DNO fee now included at cost, £320 added",
+        "Upgraded to Fox ESS ECS2900-H5 (10 kWh) due to availability — same price"
+      ],
+      "hardware": {
+        "panels":   { "count": 10, "watts": 475, "kwp": 4.75, "make": "JA Solar", "model": "JAM60S20" },
+        "battery":  { "kwh": 10.0,                             "make": "Fox ESS",  "model": "ECS2900-H5" },
+        "inverters": [{ "count": 1, "type": "hybrid", "make": "Solis", "model": "RHI-3.6K-48ES" }]
+      },
+      "price": {
+        "total_inc_vat": 8470,
+        "breakdown": [
+          { "item": "Solar panels — 10 × JA Solar JAM60S20 475 W", "gbp": 3800 },
+          { "item": "Solis RHI-3.6K-48ES hybrid inverter",          "gbp": 900  },
+          { "item": "Fox ESS ECS2900-H5 10 kWh battery",           "gbp": 2100 },
+          { "item": "Mounting & fixings",                           "gbp": 480  },
+          { "item": "Electrical work",                              "gbp": 370  },
+          { "item": "DNO application & fee",                        "gbp": 320  },
+          { "item": "Scaffolding (4 days)",                        "gbp": 500  },
+          { "item": "VAT (0% — energy-saving materials)",          "gbp": 0    }
+        ]
+      },
+      "payment_terms": { "deposit_pct": 25, "on_delivery_pct": 0, "on_completion_pct": 75 },
+      "warranty": { "panel_product_years": 15, "panel_performance_years": 30, "battery_years": 10, "installation_years": 2 },
+      "installation_window": "August 2026",
+      "duration_days": 1,
+      "mcs_certificate": true,
+      "installer_notes": "One-day installation. Battery installed in utility room. All scaffolding included."
+    }
+  ]
+}

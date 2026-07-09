@@ -3,51 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 <title>Your quote room — MyGridGB Solar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/quotes.css">
+<script src="../assets/nav.js" defer></script>
+<script src="js/step-nav.js" defer></script>
 </head>
 <body>
 
-<div class="siteband">
-  <div class="inner">
-    <div class="logo">MyGrid<span>GB</span></div>
-    <div class="private mono">PRIVATE LINK · <span id="room-ref">—</span> · <span id="room-area">—</span></div>
-  </div>
+<div class="ref-strip">
+  <span>PRIVATE LINK</span> · <span id="room-ref">—</span> · <span id="room-area">—</span>
 </div>
 
 <div class="page">
 
-  <!-- State 2: quote room -->
-  <section class="room-head">
+  <div class="room-head">
     <div>
-      <h1>Your quote room</h1>
-      <p class="sub">Three installers were invited. Quotes are indicative until a survey — but each firm has your full design, so they should hold close.</p>
+      <h1>Indicative quotes</h1>
+      <p class="sub">These are ballpark prices based on your design brief — not binding until a surveyor has seen your roof. Use them to shortlist installers for a site visit. Your contact details are only released to firms you select for survey. Your contract will be with the installer, not MyGridGB.</p>
       <p class="window">
         Quote window closes <span class="mono" id="room-close">—</span> ·
-        <span id="room-ratio">— quotes in</span> ·
-        you'll get one email when the round completes
+        <span id="room-ratio">waiting for quotes…</span>
       </p>
     </div>
-    <div class="designchip" id="design-chip">Loading…</div>
-  </section>
-
-  <div class="quotes" id="quote-grid">
-    <p style="padding:20px;color:var(--ink-soft)">Loading quotes…</p>
+    <div class="designchip" id="design-chip"></div>
   </div>
 
-  <p class="norm-note">
-    <b>How scoring works:</b> every quote is run through the same MyGridGB payback model that produced your original estimate — same MCS irradiance data, same tariff assumptions, over 25 years. That's why a dearer quote can score better. Hardware controllability notes come from our independent <a href="#">inverter &amp; battery reference table</a>.
+  <!-- Quote groups (one per invited installer) -->
+  <div id="quote-groups"></div>
+
+  <!-- Add more installers -->
+  <div class="more-section" id="more-section" style="display:none">
+    <div class="more-head">
+      <strong>Add more installers</strong>
+      <span class="more-sub">Invite additional firms — they'll receive the same design brief and have until the round closes to respond.</span>
+    </div>
+    <div id="more-list"></div>
+  </div>
+
+  <p class="norm-note" id="norm-note" style="display:none">
+    <b>About these estimates:</b> the % of consumption met is estimated annual generation (MCS irradiance data for your area) divided by your entered annual demand. Actual results depend on your usage patterns, shading, and weather. These are indicative figures for comparison — the authoritative performance figure will be your MCS performance certificate, issued by the installer on completion. Warranty descriptions are as stated by each installer; verify full terms before proceeding. Hardware controllability notes come from our <a href="#">inverter &amp; battery reference table</a>. <b>MyGridGB is an introduction platform — your contract is with the installer.</b>
   </p>
 
-  <!-- State 3: confirmation (hidden until a firm is chosen) -->
-  <section class="confirm" id="confirm-box" hidden>
-    <h3>✓ <span id="confirm-name"></span> will be in touch to arrange a survey</h3>
-    <p>They now have your name, email and address — no one else does. If the surveyed price moves more than a few percent from the quote here without a clear reason (roof condition, access), tell us: quote accuracy is tracked and shown on installer listings.</p>
-  </section>
 
 </div>
 

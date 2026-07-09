@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+<title>Leave a review — MyGridGB Solar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/quotes.css">
+<script src="../assets/nav.js" defer></script>
+<script src="js/step-nav.js" defer></script>
+</head>
+<body>
+
+<div class="ref-strip">
+  <span>PRIVATE LINK</span> · <span id="room-ref">SC-2026-04182</span> · <span id="room-area">NG22 area</span>
+</div>
+
+<div class="page">
+
+  <div class="room-head" style="margin-top:8px">
+    <div>
+      <h1>How did it go?</h1>
+      <p class="sub">Your review helps other homeowners choose. It also tells us whether the quote held to the survey price — that data feeds directly back into how installers are ranked on future rounds.</p>
+    </div>
+  </div>
+
+  <div class="review-installer-context" id="review-context">
+    <div class="review-ins-name" id="review-ins-name">Trent Valley Renewables</div>
+    <div class="review-ins-meta" id="review-ins-meta">Installation completed · ref SC-2026-04182</div>
+  </div>
+
+  <form class="review-form" id="review-form" novalidate>
+
+    <!-- Star rating -->
+    <div class="rv-section">
+      <div class="rv-label">Overall rating</div>
+      <div class="star-row" role="radiogroup" aria-label="Overall rating">
+        <button type="button" class="star" data-v="1" aria-label="1 star">★</button>
+        <button type="button" class="star" data-v="2" aria-label="2 stars">★</button>
+        <button type="button" class="star" data-v="3" aria-label="3 stars">★</button>
+        <button type="button" class="star" data-v="4" aria-label="4 stars">★</button>
+        <button type="button" class="star" data-v="5" aria-label="5 stars">★</button>
+      </div>
+      <input type="hidden" id="rv-rating" value="">
+    </div>
+
+    <!-- Price accuracy -->
+    <div class="rv-section">
+      <div class="rv-label">Did the final price match the survey quote?</div>
+      <div class="rv-options" id="price-accuracy">
+        <label class="rv-opt"><input type="radio" name="price" value="exact"> Exact match</label>
+        <label class="rv-opt"><input type="radio" name="price" value="within5"> Within 5%</label>
+        <label class="rv-opt"><input type="radio" name="price" value="over5"> More than 5% higher</label>
+        <label class="rv-opt"><input type="radio" name="price" value="lower"> Came in lower</label>
+      </div>
+      <div class="rv-field" id="price-explain-wrap" style="display:none">
+        <label for="price-explain">What changed, and did they explain why?</label>
+        <textarea id="price-explain" rows="2" placeholder="e.g. Extra scaffolding required — they told me before starting work"></textarea>
+      </div>
+    </div>
+
+    <!-- Scores -->
+    <div class="rv-section">
+      <div class="rv-label">Rate each area <span style="font-weight:400;color:var(--ink-soft)">(1–5)</span></div>
+      <div class="rv-score-grid">
+        <div class="rv-score-row"><span>Communication before installation</span><div class="mini-stars" data-field="communication"></div></div>
+        <div class="rv-score-row"><span>Tidiness and professionalism on the day</span><div class="mini-stars" data-field="professionalism"></div></div>
+        <div class="rv-score-row"><span>Quality of the finished installation</span><div class="mini-stars" data-field="quality"></div></div>
+        <div class="rv-score-row"><span>Aftercare and paperwork (MCS cert, DNO)</span><div class="mini-stars" data-field="aftercare"></div></div>
+      </div>
+    </div>
+
+    <!-- System performance -->
+    <div class="rv-section">
+      <div class="rv-label">Is your system generating as expected?</div>
+      <div class="rv-options">
+        <label class="rv-opt"><input type="radio" name="perf" value="better"> Better than expected</label>
+        <label class="rv-opt"><input type="radio" name="perf" value="asexpected"> About as expected</label>
+        <label class="rv-opt"><input type="radio" name="perf" value="worse"> Below expectations</label>
+        <label class="rv-opt"><input type="radio" name="perf" value="toosoon"> Too early to say</label>
+      </div>
+    </div>
+
+    <!-- Free text -->
+    <div class="rv-section">
+      <div class="rv-label">Anything else to add?</div>
+      <textarea class="rv-textarea" id="rv-freetext" rows="4" placeholder="What would you tell someone choosing between this installer and another? Any tips, warnings or things that surprised you…"></textarea>
+    </div>
+
+    <!-- Would recommend -->
+    <div class="rv-section">
+      <div class="rv-label">Would you recommend this installer to a neighbour?</div>
+      <div class="rv-options">
+        <label class="rv-opt"><input type="radio" name="recommend" value="yes"> Yes, definitely</label>
+        <label class="rv-opt"><input type="radio" name="recommend" value="maybe"> With reservations</label>
+        <label class="rv-opt"><input type="radio" name="recommend" value="no"> No</label>
+      </div>
+    </div>
+
+    <div class="rv-section">
+      <button type="submit" class="btn" id="rv-submit" disabled>Submit review</button>
+      <p class="rv-note">Your review is attributed to a verified installation (ref SC-2026-04182). We don't publish your name — only that the reviewer completed a real installation through MyGridGB.</p>
+    </div>
+
+  </form>
+
+  <div class="review-thanks" id="review-thanks" hidden>
+    <div class="thanks-icon">✓</div>
+    <h2>Thanks — your review has been submitted</h2>
+    <p>It will appear on <strong id="thanks-ins-name">this installer's</strong> profile once we've checked it against the installation record. Price accuracy data feeds into our installer rankings straight away.</p>
+    <p style="margin-top:12px"><a href="/solar-matcher/" class="page-nav-back">← Back to the solar calculator</a></p>
+  </div>
+
+</div>
+
+<script>
+// ── Star rating ───────────────────────────────────────────────────────────────
+let overallRating = 0;
+const stars = document.querySelectorAll('.star-row .star');
+stars.forEach(s => {
+  s.addEventListener('mouseover', () => highlightStars(+s.dataset.v));
+  s.addEventListener('mouseout',  () => highlightStars(overallRating));
+  s.addEventListener('click', () => {
+    overallRating = +s.dataset.v;
+    document.getElementById('rv-rating').value = overallRating;
+    highlightStars(overallRating);
+    checkReady();
+  });
+});
+function highlightStars(n) {
+  stars.forEach(s => s.classList.toggle('lit', +s.dataset.v <= n));
+}
+
+// ── Mini stars (per-category) ─────────────────────────────────────────────────
+document.querySelectorAll('.mini-stars').forEach(wrap => {
+  let val = 0;
+  for (let i = 1; i <= 5; i++) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = '★'; b.dataset.v = i;
+    b.className = 'mini-star';
+    b.addEventListener('mouseover', () => setMini(wrap, i));
+    b.addEventListener('mouseout',  () => setMini(wrap, val));
+    b.addEventListener('click',     () => { val = i; setMini(wrap, i); wrap.dataset.value = i; checkReady(); });
+    wrap.appendChild(b);
+  }
+});
+function setMini(wrap, n) {
+  wrap.querySelectorAll('.mini-star').forEach(b => b.classList.toggle('lit', +b.dataset.v <= n));
+}
+
+// ── Price accuracy — show explain box if price moved ─────────────────────────
+document.querySelectorAll('[name="price"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const show = r.value === 'over5' || r.value === 'within5';
+    document.getElementById('price-explain-wrap').style.display = show ? '' : 'none';
+    checkReady();
+  });
+});
+
+// ── Enable submit when minimum filled ────────────────────────────────────────
+function checkReady() {
+  const hasRating  = overallRating > 0;
+  const hasPrice   = !!document.querySelector('[name="price"]:checked');
+  const hasPerf    = !!document.querySelector('[name="perf"]:checked');
+  const hasRecom   = !!document.querySelector('[name="recommend"]:checked');
+  document.getElementById('rv-submit').disabled = !(hasRating && hasPrice && hasPerf && hasRecom);
+}
+document.querySelectorAll('[name="perf"], [name="recommend"]').forEach(r => r.addEventListener('change', checkReady));
+
+// ── Submit ────────────────────────────────────────────────────────────────────
+document.getElementById('review-form').addEventListener('submit', e => {
+  e.preventDefault();
+  document.getElementById('review-form').hidden = true;
+  document.getElementById('review-installer-context').hidden = true;
+  const thanks = document.getElementById('review-thanks');
+  document.getElementById('thanks-ins-name').textContent =
+    document.getElementById('review-ins-name').textContent + "'s";
+  thanks.hidden = false;
+  thanks.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// ── Load installer name from survey-quotes.json ───────────────────────────────
+fetch('data/survey-quotes.json')
+  .then(r => r.json())
+  .then(data => {
+    const sq = data.survey_quotes.find(q => q.status === 'submitted');
+    if (sq) {
+      document.getElementById('review-ins-name').textContent = sq.installer.name;
+      document.getElementById('review-ins-meta').textContent =
+        `Installation completed · ref ${data.round_reference}`;
+    }
+  }).catch(() => {});
+</script>
+</body>
+</html>

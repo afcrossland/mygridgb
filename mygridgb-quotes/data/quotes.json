@@ -1,10 +1,18 @@
 {
+  "local_installers": [
+    { "id": "ins-trent",   "name": "Trent Valley Renewables",  "address": "12 Solar Way, Nottingham NG1 4BT",                    "website": "https://trentvalleyrenewables.co.uk",  "mcs": true, "hies": false, "recc": true,  "google_rating": 4.9, "review_count": 96,  "distance_miles": 7  },
+    { "id": "ins-sherwood","name": "Sherwood Solar Ltd",         "address": "Unit 4 Sherwood Business Park, Mansfield NG18 2JF",  "website": "https://sherwoodsolar.co.uk",           "mcs": true, "hies": true,  "recc": false, "google_rating": 4.8, "review_count": 214, "distance_miles": 13 },
+    { "id": "ins-beacon",  "name": "Beacon Energy Systems",     "address": "8 Castle Gate, Newark NG24 1BG",                     "website": "https://beaconenergy.co.uk",            "mcs": true, "hies": true,  "recc": true,  "google_rating": 4.7, "review_count": 51,  "distance_miles": 21 },
+    { "id": "ins-peak",    "name": "Peak Solar Solutions",      "address": "34 Gregory Boulevard, Nottingham NG7 5JD",            "website": "https://peaksolarsolutions.co.uk",      "mcs": true, "hies": false, "recc": true,  "google_rating": 4.6, "review_count": 38,  "distance_miles": 9  },
+    { "id": "ins-midland", "name": "Midland Green Energy",      "address": "Riverside Court, Derby DE1 3QU",                     "website": "https://midlandgreenenergy.co.uk",      "mcs": true, "hies": true,  "recc": false, "google_rating": 4.5, "review_count": 127, "distance_miles": 34 }
+  ],
+
   "round": {
     "reference": "SC-2026-04182",
     "postcode_area": "NG22",
     "created_at": "2026-07-06T09:00:00Z",
     "window_closes_at": "2026-07-13T17:00:00Z",
-    "invited_count": 3,
+    "invited_installer_ids": ["ins-trent", "ins-sherwood", "ins-beacon"],
     "design": {
       "panel_watts": 475,
       "panel_count": 10,
@@ -14,109 +22,112 @@
       "est_generation_kwh_yr": 3590
     }
   },
+
   "quotes": [
     {
-      "id": "q-trent",
-      "installer": {
-        "name": "Trent Valley Renewables",
-        "mcs_number": "NAP-31097",
-        "consumer_code": "RECC",
-        "google_rating": 4.9,
-        "review_count": 96
-      },
-      "hardware": {
-        "panels": {
-          "make": "Aiko",
-          "model": "Neostar 2S",
-          "watts": 475,
-          "count": 10
-        },
-        "inverter": {
-          "make": "Sungrow",
-          "model": "SH3.6RS hybrid",
-          "controllability": "local_modbus",
-          "controllability_note": "local Modbus control — works with smart tariffs"
-        },
-        "battery": {
-          "make": "Sungrow",
-          "model": "SBR",
-          "kwh": 6.4
-        }
-      },
-      "price": {
-        "total_inc_vat": 7840,
-        "includes_scaffolding": true,
-        "includes_dno": true
-      },
-      "warranty_years": 10,
-      "lead_time_weeks": { "min": 4, "max": 6 },
-      "substitution_note": "Upgraded to 6.4 kWh battery; same panel spec as design.",
+      "installer_id": "ins-trent",
+      "installer": { "name": "Trent Valley Renewables", "mcs_number": "NAP-31097", "consumer_code": "RECC", "google_rating": 4.9, "review_count": 96 },
       "status": "submitted",
-      "computed": {
-        "payback_years": 8.3,
-        "lifetime_return_gbp": 14900,
-        "self_use_pct": 71
-      }
+      "designs": [
+        {
+          "id": "q-trent-a",
+          "label": "Matched spec",
+          "hardware": {
+            "panels":  { "count": 10, "watts": 475, "kwp": 4.75, "make": "Aiko",    "model": "Neostar 2S" },
+            "battery": { "kwh": 6.4,               "make": "Sungrow", "model": "SBR 096" },
+            "inverters": [{ "count": 1, "type": "hybrid", "make": "Sungrow", "model": "SH3.6RS", "controllability": "local_modbus", "controllability_note": "local Modbus — works with smart tariffs" }]
+          },
+          "price": { "total_inc_vat": 7840, "includes_scaffolding": true, "includes_dno": true },
+          "warranty": {
+            "panel_product_years": 25, "panel_performance_years": 30,
+            "battery_years": 10, "installation_years": 2
+          },
+          "lead_time_weeks": { "min": 4, "max": 6 },
+          "notes": "Upgraded to 6.4 kWh battery for better overnight coverage; panels match your design spec.",
+          "computed": { "pct_consumption_met": 72, "est_generation_kwh_yr": 3590 }
+        },
+        {
+          "id": "q-trent-b",
+          "label": "Larger system",
+          "hardware": {
+            "panels":  { "count": 14, "watts": 475, "kwp": 6.65, "make": "Aiko",    "model": "Neostar 2S" },
+            "battery": { "kwh": 9.6,                "make": "Sungrow", "model": "SBR 096" },
+            "inverters": [{ "count": 1, "type": "hybrid", "make": "Sungrow", "model": "SH5.0RS", "controllability": "local_modbus", "controllability_note": "local Modbus — works with smart tariffs" }]
+          },
+          "price": { "total_inc_vat": 10200, "includes_scaffolding": true, "includes_dno": true },
+          "warranty": {
+            "panel_product_years": 25, "panel_performance_years": 30,
+            "battery_years": 10, "installation_years": 2
+          },
+          "lead_time_weeks": { "min": 5, "max": 7 },
+          "notes": "6.65 kWp with 9.6 kWh battery — higher self-sufficiency, strong if you charge an EV.",
+          "computed": { "pct_consumption_met": 84, "est_generation_kwh_yr": 5030 }
+        }
+      ]
     },
     {
-      "id": "q-sherwood",
-      "installer": {
-        "name": "Sherwood Solar Ltd",
-        "mcs_number": "NAP-52814",
-        "consumer_code": "HIES",
-        "google_rating": 4.8,
-        "review_count": 214
-      },
-      "hardware": {
-        "panels": {
-          "make": "JA Solar",
-          "model": "JAM54S30",
-          "watts": 460,
-          "count": 10
-        },
-        "inverter": {
-          "make": "Growatt",
-          "model": "SPH 3.6",
-          "controllability": "cloud_only",
-          "controllability_note": "cloud-only control — limited smart-tariff support"
-        },
-        "battery": {
-          "make": "Growatt",
-          "model": "ARK-5.0H-A1",
-          "kwh": 5.0
-        }
-      },
-      "price": {
-        "total_inc_vat": 6990,
-        "includes_scaffolding": true,
-        "includes_dno": false
-      },
-      "warranty_years": 5,
-      "lead_time_weeks": { "min": 2, "max": 3 },
-      "substitution_note": null,
+      "installer_id": "ins-sherwood",
+      "installer": { "name": "Sherwood Solar Ltd", "mcs_number": "NAP-52814", "consumer_code": "HIES", "google_rating": 4.8, "review_count": 214 },
       "status": "submitted",
-      "computed": {
-        "payback_years": 8.1,
-        "lifetime_return_gbp": 13200,
-        "self_use_pct": 65
-      }
+      "designs": [
+        {
+          "id": "q-sherwood-a",
+          "label": "Budget option",
+          "hardware": {
+            "panels":  { "count": 10, "watts": 460, "kwp": 4.60, "make": "JA Solar", "model": "JAM54S30" },
+            "battery": { "kwh": 5.0,                "make": "Growatt", "model": "ARK-5.0H-A1" },
+            "inverters": [{ "count": 1, "type": "hybrid", "make": "Growatt", "model": "SPH 3.6", "controllability": "cloud_only", "controllability_note": "cloud-only — limited smart-tariff support" }]
+          },
+          "price": { "total_inc_vat": 6490, "includes_scaffolding": true, "includes_dno": false },
+          "warranty": {
+            "panel_product_years": 12, "panel_performance_years": 30,
+            "battery_years": 10, "installation_years": 2
+          },
+          "lead_time_weeks": { "min": 2, "max": 3 },
+          "notes": null,
+          "computed": { "pct_consumption_met": 65, "est_generation_kwh_yr": 3470 }
+        },
+        {
+          "id": "q-sherwood-b",
+          "label": "Standard option",
+          "hardware": {
+            "panels":  { "count": 10, "watts": 475, "kwp": 4.75, "make": "JA Solar", "model": "JAM60S20" },
+            "battery": { "kwh": 7.5,                "make": "Fox ESS", "model": "ECS2900-H3" },
+            "inverters": [{ "count": 1, "type": "hybrid", "make": "Solis", "model": "RHI-3.6K-48ES", "controllability": "local_modbus", "controllability_note": "local Modbus — works with smart tariffs" }]
+          },
+          "price": { "total_inc_vat": 8150, "includes_scaffolding": true, "includes_dno": false },
+          "warranty": {
+            "panel_product_years": 15, "panel_performance_years": 30,
+            "battery_years": 10, "installation_years": 2
+          },
+          "lead_time_weeks": { "min": 3, "max": 5 },
+          "notes": "Upgraded to 7.5 kWh battery; better overnight coverage than your original spec.",
+          "computed": { "pct_consumption_met": 73, "est_generation_kwh_yr": 3590 }
+        },
+        {
+          "id": "q-sherwood-c",
+          "label": "Premium option",
+          "hardware": {
+            "panels":  { "count": 12, "watts": 420, "kwp": 5.04, "make": "REC", "model": "Alpha Pure-R (bifacial)" },
+            "battery": { "kwh": 10.0,               "make": "Fox ESS", "model": "ECS2900-H4" },
+            "inverters": [{ "count": 1, "type": "hybrid", "make": "SolarEdge", "model": "SE3680H", "controllability": "local_modbus", "controllability_note": "local Modbus — works with smart tariffs" }]
+          },
+          "price": { "total_inc_vat": 11400, "includes_scaffolding": true, "includes_dno": true },
+          "warranty": {
+            "panel_product_years": 25, "panel_performance_years": 30,
+            "battery_years": 15, "installation_years": 5
+          },
+          "lead_time_weeks": { "min": 6, "max": 8 },
+          "notes": "Bifacial panels — picks up reflected light, useful on a light-coloured roof. Comprehensive warranty package.",
+          "computed": { "pct_consumption_met": 79, "est_generation_kwh_yr": 3810 }
+        }
+      ]
     },
     {
-      "id": "q-beacon",
-      "installer": {
-        "name": "Beacon Energy Systems",
-        "mcs_number": "NAP-78341",
-        "consumer_code": "RECC",
-        "google_rating": 4.7,
-        "review_count": 51
-      },
-      "hardware": null,
-      "price": null,
-      "warranty_years": null,
-      "lead_time_weeks": null,
-      "substitution_note": null,
+      "installer_id": "ins-beacon",
+      "installer": { "name": "Beacon Energy Systems", "mcs_number": "NAP-78341", "consumer_code": "RECC", "google_rating": 4.7, "review_count": 51 },
       "status": "pending",
-      "computed": null
+      "designs": []
     }
   ]
 }

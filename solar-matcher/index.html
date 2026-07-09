@@ -8,8 +8,29 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../mygridgb-quotes/js/step-nav.js" defer></script>
+  <link rel="stylesheet" href="../mygridgb-quotes/css/quotes.css">
   <style>
     /* ── Layout ── */
+    .how-it-works {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin: 14px 0 22px; font-size: 13px; color: var(--muted);
+    }
+    .hiw-step {
+      display: flex; align-items: center; gap: 7px;
+      background: #f0f4f8; border-radius: 6px; padding: 6px 12px;
+    }
+    .hiw-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--brand); color: #fff;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hiw-sep { color: #c0ccd8; font-size: 16px; }
+    @media (max-width: 700px) {
+      .hiw-sep { display: none; }
+      .hiw-step { width: 100%; }
+    }
     .postcode-row {
       margin-bottom: 28px;
       padding: 16px 20px;
@@ -428,7 +449,7 @@
     /* ── Intent hero ─────────────────────────────────────────── */
     .calc-hero {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-bottom: 24px;
     }
@@ -1051,19 +1072,19 @@
     .results-breakdown-btn:hover { background: var(--brand); color: #fff; }
 
     .quote-cta {
-      margin-top: 20px; padding: 16px 18px;
-      background: #f8fafc; border: 1px solid var(--border); border-radius: 9px;
+      margin-top: 16px; padding: 16px 18px;
+      background: #fffbf0; border: 1px solid #f0c96b; border-radius: 9px;
     }
     .quote-cta-heading { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .quote-cta-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+    .quote-cta-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.55; }
     .quote-cta-btn {
       display: inline-block; font-family: 'DM Sans', sans-serif;
-      font-size: 13.5px; font-weight: 700;
-      background: var(--brand); color: #fff;
-      border: none; border-radius: 7px; padding: 10px 20px;
+      font-size: 14px; font-weight: 700;
+      background: #f59e0b; color: #1c1917;
+      border: none; border-radius: 7px; padding: 10px 22px;
       cursor: pointer; text-decoration: none; transition: background .15s;
     }
-    .quote-cta-btn:hover { background: var(--brand-dark); color: #fff; text-decoration: none; }
+    .quote-cta-btn:hover { background: #d97706; color: #fff; text-decoration: none; }
 
     /* ── Placeholder state ── */
     .results-placeholder {
@@ -1084,8 +1105,15 @@
 <body>
 <div class="page-wrap">
   <main>
-    <h1 class="page-title">Home Solar Calculator</h1>
-    <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year.</p>
+    <h1 class="page-title">Solar quotes, done properly</h1>
+    <p class="page-intro">See what solar could save you, then get quotes from MCS-registered local installers — compared fairly, on the same assumptions as your estimate. MyGridGB is an introduction service; your contract is with the installer.</p>
+    <div class="how-it-works">
+      <div class="hiw-step"><span class="hiw-num">1</span>Estimate what solar could do for your home</div>
+      <div class="hiw-sep">→</div>
+      <div class="hiw-step"><span class="hiw-num">2</span>Choose MCS-registered local installers to invite</div>
+      <div class="hiw-sep">→</div>
+      <div class="hiw-step"><span class="hiw-num">3</span>Compare their quotes in one place, fairly</div>
+    </div>
 
     <!-- Postcode lookup — shown immediately -->
     <div class="postcode-row">
@@ -1102,19 +1130,15 @@
 
     <!-- Mode chooser — revealed after postcode -->
     <div id="hero-section" style="display:none">
-      <p class="hero-prompt">What would you like to do?</p>
+      <p class="hero-prompt">How would you like to start?</p>
       <div id="calc-hero" class="calc-hero">
         <button class="hero-card" id="hero-explore">
-          <div class="hero-card-title">I'm just looking</div>
-          <div class="hero-card-sub">See what rooftop or plug-in solar could do for your home — enter a few details and get an instant estimate</div>
+          <div class="hero-card-title">Quick estimate</div>
+          <div class="hero-card-sub">Answer a few questions and see roughly what solar could save you — rooftop or plug-in</div>
         </button>
         <button class="hero-card" id="hero-detailed">
-          <div class="hero-card-title">I have a good idea of what I want</div>
-          <div class="hero-card-sub">I know roughly how many panels my roof can fit and I want a more bespoke outcome</div>
-        </button>
-        <button class="hero-card" id="hero-compare">
-          <div class="hero-card-title">I have quotes to compare</div>
-          <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
+          <div class="hero-card-title">Design and get quotes</div>
+          <div class="hero-card-sub">Specify your exact system, see detailed financials, and invite MCS-registered local installers to quote</div>
         </button>
       </div>
       <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
@@ -1443,6 +1467,20 @@
           <button class="results-breakdown-btn" id="results-breakdown-btn">See full breakdown ↓</button>
         </div>
 
+        <!-- Connect CTA — shown when design is complete -->
+        <div id="quote-cta" class="quote-cta" style="display:none">
+          <div id="quote-cta-rooftop">
+            <div class="quote-cta-heading">Ready to get real prices?</div>
+            <div class="quote-cta-sub">Vetted local installers quote against your exact design in a fixed format — price, hardware, warranty — so you can compare them fairly. You stay anonymous until you choose someone.</div>
+            <a href="/mygridgb-quotes/" class="quote-cta-btn">Connect me with installers →</a>
+          </div>
+          <div id="quote-cta-plugin" style="display:none">
+            <div class="quote-cta-heading">Ready to buy?</div>
+            <div class="quote-cta-sub">Plug-in solar doesn't need an installer — order online and plug in yourself. We recommend checking specialist retailers for current prices.</div>
+            <a href="https://bnbsolar.co.uk" target="_blank" rel="noopener" class="quote-cta-btn">Browse plug-in solar at BnB Solar →</a>
+          </div>
+        </div>
+
         <!-- Results (hidden until postcode entered) -->
         <div id="results-content" style="display:none">
           <div id="results-system-summary" class="results-system-summary"></div>
@@ -1522,12 +1560,6 @@
             </div>
           </div>
 
-
-          <div class="quote-cta">
-            <div class="quote-cta-heading">Ready to get real prices?</div>
-            <div class="quote-cta-sub">Vetted installers quote against this exact design — fixed format, no phone calls, you stay anonymous until you choose someone.</div>
-            <a href="/mygridgb-quotes/" class="quote-cta-btn">Put this design out to quote →</a>
-          </div>
 
         </div>
       </div>
@@ -2087,14 +2119,21 @@ function applyResultsVisibility(mode) {
   const inExplore = mode === 'explore';
   document.getElementById('demand-ctrl-group').style.display = inExplore ? 'none' : '';
   document.getElementById('results-hero').style.display      = 'none';
+  document.getElementById('quote-cta').style.display        = 'none';
   if (inExplore) {
     document.getElementById('results-content').style.display = 'none';
-    // Restore hero if steps already completed
-    if (easyHeroShown) document.getElementById('results-hero').style.display = '';
+    if (easyHeroShown) {
+      document.getElementById('results-hero').style.display = '';
+      document.getElementById('quote-cta').style.display    = '';
+    }
   } else {
     document.getElementById('results-content').style.display = 'block';
     document.getElementById('results-placeholder').style.display = 'none';
+    document.getElementById('quote-cta').style.display = '';
   }
+  // Show the right CTA variant based on system type
+  document.getElementById('quote-cta-rooftop').style.display = isPlugIn ? 'none' : '';
+  document.getElementById('quote-cta-plugin').style.display  = isPlugIn ? '' : 'none';
 }
 
 function revealCurrentMode() {
@@ -2128,7 +2167,6 @@ function setMode(mode) {
 
   document.getElementById('hero-explore').classList.toggle('active',  mode === 'explore');
   document.getElementById('hero-detailed').classList.toggle('active', mode === 'detailed');
-  document.getElementById('hero-compare').classList.toggle('active',  mode === 'compare');
 
   // Don't reveal calculator panels until a postcode has been looked up
   if (!currentZoneKey) return;
@@ -2164,7 +2202,6 @@ function setMode(mode) {
 document.getElementById('hero-explore').addEventListener('click',  () => setMode('explore'));
 document.getElementById('switch-to-expert-link').addEventListener('click', e => { e.preventDefault(); setMode('detailed'); });
 document.getElementById('hero-detailed').addEventListener('click', () => setMode('detailed'));
-document.getElementById('hero-compare').addEventListener('click',  () => setMode('compare'));
 
 // Init easy mode
 applyEasyConfig();
@@ -2419,6 +2456,7 @@ function easyShowHero() {
   easyHeroShown = true;
   document.getElementById('results-placeholder').style.display = 'none';
   document.getElementById('results-hero').style.display = '';
+  document.getElementById('quote-cta').style.display    = '';
 }
 
 function updateHero(r) {

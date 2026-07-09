@@ -3,60 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Get quotes — MyGridGB Solar</title>
+<link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+<title>Get installer quotes — MyGridGB Solar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/quotes.css">
+<script src="../assets/nav.js" defer></script>
+<script src="js/step-nav.js" defer></script>
 </head>
 <body>
 
-<div class="siteband">
-  <div class="inner">
-    <div class="logo">MyGrid<span>GB</span></div>
-    <div class="private">Solar Matcher · private</div>
-  </div>
-</div>
-
 <div class="page">
-  <section class="request" style="margin-top:44px">
-    <h1>Put this design out to quote</h1>
-    <p class="standfirst">Vetted installers quote against your design — in a fixed format, through this site. You compare them here, on the same assumptions as your estimate above. No installer gets your name or number unless you choose them.</p>
 
-    <div class="promises">
-      <div class="promise"><b>No phone calls</b>We don't ask for your number, so nobody can ring you. You need one email address for your private link.</div>
-      <div class="promise"><b>Quotes in one format</b>Hardware, price, warranty, lead time — every quote answers the same questions, so they're actually comparable.</div>
-      <div class="promise"><b>You choose who learns your name</b>Contact details are released only to the firm you pick for a survey. The others never know who you are.</div>
+  <!-- Design context chip -->
+  <div class="design-context" id="design-context">Loading design…</div>
+
+  <!-- Step 1: pick installers -->
+  <section class="setup-section" id="installer-step">
+    <div class="step-head">
+      <div class="step-num">1</div>
+      <div>
+        <h2>Choose your installers</h2>
+        <p class="step-sub">These firms are MCS-registered and are members of at least one consumer protection scheme (RECC or HIES). Pick up to 3 — they'll each receive your full design brief and respond with a quote. You stay anonymous until you decide to proceed. <strong>MyGridGB is an introduction service — your contract is directly with the installer, not with us.</strong></p>
+      </div>
     </div>
 
-    <div class="reqrow">
-      <div class="field">
-        <label for="em">Email address</label>
-        <input id="em" type="email" autocomplete="email" placeholder="you@example.com">
-        <div class="hint">Used for your private quote-room link and one message when quotes arrive. Nothing else.</div>
-      </div>
-      <div class="field">
-        <label for="pc">Full postcode</label>
-        <input id="pc" type="text" placeholder="e.g. NG22 6UF" autocomplete="postal-code">
-        <div class="hint">Installers see the postcode area only, not your address.</div>
-      </div>
-      <button type="button" class="btn" id="open-btn">Open my quote room</button>
+    <div class="radius-row">
+      <div class="radius-label">Search radius: <strong id="radius-val">25</strong> miles</div>
+      <input type="range" id="radius-slider" min="5" max="50" step="5" value="25" class="radius-slider">
+      <div class="radius-hint" id="radius-hint"></div>
     </div>
 
-    <div class="honesty"><strong>How this is funded:</strong> when you choose an installer, that firm pays MyGridGB a fee. Prices quoted are the same either way, quotes are scored by the same model that produced your estimate, and installers can't pay for a better score or position.</div>
+    <div id="installer-list"></div>
+    <p class="ins-cap" id="ins-cap">Select up to 3 installers</p>
   </section>
+
+  <!-- Step 2: your details (revealed after selecting ≥1 installer) -->
+  <section class="setup-section" id="details-step" hidden>
+    <div class="step-head">
+      <div class="step-num">2</div>
+      <div>
+        <h2>Your details</h2>
+        <p class="step-sub">We need an email for your private quote-room link and an address for installers to visit for a survey. Your contact details are not shared with any installer until you choose one.</p>
+      </div>
+    </div>
+
+    <div class="details-form">
+      <div class="field">
+        <label for="f-email">Email address</label>
+        <input id="f-email" type="email" autocomplete="email" placeholder="you@example.com">
+        <div class="hint">We'll email you a private link to your quote room. Nothing else.</div>
+      </div>
+      <div class="field">
+        <label for="f-address">Your address</label>
+        <textarea id="f-address" rows="3" placeholder="12 Example Street&#10;Nottingham&#10;NG22 6UF" autocomplete="street-address"></textarea>
+        <div class="hint">Released only to the installer you choose for a survey.</div>
+      </div>
+      <div class="field">
+        <label for="f-password">Password</label>
+        <input id="f-password" type="password" autocomplete="new-password" placeholder="To access your quote room later">
+        <div class="hint">Use anything memorable — minimum 8 characters.</div>
+      </div>
+    </div>
+
+    <button class="btn" id="submit-btn" disabled>Request quotes →</button>
+
+    <div class="honesty">
+      <strong>How this is funded:</strong> when you proceed to survey, the installer pays MyGridGB an introduction fee. This does not affect the quotes, their ranking, or the price you pay.
+      <br><br>
+      <strong>Your contract is with the installer, not MyGridGB.</strong> MyGridGB is an introduction platform only. All installers listed are MCS-registered — MCS registration requires a performance certificate on completion and gives you access to the MCS complaints procedure. Installers marked HIES provide insurance-backed guarantees and deposit protection. Installers marked RECC are bound by the Renewable Energy Consumer Code and a formal complaints process. MyGridGB does not guarantee the quality of any installation.
+    </div>
+  </section>
+
+
 </div>
 
 <script>
-document.getElementById('open-btn').addEventListener('click', () => {
-  const em = document.getElementById('em').value.trim();
-  const pc = document.getElementById('pc').value.trim();
-  if (!em || !pc) { alert('Please enter your email and postcode.'); return; }
-  // In production: POST to Cloudflare Worker, receive magic link via email.
-  // For prototype: navigate directly to room.html.
+let selectedIds = new Set();
+let allInstallers = [];
+const MAX = 3;
+
+function certBadge(has, label) {
+  return `<span class="cert ${has ? 'cert-yes' : 'cert-no'}">${has ? '✓' : '○'} ${label}</span>`;
+}
+
+function applyRadius() {
+  const radius  = parseInt(document.getElementById('radius-slider').value, 10);
+  const visible = allInstallers.filter(i => i.distance_miles <= radius);
+
+  document.getElementById('radius-val').textContent = radius;
+  document.getElementById('radius-hint').textContent =
+    visible.length === 0
+      ? 'No registered firms found within this range — try increasing the radius.'
+      : `${visible.length} registered firm${visible.length > 1 ? 's' : ''} within ${radius} miles`;
+
+  // Deselect any installers that are no longer in range
+  for (const id of [...selectedIds]) {
+    const ins = allInstallers.find(i => i.id === id);
+    if (ins && ins.distance_miles > radius) selectedIds.delete(id);
+  }
+
+  renderInstallers(visible);
+  updateCap();
+}
+
+function renderInstallers(installers) {
+  const list = document.getElementById('installer-list');
+  if (installers.length === 0) {
+    list.innerHTML = '';
+    return;
+  }
+  list.innerHTML = installers.map(ins => `
+    <div class="ins-card${selectedIds.has(ins.id) ? ' selected' : ''}"
+         data-id="${ins.id}" role="checkbox"
+         aria-checked="${selectedIds.has(ins.id)}" tabindex="0">
+      <div class="ins-check-circle"></div>
+      <div class="ins-card-main">
+        <div class="ins-name">${ins.name}${ins.website ? ` <a class="ins-web" href="${ins.website}" target="_blank" rel="noopener" tabindex="-1">website ↗</a>` : ''}</div>
+        <div class="ins-addr">${ins.address}</div>
+        <div class="ins-certs">
+          ${certBadge(ins.mcs,  'MCS')}
+          ${certBadge(ins.recc, 'RECC')}
+          ${certBadge(ins.hies, 'HIES')}
+        </div>
+      </div>
+      <div class="ins-card-rating">
+        <div class="ins-stars">★ ${ins.google_rating}</div>
+        <div class="ins-review-count">${ins.review_count} reviews</div>
+        <div class="ins-distance">${ins.distance_miles} miles away</div>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.ins-card').forEach(card => {
+    card.addEventListener('click', () => toggle(card));
+    card.addEventListener('keydown', e => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(card); }
+    });
+  });
+}
+
+function toggle(card) {
+  const id = card.dataset.id;
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id);
+    card.classList.remove('selected');
+    card.setAttribute('aria-checked', 'false');
+  } else {
+    if (selectedIds.size >= MAX) return;
+    selectedIds.add(id);
+    card.classList.add('selected');
+    card.setAttribute('aria-checked', 'true');
+  }
+  updateCap();
+}
+
+function updateCap() {
+  const n = selectedIds.size;
+  document.getElementById('ins-cap').textContent =
+    n === 0 ? 'Select up to 3 installers'
+    : n === MAX ? `${MAX} selected — maximum reached`
+    : `${n} selected · you can add ${MAX - n} more`;
+  document.getElementById('details-step').hidden = n === 0;
+  document.getElementById('submit-btn').disabled = n === 0;
+}
+
+document.getElementById('radius-slider').addEventListener('input', applyRadius);
+
+document.getElementById('submit-btn').addEventListener('click', () => {
   window.location.href = 'room.html';
 });
+
+fetch('data/quotes.json')
+  .then(r => r.json())
+  .then(data => {
+    const d = data.round.design;
+    document.getElementById('design-context').innerHTML =
+      `<span class="dim">Your design · </span>${(d.panel_count * d.panel_watts / 1000).toFixed(2)} kWp · ${d.panel_count} × ${d.panel_watts} W · ${d.battery_kwh} kWh battery · <span class="dim">est. ${d.est_generation_kwh_yr.toLocaleString('en-GB')} kWh/yr</span>`;
+    allInstallers = data.local_installers;
+    applyRadius();
+  });
 </script>
 </body>
 </html>
