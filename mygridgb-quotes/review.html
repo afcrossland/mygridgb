@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-<title>Leave a review — MyGridGB Solar</title>
+<title>Leave a review - MyGridGB Solar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
   <div class="room-head" style="margin-top:8px">
     <div>
       <h1>How did it go?</h1>
-      <p class="sub">Your review helps other homeowners choose. It also tells us whether the quote held to the survey price — that data feeds directly back into how installers are ranked on future rounds.</p>
+      <p class="sub">Your review helps other homeowners choose. It also tells us whether the quote held to the survey price - that data feeds directly back into how installers are ranked on future rounds.</p>
     </div>
   </div>
 
@@ -60,7 +60,7 @@
       </div>
       <div class="rv-field" id="price-explain-wrap" style="display:none">
         <label for="price-explain">What changed, and did they explain why?</label>
-        <textarea id="price-explain" rows="2" placeholder="e.g. Extra scaffolding required — they told me before starting work"></textarea>
+        <textarea id="price-explain" rows="2" placeholder="e.g. Extra scaffolding required - they told me before starting work"></textarea>
       </div>
     </div>
 
@@ -104,14 +104,14 @@
 
     <div class="rv-section">
       <button type="submit" class="btn" id="rv-submit" disabled>Submit review</button>
-      <p class="rv-note">Your review is attributed to a verified installation (ref SC-2026-04182). We don't publish your name — only that the reviewer completed a real installation through MyGridGB.</p>
+      <p class="rv-note">Your review is attributed to a verified installation (ref SC-2026-04182). We don't publish your name - only that the reviewer completed a real installation through MyGridGB.</p>
     </div>
 
   </form>
 
   <div class="review-thanks" id="review-thanks" hidden>
     <div class="thanks-icon">✓</div>
-    <h2>Thanks — your review has been submitted</h2>
+    <h2>Thanks - your review has been submitted</h2>
     <p>It will appear on <strong id="thanks-ins-name">this installer's</strong> profile once we've checked it against the installation record. Price accuracy data feeds into our installer rankings straight away.</p>
     <p style="margin-top:12px"><a href="/solar-matcher/" class="page-nav-back">← Back to the solar calculator</a></p>
   </div>
@@ -153,7 +153,7 @@ function setMini(wrap, n) {
   wrap.querySelectorAll('.mini-star').forEach(b => b.classList.toggle('lit', +b.dataset.v <= n));
 }
 
-// ── Price accuracy — show explain box if price moved ─────────────────────────
+// ── Price accuracy - show explain box if price moved ─────────────────────────
 document.querySelectorAll('[name="price"]').forEach(r => {
   r.addEventListener('change', () => {
     const show = r.value === 'over5' || r.value === 'within5';

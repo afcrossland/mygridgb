@@ -4,17 +4,17 @@
   <meta charset="UTF-8">
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Home Solar Panel Calculator UK — MyGridGB</title>
+  <title>Rooftop and Plug-in Solar Calculator UK - MyGridGB</title>
   <meta name="description" content="Free UK home solar calculator. Enter your postcode for an instant estimate of solar panel output, savings and payback period for your home.">
   <link rel="canonical" href="https://www.mygridgb.co.uk/solar-calculator/">
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://www.mygridgb.co.uk/solar-calculator/">
-  <meta property="og:title"       content="Home Solar Panel Calculator UK — MyGridGB">
+  <meta property="og:title"       content="Rooftop and Plug-in Solar Calculator UK - MyGridGB">
   <meta property="og:description" content="Free UK home solar calculator. Enter your postcode for an instant estimate of solar panel output, savings and payback period for your home.">
   <meta property="og:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <meta name="twitter:card"        content="summary">
   <meta name="twitter:site"        content="@mygridgb">
-  <meta name="twitter:title"       content="Home Solar Panel Calculator UK — MyGridGB">
+  <meta name="twitter:title"       content="Rooftop and Plug-in Solar Calculator UK - MyGridGB">
   <meta name="twitter:description" content="Free UK home solar calculator. Enter your postcode for an instant estimate of solar panel output, savings and payback period for your home.">
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -462,7 +462,7 @@
     }
     .hero-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
 
-    /* "I'm just looking" — warm amber/solar */
+    /* "I'm just looking" - warm amber/solar */
     #hero-explore {
       background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
       border-color: #fcd34d;
@@ -475,7 +475,7 @@
     #hero-explore.active .hero-card-title,
     #hero-explore.active .hero-card-sub { color: #fff; }
 
-    /* "I have quotes" — cool blue/brand */
+    /* "I have quotes" - cool blue/brand */
     #hero-compare {
       background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
       border-color: #93c5fd;
@@ -488,7 +488,7 @@
     #hero-compare.active .hero-card-title,
     #hero-compare.active .hero-card-sub { color: #fff; }
 
-    /* "Expert designer" — green */
+    /* "Expert designer" - green */
     #hero-detailed {
       background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
       border-color: #6ee7b7;
@@ -1081,12 +1081,12 @@
 <body>
 <div class="page-wrap">
   <main>
-    <h1 class="page-title">Home Solar Calculator</h1>
-    <p class="page-intro">Estimate how much of your electricity a solar and battery system could provide, and how much you could save each year.</p>
+    <h1 class="page-title">Rooftop and Plug-in Solar Calculator</h1>
+    <p class="page-intro">Estimate how much of your electricity a rooftop or plug-in solar system could provide, and how much you could save each year.</p>
 
-    <!-- Postcode lookup — shown immediately -->
+    <!-- Postcode lookup - shown immediately -->
     <div class="postcode-row">
-      <label class="postcode-label">Enter your postcode or address — we use it to look up how much sunshine your area gets</label>
+      <label class="postcode-label">Enter your postcode or address - we use it to look up how much sunshine your area gets</label>
       <div class="postcode-input-row">
         <div class="pc-input-wrap">
           <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or 14 Green Lane, Sheffield" autocomplete="off" style="width:280px">
@@ -1097,21 +1097,21 @@
       </div>
     </div>
 
-    <!-- Mode chooser — revealed after postcode -->
+    <!-- Mode chooser - revealed after postcode -->
     <div id="hero-section" style="display:none">
       <p class="hero-prompt">What would you like to do?</p>
       <div id="calc-hero" class="calc-hero">
         <button class="hero-card" id="hero-explore">
-          <div class="hero-card-title">I'm just looking</div>
-          <div class="hero-card-sub">See what rooftop or plug-in solar could do for your home — enter a few details and get an instant estimate</div>
+          <div class="hero-card-title">Beginner</div>
+          <div class="hero-card-sub">I am new to solar and want to quickly understand if it is for me</div>
         </button>
         <button class="hero-card" id="hero-detailed">
-          <div class="hero-card-title">I have a good idea of what I want</div>
-          <div class="hero-card-sub">I know roughly how many panels my roof can fit and I want a more bespoke outcome</div>
+          <div class="hero-card-title">Intermediate</div>
+          <div class="hero-card-sub">I know roughly what I want and want to model my system in detail</div>
         </button>
         <button class="hero-card" id="hero-compare">
-          <div class="hero-card-title">I have quotes to compare</div>
-          <div class="hero-card-sub">Enter quotes from installers side by side and see which gives the best return</div>
+          <div class="hero-card-title">Expert</div>
+          <div class="hero-card-sub">I have quotes from installers and want to find the best outcome for me</div>
         </button>
       </div>
       <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
@@ -1156,7 +1156,7 @@
               <span class="easy-step-num">1</span>
               <span class="easy-step-q">How much electricity does your home use?</span>
             </div>
-            <p class="easy-section-hint">This is the starting point — we use it to design your system and work out how much solar can cover. Check a recent bill, or use a typical value below.</p>
+            <p class="easy-section-hint">This is the starting point - we use it to design your system and work out how much solar can cover. Check a recent bill, or use a typical value below.</p>
             <div class="demand-typical-row">
               <button class="demand-preset-btn" data-kwh="1800">Low<span>1,800 kWh</span><span class="demand-preset-sub">1–2 people, flat or 1-bed</span></button>
               <button class="demand-preset-btn" data-kwh="2700">Medium<span>2,700 kWh</span><span class="demand-preset-sub">2–3 people, 3-bed</span></button>
@@ -1185,7 +1185,7 @@
               <span class="easy-step-num">3</span>
               <span class="easy-step-q">Which way does your main roof face?</span>
             </div>
-            <p class="easy-section-hint">South-facing roofs get the most sun. Not sure? Pick "Not sure" — we'll assume a typical SE/SW facing.</p>
+            <p class="easy-section-hint">South-facing roofs get the most sun. Not sure? Pick "Not sure" - we'll assume a typical SE/SW facing.</p>
             <div class="easy-cards" id="roof-dir-cards">
               <button class="easy-card" data-az="0">
                 <span class="easy-card-title">South</span>
@@ -1208,7 +1208,7 @@
               <button class="map-toggle-btn" id="map-toggle-btn">Need help? Show satellite view ▾</button>
               <div id="map-wrap" style="display:none">
                 <div id="satellite-map"></div>
-                <p class="map-hint">Find your roof — the N↑ arrow shows north. Use this to judge which way your roof faces, then select above.</p>
+                <p class="map-hint">Find your roof - the N↑ arrow shows north. Use this to judge which way your roof faces, then select above.</p>
               </div>
             </div>
           </div>
@@ -1219,11 +1219,11 @@
               <span class="easy-step-num">4</span>
               <span class="easy-step-q">Are you usually home during the day?</span>
             </div>
-            <p class="easy-section-hint">This affects how much of the solar electricity you use directly — and how much gets exported back to the grid.</p>
+            <p class="easy-section-hint">This affects how much of the solar electricity you use directly - and how much gets exported back to the grid.</p>
             <div class="easy-cards" id="easy-archetype-cards">
               <button class="easy-card" data-archetype="outallday">
                 <span class="easy-card-title">Mostly out</span>
-                <span class="easy-card-sub">Commuter — out most of the day</span>
+                <span class="easy-card-sub">Commuter - out most of the day</span>
               </button>
               <button class="easy-card" data-archetype="inhalftheday">
                 <span class="easy-card-title">Sometimes home</span>
@@ -1262,7 +1262,7 @@
               <span class="easy-step-num">3</span>
               <span class="easy-step-q">Would you like a plug-in battery?</span>
             </div>
-            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening — no rewiring needed.</p>
+            <p class="easy-section-hint">An optional battery stores surplus solar to use in the evening - no rewiring needed.</p>
             <div class="easy-cards" id="plugin-battery-cards">
               <button class="easy-card" data-plugin-batt="0">
                 <span class="easy-card-title">No battery</span>
@@ -1289,9 +1289,9 @@
             <div class="ctrl-label"><span>Are you home during the day?</span></div>
             <select id="ctrl-archetype" class="ctrl-select">
               <option value="inhalftheday" selected>Prefer not to say</option>
-              <option value="homeallday">Yes — home all day (retired, WFH)</option>
-              <option value="inhalftheday">Sometimes — in for part of the day</option>
-              <option value="outallday">No — out all day (commuter household)</option>
+              <option value="homeallday">Yes - home all day (retired, WFH)</option>
+              <option value="inhalftheday">Sometimes - in for part of the day</option>
+              <option value="outallday">No - out all day (commuter household)</option>
             </select>
             <div class="ctrl-hint">If you're home during the day you'll use more solar electricity directly, so you save more. If you're out, more gets exported to the grid.</div>
           </div>
@@ -1312,19 +1312,19 @@
                 <input id="ctrl-cheap" class="rate-input" type="number" value="7" min="0" max="50" step="0.5">
               </div>
             </div>
-            <div class="ctrl-hint">💡 We've pre-filled typical UK values — only change these if you know your exact figures. Check your electricity bill for your import (day) rate. The export rate (SEG) is what your energy supplier pays for surplus solar. <strong>Overnight rate:</strong> only fill this in if you're on Economy 7 or a similar time-of-use tariff — leave blank if not, and we'll use your day rate.</div>
+            <div class="ctrl-hint">💡 We've pre-filled typical UK values - only change these if you know your exact figures. Check your electricity bill for your import (day) rate. The export rate (SEG) is what your energy supplier pays for surplus solar. <strong>Overnight rate:</strong> only fill this in if you're on Economy 7 or a similar time-of-use tariff - leave blank if not, and we'll use your day rate.</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Electricity price rises</span>
               <span class="ctrl-val" id="val-inflation">3.0% / yr</span>
             </div>
             <input type="range" id="ctrl-inflation" min="0" max="10" value="3" step="0.1">
-            <div class="ctrl-hint">Electricity prices tend to rise over time. This adjusts future savings to account for likely increases — making solar even more valuable in later years.</div>
+            <div class="ctrl-hint">Electricity prices tend to rise over time. This adjusts future savings to account for likely increases - making solar even more valuable in later years.</div>
             <div class="ctrl-label" style="margin-top:12px">
               <span>Boost to home value</span>
               <span class="ctrl-val" id="val-houseval">£0</span>
             </div>
             <input type="range" id="ctrl-houseval" min="0" max="15000" value="0" step="500">
-            <div class="ctrl-hint">Solar panels can add value when you sell your home. Evidence varies — leave at £0 if you'd rather not include this.</div>
+            <div class="ctrl-hint">Solar panels can add value when you sell your home. Evidence varies - leave at £0 if you'd rather not include this.</div>
           </div>
 
           <div class="ctrl-group">
@@ -1385,7 +1385,7 @@
                   <input type="range" id="ctrl-tilt" min="0" max="60" value="35" step="1">
                 </div>
               </div>
-              <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical — a standard pitched roof.</div>
+              <div class="ctrl-hint" style="margin-top:6px">Each panel is roughly 1.7m × 1m and rated at 475W. Most UK roofs fit 8–16 panels. Tilt of 30–40° is typical - a standard pitched roof.</div>
             </div>
 
             <!-- Multiple roofs -->
@@ -1431,7 +1431,7 @@
           Use your postcode to estimate your solar potential.
         </div>
 
-        <!-- Easy mode hero — shown after step 2+ -->
+        <!-- Easy mode hero - shown after step 2+ -->
         <div id="results-hero" class="results-hero" style="display:none">
           <div class="results-hero-label">You could save around</div>
           <div class="results-hero-amount" id="hero-saving-amount">£—</div>
@@ -1540,7 +1540,7 @@
       <!-- Shared assumptions (always visible in Compare mode) -->
       <div class="shared-assumptions">
         <div class="shared-assumptions-title">About your home</div>
-        <div class="shared-assumptions-note">💡 We've pre-filled typical UK values — you only need to change these if you know your exact figures.</div>
+        <div class="shared-assumptions-note">💡 We've pre-filled typical UK values - you only need to change these if you know your exact figures.</div>
         <div class="shared-inputs-grid">
           <div class="shared-input-wrap">
             <label class="shared-label">Annual electricity use (kWh)</label>
@@ -1557,7 +1557,7 @@
             </select>
           </div>
           <div class="shared-input-wrap">
-            <label class="shared-label">Day rate — what you pay (p/kWh)</label>
+            <label class="shared-label">Day rate - what you pay (p/kWh)</label>
             <input type="number" id="sa-import" class="shared-input" min="1" max="100" step="0.5">
             <div class="shared-hint">Your standard electricity rate. Check your bill.</div>
           </div>
@@ -1605,7 +1605,7 @@
 
         <!-- Battery -->
         <div class="qf-arrays-header" style="margin-top:12px">
-          <span class="qf-arrays-label">Battery size — set to 0 if no battery included</span>
+          <span class="qf-arrays-label">Battery size - set to 0 if no battery included</span>
         </div>
         <div style="max-width:50%">
           <div class="battery-slider-wrap battery-slider-wrap--sm">
@@ -1636,10 +1636,10 @@
       <summary>How this tool works</summary>
       <div class="method-body">
         <h3>Generation estimate</h3>
-        <p>Annual solar generation is calculated using solar resource data from the <strong>MCS MGD003 dataset</strong> — the same data used by certified solar installers in the UK. The dataset provides annual yield figures (kWh per kWp) for 25 climate zones across the UK, at every combination of roof tilt (0–90°) and orientation (0–175° from south). Your postcode is matched to the nearest zone centre. The panel output assumes each panel is rated at <strong>475 Wp</strong>; performance losses (wiring, inverter, temperature) are already embedded in the MCS figures.</p>
+        <p>Annual solar generation is calculated using solar resource data from the <strong>MCS MGD003 dataset</strong> - the same data used by certified solar installers in the UK. The dataset provides annual yield figures (kWh per kWp) for 25 climate zones across the UK, at every combination of roof tilt (0–90°) and orientation (0–175° from south). Your postcode is matched to the nearest zone centre. The panel output assumes each panel is rated at <strong>475 Wp</strong>; performance losses (wiring, inverter, temperature) are already embedded in the MCS figures.</p>
 
         <h3>How much solar you actually use</h3>
-        <p>What fraction of generated electricity is actually used in your home (rather than sent back to the grid) depends on when you're home and whether you have a battery. These fractions come from the <strong>MCS MGD003 lookup tables</strong>, which model three occupancy types and a range of battery sizes against different generation and demand levels. A 90% cap is applied — it is not practically possible to cover all electricity from solar alone due to overnight and low-sunlight periods.</p>
+        <p>What fraction of generated electricity is actually used in your home (rather than sent back to the grid) depends on when you're home and whether you have a battery. These fractions come from the <strong>MCS MGD003 lookup tables</strong>, which model three occupancy types and a range of battery sizes against different generation and demand levels. A 90% cap is applied - it is not practically possible to cover all electricity from solar alone due to overnight and low-sunlight periods.</p>
 
         <h3>Financial estimate</h3>
         <p>Annual saving = (solar used in your home × your electricity rate) + (surplus exported × export rate) + overnight battery charging saving. The export rate is what you receive under the <a href="https://www.ofgem.gov.uk/check-if-energy-price-cap-affects-you" target="_blank">Smart Export Guarantee (SEG)</a> or similar tariff.</p>
@@ -1845,7 +1845,7 @@ async function lookupPostcode() {
     resolveLocation(latitude, longitude, displayCode, zoom);
   } catch (e) {
     console.error('Location lookup error:', e);
-    pcStatus.innerHTML = `<span class="pc-error">Location not recognised — try a postcode (e.g. SW1A 1AA) or a street address</span>`;
+    pcStatus.innerHTML = `<span class="pc-error">Location not recognised - try a postcode (e.g. SW1A 1AA) or a street address</span>`;
   } finally {
     pcBtn.disabled = false;
     pcBtn.textContent = 'Find location';
@@ -2589,7 +2589,7 @@ function calculate() {
   // Payback table
   const plugInActive = currentMode === 'explore' && isPlugIn;
   document.getElementById('payback-cost-note').textContent = plugInActive
-    ? 'Cost estimate for panels and battery only — no labour or scaffolding needed.'
+    ? 'Cost estimate for panels and battery only - no labour or scaffolding needed.'
     : 'Cost estimate includes panels, inverter, labour, and scaffolding.';
 
   const salarySac = document.getElementById('salary-sac-chk').checked;
@@ -2788,7 +2788,7 @@ function getSharedParams() {
 function renderQuotesTable() {
   if (quotes.length === 0) {
     document.getElementById('quotes-table-wrap').innerHTML =
-      `<div class="quotes-empty-hint">No quotes yet — <button class="inline-add-btn" onclick="openQF(null)">+ Add your first quote</button></div>`;
+      `<div class="quotes-empty-hint">No quotes yet - <button class="inline-add-btn" onclick="openQF(null)">+ Add your first quote</button></div>`;
     return;
   }
   const shared = getSharedParams();
@@ -2801,7 +2801,7 @@ function renderQuotesTable() {
     const arrDesc     = q.arrays.length > 1 ? ` (${q.arrays.length} arrays)` : '';
     const sysDesc     = `${totalPanels} panels${arrDesc}` + (q.batteryKwh >= 1.1 ? ` + ${q.batteryKwh} kWh` : '');
 
-    // Estimate cost even without postcode — it only depends on system size
+    // Estimate cost even without postcode - it only depends on system size
     const rawCostEst    = 170 * totalPanels + (q.batteryKwh >= 1.1 ? 1000 + 200 * q.batteryKwh : 0) + 4000;
     const estCostNoZone = Math.round(rawCostEst / 1000) * 1000;
     const effectiveCost = q.quotedPrice != null ? q.quotedPrice : (r ? r.estimatedCost : estCostNoZone);
@@ -2884,7 +2884,7 @@ document.getElementById('quotes-upload-input').addEventListener('change', e => {
         renderQuotesTable();
         document.getElementById('quotes-panel').style.display = '';
       }
-    } catch { alert('Could not read file — please upload a valid solar-quotes.json file.'); }
+    } catch { alert('Could not read file - please upload a valid solar-quotes.json file.'); }
   };
   reader.readAsText(file);
   e.target.value = '';

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-<title>Get installer quotes — MyGridGB Solar</title>
+<title>Get installer quotes - MyGridGB Solar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
       <div class="step-num">1</div>
       <div>
         <h2>Choose your installers</h2>
-        <p class="step-sub">These firms are MCS-registered and are members of at least one consumer protection scheme (RECC or HIES). Pick up to 3 — they'll each receive your full design brief and respond with a quote. You stay anonymous until you decide to proceed. <strong>MyGridGB is an introduction service — your contract is directly with the installer, not with us.</strong></p>
+        <p class="step-sub">These firms are MCS-registered and are members of at least one consumer protection scheme (RECC or HIES). Pick up to 3 - they'll each receive your full design brief and respond with a quote. You stay anonymous until you decide to proceed. <strong>MyGridGB is an introduction service - your contract is directly with the installer, not with us.</strong></p>
       </div>
     </div>
 
@@ -65,7 +65,7 @@
       <div class="field">
         <label for="f-password">Password</label>
         <input id="f-password" type="password" autocomplete="new-password" placeholder="To access your quote room later">
-        <div class="hint">Use anything memorable — minimum 8 characters.</div>
+        <div class="hint">Use anything memorable - minimum 8 characters.</div>
       </div>
     </div>
 
@@ -74,7 +74,7 @@
     <div class="honesty">
       <strong>How this is funded:</strong> when you proceed to survey, the installer pays MyGridGB an introduction fee. This does not affect the quotes, their ranking, or the price you pay.
       <br><br>
-      <strong>Your contract is with the installer, not MyGridGB.</strong> MyGridGB is an introduction platform only. All installers listed are MCS-registered — MCS registration requires a performance certificate on completion and gives you access to the MCS complaints procedure. Installers marked HIES provide insurance-backed guarantees and deposit protection. Installers marked RECC are bound by the Renewable Energy Consumer Code and a formal complaints process. MyGridGB does not guarantee the quality of any installation.
+      <strong>Your contract is with the installer, not MyGridGB.</strong> MyGridGB is an introduction platform only. All installers listed are MCS-registered - MCS registration requires a performance certificate on completion and gives you access to the MCS complaints procedure. Installers marked HIES provide insurance-backed guarantees and deposit protection. Installers marked RECC are bound by the Renewable Energy Consumer Code and a formal complaints process. MyGridGB does not guarantee the quality of any installation.
     </div>
   </section>
 
@@ -97,7 +97,7 @@ function applyRadius() {
   document.getElementById('radius-val').textContent = radius;
   document.getElementById('radius-hint').textContent =
     visible.length === 0
-      ? 'No registered firms found within this range — try increasing the radius.'
+      ? 'No registered firms found within this range - try increasing the radius.'
       : `${visible.length} registered firm${visible.length > 1 ? 's' : ''} within ${radius} miles`;
 
   // Deselect any installers that are no longer in range
@@ -165,7 +165,7 @@ function updateCap() {
   const n = selectedIds.size;
   document.getElementById('ins-cap').textContent =
     n === 0 ? 'Select up to 3 installers'
-    : n === MAX ? `${MAX} selected — maximum reached`
+    : n === MAX ? `${MAX} selected - maximum reached`
     : `${n} selected · you can add ${MAX - n} more`;
   document.getElementById('details-step').hidden = n === 0;
   document.getElementById('submit-btn').disabled = n === 0;

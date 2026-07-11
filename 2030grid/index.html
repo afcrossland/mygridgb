@@ -4,20 +4,20 @@
   <meta charset="UTF-8">
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My 2030 Blueprint — UK Clean Power Simulation — MyGridGB</title>
+  <title>My 2030 Blueprint - UK Clean Power Simulation - MyGridGB</title>
   <meta name="description" content="My simulation of Britain's electricity grid in 2030, replacing gas with wind, solar and storage to hit the clean power target at lower cost.">
   <link rel="canonical" href="https://www.mygridgb.co.uk/2030grid/">
   <!-- Open Graph -->
   <meta property="og:type"        content="website">
   <meta property="og:url"         content="https://www.mygridgb.co.uk/2030grid/">
-  <meta property="og:title"       content="The 2030 Blueprint — MyGridGB">
-  <meta property="og:description" content="A real-time simulation of Britain's electricity in 2030 — running against today's actual weather and demand data.">
+  <meta property="og:title"       content="The 2030 Blueprint - MyGridGB">
+  <meta property="og:description" content="A real-time simulation of Britain's electricity in 2030 - running against today's actual weather and demand data.">
   <meta property="og:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary">
   <meta name="twitter:site"        content="@mygridgb">
-  <meta name="twitter:title"       content="The 2030 Blueprint — MyGridGB">
-  <meta name="twitter:description" content="A real-time simulation of Britain's electricity in 2030 — running against today's actual weather and demand data.">
+  <meta name="twitter:title"       content="The 2030 Blueprint - MyGridGB">
+  <meta name="twitter:description" content="A real-time simulation of Britain's electricity in 2030 - running against today's actual weather and demand data.">
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
@@ -261,7 +261,7 @@
 <div class="page-wrap">
   <main>
     <h1 class="page-title">The 2030 Grid</h1>
-    <p class="page-intro">A simulation of what Britain's electricity could look like in 2030 — running in real time against today's actual weather and demand data. This is the 2030 Blueprint: a scenario for a net-zero electricity system that goes beyond government and NESO targets.</p>
+    <p class="page-intro">A simulation of what Britain's electricity could look like in 2030 - running in real time against today's actual weather and demand data. This is the 2030 Blueprint: a scenario for a net-zero electricity system that goes beyond government and NESO targets.</p>
 
     <!-- Comparison stat strip (populated by JS) -->
     <div class="compare-strip" id="compare-strip"></div>
@@ -282,18 +282,18 @@
           <li>3× the amount of solar generation (10 million solar homes)</li>
           <li>1.5× more biomass capacity, dispatched only when wind and solar are low</li>
           <li>No coal</li>
-          <li>200 GWh of electricity storage — approximately 12x more than Dinorwig and Cruachan combined</li>
+          <li>200 GWh of electricity storage - approximately 12x more than Dinorwig and Cruachan combined</li>
         </ul>
-        <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full — then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
+        <p>Dispatch order: nuclear runs baseload, then hydro, solar and wind. When supply exceeds demand, storage charges until full - then wind and solar are curtailed. Gas is the last resort, used only when all other sources are insufficient. Biomass is held back to avoid depleting this finite resource.</p>
         <p>The assumptions are sufficient to show whether enough low carbon electricity can be generated when it is needed. They are not a complete optimisation of cost or carbon reduction. Demand profiles are not changed.</p>
         <p>The 2030 Blueprint is outlined in my book <em>Decarbonising Electricity: Made Simple</em>. For the full methodology, see: Crossland et al., <em>Assessment of Electricity Decarbonization Scenarios for New Zealand and Great Britain</em>, Energies 2020, 13, 2799. <a href="https://doi.org/10.3390/en13112799" target="_blank">doi:10.3390/en13112799</a></p>
-        <p>Full LCOE assumptions — including source data, the gas load-factor formula, curtailment accounting, and the nuclear exclusion rationale — are documented in the <a href="/about/index.html#lcoe-methodology">About page methodology section</a>.</p>
+        <p>Full LCOE assumptions - including source data, the gas load-factor formula, curtailment accounting, and the nuclear exclusion rationale - are documented in the <a href="/about/index.html#lcoe-methodology">About page methodology section</a>.</p>
       </div>
     </details>
 
     <!-- Side-by-side mix comparison -->
     <h2 class="section-h2">Today vs the 2030 Blueprint</h2>
-    <p class="section-p">The <span class="desktop-only">right-hand</span><span class="mobile-only">lower</span> pie shows a simulation of what the 2030 Blueprint electricity mix would have looked like over the last 28 days — using actual weather and demand data, but with the Blueprint's generating capacity in place. The <span class="desktop-only">left</span><span class="mobile-only">upper</span> shows what actually happened.</p>
+    <p class="section-p">The <span class="desktop-only">right-hand</span><span class="mobile-only">lower</span> pie shows a simulation of what the 2030 Blueprint electricity mix would have looked like over the last 28 days - using actual weather and demand data, but with the Blueprint's generating capacity in place. The <span class="desktop-only">left</span><span class="mobile-only">upper</span> shows what actually happened.</p>
     <div class="compare-mix">
       <div>
         <div class="compare-panel-title compare-panel-title--now">Today's Grid</div>
@@ -324,7 +324,7 @@
 
     <!-- Curtailment -->
     <h2 class="section-h2">Renewable curtailment</h2>
-    <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed — switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 Blueprint.</p>
+    <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed - switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 Blueprint.</p>
     <div style="position:relative; height:160px;">
       <div class="chart-loading" id="curtailment-chart-loading"></div>
       <canvas id="curtailment-chart"></canvas>
@@ -403,7 +403,7 @@ const hideLoader = id => {
     Coal:          220,  // Historical + high ETS carbon costs
   };
 
-  // Gas LCOE is load-factor dependent — derived from DESNZ 2025 Annex A (2030 commissioning):
+  // Gas LCOE is load-factor dependent - derived from DESNZ 2025 Annex A (2030 commissioning):
   //   5% LF → £424/MWh, 30% LF → £147/MWh, 93% LF → £111/MWh
   // Structure: fixed_capital/LF + variable (fuel+carbon) where variable ≈ £104/MWh
   // Variable updated to reflect 5-yr avg UK NBP ~94p/therm (2020-2024, includes 2022 crisis):
@@ -411,7 +411,7 @@ const hideLoader = id => {
   // Formula: LCOE = 16.74 / LF + 104  (fits DESNZ shape; variable scaled to 5-yr avg gas price)
   const GAS_CAPACITY_GW = 35;  // approximate GB gas fleet (CCGT + OCGT)
   const WINDOW_HOURS    = 28 * 24;
-  const GAS_LCOE_CAP    = 250;  // £/MWh — reflects capacity markets, batteries, biofuel flexibility by 2030
+  const GAS_LCOE_CAP    = 250;  // £/MWh - reflects capacity markets, batteries, biofuel flexibility by 2030
 
   function gasLcoeFromRow(row) {
     const src = MIX_SOURCES.find(s => s.label === 'Gas');
@@ -589,7 +589,7 @@ const hideLoader = id => {
             <div class="lcoe-stage-label">Blueprint + useful curtailment</div>
           </div>
         </div>
-        <div class="compare-unit">£/MWh delivered (excl. nuclear) — decarbonisation slightly raises cost, but using curtailed renewables to displace petrol &amp; fossil gas brings it below today's level</div>`;
+        <div class="compare-unit">£/MWh delivered (excl. nuclear) - decarbonisation slightly raises cost, but using curtailed renewables to displace petrol &amp; fossil gas brings it below today's level</div>`;
     }
 
     // Helper: build sorted fuel list + pie data from a row
