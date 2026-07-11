@@ -44,6 +44,7 @@ const NAV_HTML = `
           </ul>
         </li>
         <li><a href="/about/">About</a></li>
+        <li><a href="/press/">Press</a></li>
         <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
       </ul>
     </nav>

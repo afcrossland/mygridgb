@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found — MyGridGB</title>
+  <meta name="description" content="The page you were looking for doesn't exist. Find live UK electricity data, generation history and more at MyGridGB.">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/nav.js" defer></script>
+  <style>
+    .not-found-wrap {
+      max-width: 560px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 0 24px;
+    }
+    .not-found-code {
+      font-size: 5rem;
+      font-weight: 200;
+      color: var(--brand);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .not-found-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .not-found-body {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+    .not-found-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .not-found-link {
+      display: inline-block;
+      padding: 11px 28px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .not-found-link:hover { opacity: .8; text-decoration: none; }
+    .not-found-link--primary {
+      background: var(--brand);
+      color: #fff;
+    }
+    .not-found-link--secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <main>
+    <div class="not-found-wrap">
+      <div class="not-found-code">404</div>
+      <h1 class="not-found-title">Page not found</h1>
+      <p class="not-found-body">This page doesn't exist or has moved. If you followed a link from somewhere, it may be out of date. The pages below should have what you need.</p>
+      <div class="not-found-links">
+        <a href="/" class="not-found-link not-found-link--primary">Home — live electricity dashboard</a>
+        <a href="/last-28-days/" class="not-found-link not-found-link--secondary">Last 28 days of generation data</a>
+        <a href="/blog/" class="not-found-link not-found-link--secondary">Blog index</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

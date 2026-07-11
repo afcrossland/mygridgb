@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core pages -->
+  <url><loc>https://www.mygridgb.co.uk/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/last-28-days/</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/last-12-months/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/historicaldata/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/carbon-tracker/</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/2030grid/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/solar-calculator/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- Data trackers -->
+  <url><loc>https://www.mygridgb.co.uk/gas-tracker/</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/coal-tracker/</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <!-- Resources -->
+  <url><loc>https://www.mygridgb.co.uk/map/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/educational-resources/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/podcast/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <!-- About -->
+  <url><loc>https://www.mygridgb.co.uk/about/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/press/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <!-- Blog -->
+  <url><loc>https://www.mygridgb.co.uk/blog/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/blog/clean-power-2030-my-thoughts.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.mygridgb.co.uk/blog/decoupling-reducing-energy-bills-by-3bn.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>
