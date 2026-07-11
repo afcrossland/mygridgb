@@ -112,6 +112,15 @@
         <canvas id="carbon-chart"></canvas>
       </div>
     </div>
+
+    <div class="chart-section">
+      <h2>Conversion &amp; grid losses</h2>
+      <p>Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram shows total TWh over the last 12 months — every unit of energy from source to delivered electricity.</p>
+      <div style="position:relative; height:500px; width:100%;">
+        <div class="chart-loading" id="sankey-chart-loading"></div>
+        <div id="sankey-chart" style="height:100%; width:100%;"></div>
+      </div>
+    </div>
   </main>
   <div id="sidebar-placeholder"></div>
 </div>
@@ -338,6 +347,113 @@ const hideLoader = id => {
     treemapChart.data.datasets[0].tree = buildTreeItems(tail(genRows, months));
     treemapChart.update();
   });
+
+  // ── Sankey: conversion & grid losses (12-month avg) ─────────────
+  if (genResult.status === 'fulfilled') {
+    const rows12 = tail(genResult.value.rows, 12);
+
+    // Sum 12 months of TWh per source directly
+    const sums = {};
+    SOURCES.forEach(src => { sums[src.label] = 0; });
+    rows12.forEach(r => SOURCES.forEach(src => { sums[src.label] += r.c[src.col]?.v ?? 0; }));
+
+    const gwS = {
+      Gas:           sums['Gas']         || 0,
+      Nuclear:       sums['Nuclear']     || 0,
+      Biomass:       sums['Biomass']     || 0,
+      Coal:          sums['Coal']        || 0,
+      Wind:          sums['Wind']        || 0,
+      Solar:         sums['Solar']       || 0,
+      'Large Hydro': sums['Large Hydro'] || 0,
+      Storage:       sums['Storage']     || 0,
+      Imports:       sums['Imports']     || 0,
+    };
+    const totalGW = Object.values(gwS).reduce((s, v) => s + v, 0);
+
+    if (totalGW > 0) {
+      const EFF       = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
+      const GRID_LOSS = 0.06;
+      const COL = {
+        Gas: 'rgba(107,114,128,0.85)',   Nuclear: 'rgba(74,222,128,0.85)',
+        Biomass: 'rgba(130,78,26,0.85)', Coal: 'rgba(17,24,39,0.85)',
+        Wind: 'rgba(13,158,110,0.85)',   Solar: 'rgba(245,158,11,0.85)',
+        'Large Hydro': 'rgba(59,130,246,0.85)', Storage: 'rgba(249,108,0,0.85)',
+        Imports: 'rgba(113,0,226,0.85)', Loss: 'rgba(248,113,113,0.75)',
+        Grid: 'rgba(26,77,122,0.85)',    Delivered: 'rgba(26,77,122,0.95)',
+      };
+
+      const nodeLabels = [], nodeColors = [], nodeX = [], nodeY = [];
+      const lSrc = [], lTgt = [], lVal = [], lCol = [];
+      let nIdx = 0;
+      const addNode = (label, color, x, y) => { nodeLabels.push(label); nodeColors.push(color); nodeX.push(x); nodeY.push(y); return nIdx++; };
+      const addLink = (s, t, v, c) => { if (v > 0.1) { lSrc.push(s); lTgt.push(t); lVal.push(+v.toFixed(1)); lCol.push(c); } };
+
+      const thermalFuels  = ['Gas','Nuclear','Biomass','Coal'].filter(n => gwS[n] > 0);
+      const directSources = ['Wind','Solar','Large Hydro','Storage','Imports'].filter(n => gwS[n] > 0);
+      const allLeft = [...thermalFuels, ...directSources];
+      const N = allLeft.length;
+      const leftY = allLeft.map((_, i) => N === 1 ? 0.45 : 0.05 + (i / (N - 1)) * 0.85);
+
+      const fuelNodeIdx = {};
+      thermalFuels.forEach((n, i) => { fuelNodeIdx[n] = addNode(n + ' fuel', COL[n], 0.01, leftY[i]); });
+
+      let thermalLossTotal = 0;
+      thermalFuels.forEach(n => { thermalLossTotal += gwS[n] / EFF[n] - gwS[n]; });
+      const hasThermal = thermalLossTotal > 0.001;
+      const thermalLossNode = hasThermal ? addNode('Thermal losses', COL.Loss, 0.40, 0.10) : -1;
+
+      const directNodeIdx = {};
+      directSources.forEach((n, i) => { directNodeIdx[n] = addNode(n, COL[n], 0.01, leftY[thermalFuels.length + i]); });
+
+      const gridNode = addNode('Electricity grid', COL.Grid,      0.40, 0.72);
+      const lossNode = addNode('Losses',            COL.Loss,      0.75, 0.10);
+      const delNode  = addNode('Delivered',         COL.Delivered, 0.99, 0.72);
+
+      thermalFuels.forEach(n => {
+        const heat = gwS[n] / EFF[n] - gwS[n];
+        if (hasThermal) addLink(fuelNodeIdx[n], thermalLossNode, heat, COL.Loss.replace('0.75','0.18'));
+        addLink(fuelNodeIdx[n], gridNode, gwS[n], COL[n].replace('0.85','0.25'));
+      });
+      directSources.forEach(n => { addLink(directNodeIdx[n], gridNode, gwS[n], COL[n].replace('0.85','0.25')); });
+      if (hasThermal) addLink(thermalLossNode, lossNode, thermalLossTotal, COL.Loss.replace('0.75','0.18'));
+      addLink(gridNode, lossNode, totalGW * GRID_LOSS,       'rgba(160,175,190,0.25)');
+      addLink(gridNode, delNode,  totalGW * (1 - GRID_LOSS), 'rgba(26,77,122,0.22)');
+
+      const sankeyData = { nodeLabels, nodeColors, nodeX, nodeY, lSrc, lTgt, lVal, lCol };
+
+      new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.plot.ly/plotly-2.27.0.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      }).then(() => {
+        Plotly.newPlot('sankey-chart', [{
+          type: 'sankey', orientation: 'h', arrangement: 'fixed',
+          node: {
+            pad: 14, thickness: 20,
+            line: { color: '#fff', width: 0.5 },
+            label: sankeyData.nodeLabels, color: sankeyData.nodeColors,
+            x: sankeyData.nodeX, y: sankeyData.nodeY,
+            hoverinfo: 'none',
+          },
+          link: {
+            source: sankeyData.lSrc, target: sankeyData.lTgt,
+            value: sankeyData.lVal,  color: sankeyData.lCol,
+            hoverinfo: 'none',
+          },
+        }], {
+          font: { family: FONT, size: 11.5, color: '#0F172A' },
+          paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+          margin: { l: 10, r: 10, t: 10, b: 10 },
+        }, { responsive: true, displayModeBar: false });
+        hideLoader('sankey-chart');
+      }).catch(() => {
+        hideLoader('sankey-chart');
+        const el = document.getElementById('sankey-chart');
+        if (el) el.style.display = 'none';
+      });
+    }
+  }
 
   // ── Column charts filter (12 / 24 / 36 months) ──────────────────
   document.getElementById('column-filter').addEventListener('click', e => {

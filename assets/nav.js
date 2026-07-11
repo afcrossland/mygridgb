@@ -32,7 +32,6 @@ const NAV_HTML = `
           </ul>
         </li>
         <li><a href="/2030grid/">The 2030 Blueprint</a></li>
-        <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
         <li>
           <a href="/map/">Resources ▾</a>
           <ul>
@@ -46,6 +45,7 @@ const NAV_HTML = `
 
         <li><a href="/podcast/">In the Media</a></li>
         <li><a href="/about/">About</a></li>
+        <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
       </ul>
     </nav>
   </div>

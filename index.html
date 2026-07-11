@@ -26,9 +26,12 @@
     /* ── Stat strip ── */
     .stat-strip {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin: 28px 0 32px;
+      margin: 20px 0 28px;
+    }
+    @media (max-width: 640px) {
+      .stat-strip { grid-template-columns: repeat(2, 1fr); }
     }
 
     .stat-card {
@@ -94,7 +97,7 @@
       grid-template-columns: 300px 1fr;
       gap: 36px;
       align-items: center;
-      margin-bottom: 36px;
+      margin-bottom: 4px;
     }
 
     .pie-col {
@@ -308,6 +311,35 @@
     }
 
     /* ── Solar calculator promo card ── */
+    .announce-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      background: #fef9c3;
+      border: 1px solid #fde047;
+      border-radius: 8px;
+      font-size: 13.5px;
+      margin-bottom: 20px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background .15s;
+    }
+    .announce-banner:hover { background: #fef08a; text-decoration: none; }
+    .announce-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      background: #f59e0b;
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .announce-text { flex: 1; color: var(--text); }
+    .announce-arrow { color: var(--brand); font-weight: 600; flex-shrink: 0; }
+
     .solar-promo-card {
       display: flex;
       align-items: center;
@@ -358,14 +390,9 @@
       .solar-promo-icon { font-size: 36px; }
     }
 
-    @media (max-width: 1100px) {
-      .stat-strip { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 560px) {
-      .stat-strip { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 360px) {
-      .stat-strip { grid-template-columns: 1fr; }
+    @media (max-width: 640px) {
+      .mix-layout { grid-template-columns: 1fr; }
+      .pie-col { max-width: 100%; }
     }
 
     /* ── Explore links ── */
@@ -405,57 +432,66 @@
     @media (max-width: 760px) {
       .explore-links { grid-template-columns: repeat(2, 1fr); }
     }
+    .explore-link--blueprint {
+      background: #0f2e4d;
+      border-color: #1a4d7a;
+    }
+    .explore-link--blueprint .explore-link-title { color: #7dd3fc; }
+    .explore-link--blueprint .explore-link-desc  { color: rgba(255,255,255,.7); }
+    .explore-link--blueprint:hover { border-color: #4ade80; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+
+    /* ── Mission intro ── */
+    .site-intro {
+      margin: 0 0 20px;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .site-intro p { margin-bottom: 12px; }
+    .site-intro p:last-child { margin-bottom: 0; }
+
+    /* ── Decarbonisation section ── */
+    .decarb-row { margin: 32px 0; }
   </style>
 </head>
 <body>
 
 <div class="page-wrap">
   <main>
-    <div class="home-hero">
-      <h1>Welcome to MyGridGB 🇬🇧</h1>
-      <p><em>The independent resource charting in real time the decarbonisation of British electricity.</em></p>
-    </div>
-
-    <a href="/solar-calculator/" class="solar-promo-card">
-      <div class="solar-promo-body">
-        <div class="solar-promo-eyebrow">Home tool</div>
-        <div class="solar-promo-title">Home Solar Calculator</div>
-        <div class="solar-promo-desc">Thinking about solar panels? Enter your postcode and get an instant estimate of how much you could generate and save — based on the same irradiance data used by certified UK installers... or compare quotes side by side.</div>
-        <div class="solar-promo-pills">
-          <span class="solar-pill">Free</span>
-          <span class="solar-pill">No sign-up needed</span>
-          <span class="solar-pill">Or compare quotes</span>
-        </div>
-      </div>
-      <div class="solar-promo-cta">Try the calculator →</div>
+    <a href="/solar-calculator/" class="announce-banner">
+      <span class="announce-tag">New</span>
+      <span class="announce-text">Home Solar Calculator — enter your postcode for an instant estimate of what solar could do for your home</span>
+      <span class="announce-arrow">→</span>
     </a>
 
-    <p class="page-intro">
-      Britain is transitioning to low carbon electricity. Coal power stations are being decommissioned and new
-      low carbon power stations are taking their place. But how much can wind turbines, solar farms, biomass and
-      nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide
-      low carbon energy for electric vehicles?
-    </p>
-    <p class="page-intro">
-      MyGridGB charts all of this change. It tells you how much electricity is produced, where that electricity
-      comes from and how much carbon is being emitted — all in real time so you can come back again and again
-      to see how Britain is tracking against carbon targets.
-      <a href="about/index.html">Read more about MyGridGB.</a>
-    </p>
+    <div class="home-hero">
+      <h1>MyGridGB 🇬🇧</h1>
+      <p><em>Charting the decarbonisation of British electricity in real time.</em></p>
+    </div>
+
+    <div class="site-intro">
+      <p>Britain is transitioning to low carbon electricity. Coal power stations are being decommissioned and new low carbon power stations are taking their place. But how much can wind turbines, solar farms, biomass and nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide low carbon energy for electric vehicles?</p>
+      <p>MyGridGB charts all of this change. It tells you how much electricity is produced, where that electricity comes from and how much carbon is being emitted — all in real time so you can come back again and again to see how Britain is tracking against carbon targets. <a href="/about/">Read more about MyGridGB.</a></p>
+    </div>
 
     <section>
       <h2 class="mix-title">Britain's Present Electricity Mix</h2>
       <p class="mix-subtitle" style="margin-bottom:4px;">How is your electricity being generated right now?</p>
 
-      <!-- Five stat cards -->
+      <!-- Pie left + fuel list right -->
+      <div class="mix-layout">
+        <div class="pie-col">
+          <div class="chart-loading" id="mix-chart-loading"></div>
+          <canvas id="mix-chart"></canvas>
+        </div>
+        <div class="fuel-list" id="fuel-list"></div>
+      </div>
+
+      <!-- Stat cards full width below -->
       <div class="stat-strip">
         <div class="stat-card" id="lowcarbon-card">
           <div class="stat-label">Low Carbon</div>
           <div class="stat-num"><span id="stat-lowcarbon">&mdash;</span><span class="stat-unit">%</span></div>
-        </div>
-        <div class="stat-card" id="renewables-card">
-          <div class="stat-label">Renewables</div>
-          <div class="stat-num"><span id="stat-renewables">&mdash;</span><span class="stat-unit">%</span></div>
         </div>
         <div class="stat-card" id="generation-card">
           <div class="stat-label">Generation</div>
@@ -469,38 +505,25 @@
           <div class="stat-label">Carbon Intensity</div>
           <div class="stat-num"><span id="stat-carbon">&mdash;</span><span class="stat-unit">gCO₂/kWh</span></div>
         </div>
-        <div class="stat-card" id="thermal-card">
-          <div class="stat-label">Thermal Losses</div>
-          <div class="stat-num"><span id="stat-thermal">&mdash;</span><span class="stat-unit">%</span></div>
-        </div>
-      </div>
-
-      <!-- Pie left + fuel list right -->
-      <div class="mix-layout">
-        <div class="pie-col">
-          <div class="chart-loading" id="mix-chart-loading"></div>
-          <canvas id="mix-chart"></canvas>
-        </div>
-        <div class="fuel-list" id="fuel-list"></div>
       </div>
     </section>
 
     <div class="explore-links">
       <a href="/last-28-days/index.html" class="explore-link">
         <span class="explore-link-title">Last 28 days →</span>
-        <span class="explore-link-desc">Hourly generation & carbon intensity</span>
+        <span class="explore-link-desc">Hourly generation, carbon intensity and energy mix. See how the grid behaves day by day and how much comes from renewables vs gas.</span>
       </a>
       <a href="/last-12-months/index.html" class="explore-link">
         <span class="explore-link-title">Last 12 months →</span>
-        <span class="explore-link-desc">Monthly generation mix & trends</span>
+        <span class="explore-link-desc">Monthly generation trends over the past year. Watch the seasonal shift between wind, solar and gas as weather changes.</span>
       </a>
       <a href="/historicaldata/index.html" class="explore-link">
         <span class="explore-link-title">Historical data →</span>
-        <span class="explore-link-desc">Annual generation since 1998</span>
+        <span class="explore-link-desc">Annual generation from 1998 to today. Over 25 years of Britain's electricity transformation from coal to low carbon.</span>
       </a>
-      <a href="/2030grid/index.html" class="explore-link">
+      <a href="/2030grid/index.html" class="explore-link explore-link--blueprint">
         <span class="explore-link-title">2030 Blueprint →</span>
-        <span class="explore-link-desc">Clean power simulation & cost</span>
+        <span class="explore-link-desc">My vision for low carbon, low cost British electricity. A simulation replacing gas with wind, solar and storage, run against real weather and demand to show it can work.</span>
       </a>
     </div>
 
@@ -518,83 +541,46 @@
       </div>
     </section>
 
-    <a href="/2030grid/index.html" class="blueprint-card">
-      <div>
-        <div class="blueprint-card-eyebrow">Simulation</div>
-        <div class="blueprint-card-title">The 2030 Blueprint</div>
-        <div class="blueprint-card-desc">What would Britain's electricity look like if we hit the 2030 clean power target? Running against today's real weather and demand, the Blueprint replaces gas with wind, solar and storage — and shows the cost of getting there.</div>
-        <div class="blueprint-card-stats">
-          <div>
-            <div class="blueprint-stat-val">3×</div>
-            <div class="blueprint-stat-label">more wind &amp; solar</div>
-          </div>
-          <div>
-            <div class="blueprint-stat-val">~90%</div>
-            <div class="blueprint-stat-label">low-carbon electricity</div>
-          </div>
-          <div>
-            <div class="blueprint-stat-val">&lt;100g</div>
-            <div class="blueprint-stat-label">CO₂ per kWh</div>
-          </div>
-          <div>
-            <div class="blueprint-stat-val">£93</div>
-            <div class="blueprint-stat-label">per MWh (vs ~£99 today)</div>
-          </div>
-        </div>
-      </div>
-      <div class="blueprint-card-cta">Explore the Blueprint →</div>
-    </a>
-
     <section style="margin:32px 0;">
-      <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">Conversion &amp; grid losses</h2>
-      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram traces every unit of energy from source to delivered electricity, in real time.</p>
-      <div style="position:relative; height:500px; width:100%;">
-        <div class="chart-loading" id="sankey-chart-loading"></div>
-        <div id="sankey-chart" style="height:100%; width:100%;"></div>
-      </div>
-    </section>
-
-    <section style="margin:32px 0; text-align:center;">
       <h2 style="font-size:1.6rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin-bottom:8px;">Decarbonising British Electricity</h2>
-      <p style="font-size:1rem; color:var(--muted); margin-bottom:20px; line-height:1.5;">The carbon intensity of British electricity has fallen dramatically since 1998, driven by the closure of coal plants and growth in wind, solar and nuclear. The chart tracks this progress — and how far there is still to go to meet the 2030 clean power target of 50–100 gCO₂eq/kWh.</p>
-      <div style="position:relative; height:400px;">
+      <p style="font-size:0.9rem; color:var(--muted); margin-bottom:16px; line-height:1.5;">Carbon intensity has fallen dramatically since 1998 — the closure of coal and growth in wind, solar and nuclear. The 2030 clean power target is 50–100 gCO₂eq/kWh.</p>
+      <div style="position:relative; height:320px;">
         <div class="chart-loading" id="carbon-chart-loading"></div>
         <canvas id="carbon-chart"></canvas>
       </div>
     </section>
 
-    <!-- 2030 Countdown -->
-    <section class="countdown-section">
-      <p class="countdown-eyebrow">The clock is ticking</p>
-      <h2 class="countdown-title">Countdown to 2030 carbon target</h2>
-      <p class="countdown-sub">The UK government has committed to decarbonising the electricity system by the end of 2030. How long do we have?</p>
-      <div class="countdown-strip">
-        <div class="countdown-unit">
-          <div class="countdown-num" id="cd-years">—</div>
-          <div class="countdown-label">Years</div>
-        </div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit">
-          <div class="countdown-num" id="cd-days">—</div>
-          <div class="countdown-label">Days</div>
-        </div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit">
-          <div class="countdown-num" id="cd-hours">—</div>
-          <div class="countdown-label">Hours</div>
-        </div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit">
-          <div class="countdown-num" id="cd-minutes">—</div>
-          <div class="countdown-label">Minutes</div>
-        </div>
-        <div class="countdown-sep">:</div>
-        <div class="countdown-unit">
-          <div class="countdown-num" id="cd-seconds">—</div>
-          <div class="countdown-label">Seconds</div>
+    <div class="countdown-section">
+        <p class="countdown-eyebrow">The clock is ticking</p>
+        <h2 class="countdown-title">Countdown to 2030 carbon target</h2>
+        <p class="countdown-sub">The UK government has committed to decarbonising the electricity system by the end of 2030. How long do we have?</p>
+        <div class="countdown-strip">
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-years">—</div>
+            <div class="countdown-label">Years</div>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-days">—</div>
+            <div class="countdown-label">Days</div>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-hours">—</div>
+            <div class="countdown-label">Hours</div>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-minutes">—</div>
+            <div class="countdown-label">Minutes</div>
+          </div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-seconds">—</div>
+            <div class="countdown-label">Seconds</div>
+          </div>
         </div>
       </div>
-    </section>
 
     <h2 style="margin: 32px 0 16px; font-size:1.3rem;">Latest Blogs</h2>
 
@@ -606,6 +592,12 @@
         <div class="excerpt">NESO released the Clean Power 2030 plan. I've modelled the pathways in my Digital Twin of the GB Electricity Mix. Here are my 10 takeaways…</div>
       </div>
       <div class="blog-card">
+        <div class="cat">Solar</div>
+        <h3><a href="blog/how-to-maximize-solar-power-efficiency-in-small-residential-homes-2024-guide.html">How to Maximize Solar Power Efficiency in Small Residential Homes</a></h3>
+        <div class="meta">Guest post · October 20, 2024</div>
+        <div class="excerpt">Want to harness the sun's power but worried about your compact space? Don't let a small roof hold you back — practical guidance for smaller homes…</div>
+      </div>
+      <div class="blog-card">
         <div class="cat">Energy Policy</div>
         <h3><a href="blog/decoupling-reducing-energy-bills-by-3bn.html">Decoupling reducing energy bills by £3bn</a></h3>
         <div class="meta">By Dr Andrew Crossland · February 5, 2023</div>
@@ -614,10 +606,6 @@
     </div>
     <p style="margin-top:16px; font-size:14px;"><a href="blog/index.html">View all 408 posts →</a></p>
 
-    <div style="margin-top:32px; padding:16px; background:var(--brand-bg); border-radius:6px; font-size:14px;">
-      MyGridGB ran a petition for solar on all new homes in the UK. The petition didn't work, but that's democracy.
-      <a href="about/index.html#solar-petition">Read the justification here.</a>
-    </div>
   </main>
 
   <div id="sidebar-placeholder"></div>
@@ -635,8 +623,8 @@ const hideLoader = id => {
   const DATA = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data';
   const SHEET = () => null; // unused, kept to avoid reference errors
 
-  const MIX_URL     = `${DATA}/live-mix.json`;
-  const HISTORY_URL = `${DATA}/annual-history.json`;
+  const MIX_URL      = `${DATA}/live-mix.json`;
+  const HISTORY_URL  = `${DATA}/annual-history.json`;
 
   const PALETTE = {
     'Nuclear':       '#4ade80',
@@ -671,8 +659,7 @@ const hideLoader = id => {
 
   // Low carbon = everything except Coal, Gas, Imports
   const LOW_CARBON = new Set(['Nuclear','Biomass','Wind','Wind*','Embedded Wind','Solar','Large Hydro','Hydro','Storage']);
-  // Renewables = Wind + Solar + Hydro only (no Biomass per user definition)
-  const RENEWABLE  = new Set(['Wind','Wind*','Embedded Wind','Solar','Large Hydro','Hydro']);
+
 
   async function fetchSheet(url) {
     const resp = await fetch(url);
@@ -690,7 +677,7 @@ const hideLoader = id => {
     const { rows } = mixResult.value;
 
     const labels = [], values = [], bgColors = [];
-    let totalGW = 0, lowCarbonGW = 0, renewableGW = 0, carbonWeighted = 0;
+    let totalGW = 0, lowCarbonGW = 0, carbonWeighted = 0;
     let importDependentGW = 0;
     const gwBySource = {};
 
@@ -707,7 +694,6 @@ const hideLoader = id => {
 
       totalGW       += val;
       if (LOW_CARBON.has(source)) lowCarbonGW  += val;
-      if (RENEWABLE.has(source))  renewableGW  += val;
       carbonWeighted += val * (CARBON_FACTORS[source] ?? 300);
 
       // Energy independence: gas/biomass/nuclear use ~80% imported fuel; imports are 100% foreign
@@ -717,41 +703,23 @@ const hideLoader = id => {
 
     if (totalGW > 0) {
       const lowCarbonPct    = Math.round(lowCarbonGW  / totalGW * 100);
-      const renewablesPct   = Math.round(renewableGW  / totalGW * 100);
       const carbonIntensity = Math.round(carbonWeighted / totalGW);
       const energyIndPct    = Math.max(0, Math.round((totalGW - importDependentGW) / totalGW * 100));
 
-      // Thermal losses: same EFF assumptions as Sankey
-      const THERM_EFF = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
-      let thermalInput = 0, thermalLoss = 0;
-      Object.entries(THERM_EFF).forEach(([src, eff]) => {
-        const gw = gwBySource[src] || 0;
-        if (gw > 0) { thermalInput += gw / eff; thermalLoss += gw / eff - gw; }
-      });
-      const directGW = totalGW - Object.keys(THERM_EFF).reduce((s, k) => s + (gwBySource[k] || 0), 0);
-      const totalInputEnergy = thermalInput + directGW;
-      const thermalLossPct = totalInputEnergy > 0 ? Math.round(thermalLoss / totalInputEnergy * 100) : 0;
-
       document.getElementById('stat-lowcarbon').textContent    = lowCarbonPct;
-      document.getElementById('stat-renewables').textContent   = renewablesPct;
       document.getElementById('stat-generation').textContent   = totalGW.toFixed(1);
       document.getElementById('stat-independence').textContent = energyIndPct;
       document.getElementById('stat-carbon').textContent       = carbonIntensity;
-      document.getElementById('stat-thermal').textContent      = thermalLossPct;
 
       // Colour each card
       document.getElementById('lowcarbon-card').classList.add(
         lowCarbonPct > 80 ? 'stat-card--low' : lowCarbonPct > 60 ? 'stat-card--mid' : 'stat-card--high');
-      document.getElementById('renewables-card').classList.add(
-        renewablesPct > 60 ? 'stat-card--low' : renewablesPct > 40 ? 'stat-card--mid' : 'stat-card--high');
       document.getElementById('generation-card').classList.add(
         totalGW > 40 ? 'stat-card--high' : totalGW > 30 ? 'stat-card--mid' : 'stat-card--low');
       document.getElementById('independence-card').classList.add(
         energyIndPct > 60 ? 'stat-card--low' : energyIndPct > 40 ? 'stat-card--mid' : 'stat-card--high');
       document.getElementById('carbon-card').classList.add(
         carbonIntensity < 100 ? 'stat-card--low' : carbonIntensity < 250 ? 'stat-card--mid' : 'stat-card--high');
-      document.getElementById('thermal-card').classList.add(
-        thermalLossPct < 20 ? 'stat-card--low' : thermalLossPct < 35 ? 'stat-card--mid' : 'stat-card--high');
     }
 
     // Sort entries by GW descending for the fuel list
@@ -802,124 +770,6 @@ const hideLoader = id => {
       }
     });
 
-    // ── Sankey: runs non-blocking after Plotly loads ──────────
-    if (totalGW > 0) {
-      const EFF       = { Gas: 0.57, Nuclear: 0.35, Biomass: 0.39, Coal: 0.35 };
-      const GRID_LOSS = 0.06;
-
-      const gw = {
-        Gas:           gwBySource['Gas']        || 0,
-        Nuclear:       gwBySource['Nuclear']    || 0,
-        Biomass:       gwBySource['Biomass']    || 0,
-        Coal:          gwBySource['Coal']       || 0,
-        Wind:          (gwBySource['Wind'] || 0) + (gwBySource['Wind*'] || 0) + (gwBySource['Embedded Wind'] || 0),
-        Solar:         gwBySource['Solar']      || 0,
-        'Large Hydro': (gwBySource['Large Hydro'] || 0) + (gwBySource['Hydro'] || 0),
-        Storage:       gwBySource['Storage']    || 0,
-        Imports:       gwBySource['Imports']    || 0,
-      };
-
-      const COL = {
-        Gas: 'rgba(107,114,128,0.85)',   Nuclear: 'rgba(74,222,128,0.85)',
-        Biomass: 'rgba(130,78,26,0.85)', Coal: 'rgba(17,24,39,0.85)',
-        Wind: 'rgba(13,158,110,0.85)',   Solar: 'rgba(245,158,11,0.85)',
-        'Large Hydro': 'rgba(59,130,246,0.85)', Storage: 'rgba(249,108,0,0.85)',
-        Imports: 'rgba(113,0,226,0.85)', Loss: 'rgba(248,113,113,0.75)',
-        Grid: 'rgba(26,77,122,0.85)',    Delivered: 'rgba(26,77,122,0.95)',
-      };
-
-      const nodeLabels = [], nodeColors = [], nodeX = [], nodeY = [];
-      const lSrc = [], lTgt = [], lVal = [], lCol = [];
-      let nIdx = 0;
-      const addNode = (label, color, x, y) => {
-        nodeLabels.push(label); nodeColors.push(color);
-        nodeX.push(x); nodeY.push(y);
-        return nIdx++;
-      };
-      const addLink = (s, t, v, c) => {
-        if (v > 0.001) { lSrc.push(s); lTgt.push(t); lVal.push(+v.toFixed(3)); lCol.push(c); }
-      };
-
-      const thermalFuels  = ['Gas','Nuclear','Biomass','Coal'].filter(n => gw[n] > 0);
-      const directSources = ['Wind','Solar','Large Hydro','Storage','Imports'].filter(n => gw[n] > 0);
-      const allLeft = [...thermalFuels, ...directSources];
-      const N = allLeft.length;
-      const leftY = allLeft.map((_, i) => N === 1 ? 0.45 : 0.05 + (i / (N - 1)) * 0.85);
-
-      // Left column: fuel inputs
-      const fuelNodeIdx = {};
-      thermalFuels.forEach((n, i) => {
-        fuelNodeIdx[n] = addNode(n + ' fuel', COL[n], 0.01, leftY[i]);
-      });
-
-      // Middle column: single thermal losses node + electricity grid
-      let thermalLossTotal = 0;
-      thermalFuels.forEach(n => { thermalLossTotal += gw[n] / EFF[n] - gw[n]; });
-      const hasThermal = thermalLossTotal > 0.001;
-      const thermalLossNode = hasThermal ? addNode('Thermal losses', COL.Loss, 0.40, 0.10) : -1;
-
-      // Left column: direct sources (below thermal fuels)
-      const directNodeIdx = {};
-      directSources.forEach((n, i) => {
-        directNodeIdx[n] = addNode(n, COL[n], 0.01, leftY[thermalFuels.length + i]);
-      });
-
-      const gridNode = addNode('Electricity grid', COL.Grid,      0.40, 0.72);
-      const lossNode = addNode('Losses',            COL.Loss,      0.75, 0.10);
-      const delNode  = addNode('Delivered',         COL.Delivered, 0.99, 0.72);
-
-      // Links: fuels → thermal losses + grid
-      thermalFuels.forEach(n => {
-        const heat = gw[n] / EFF[n] - gw[n];
-        if (hasThermal) addLink(fuelNodeIdx[n], thermalLossNode, heat,  COL.Loss.replace('0.75','0.18'));
-        addLink(fuelNodeIdx[n], gridNode, gw[n], COL[n].replace('0.85','0.25'));
-      });
-      // Links: direct sources → grid
-      directSources.forEach(n => {
-        addLink(directNodeIdx[n], gridNode, gw[n], COL[n].replace('0.85','0.25'));
-      });
-      // Links: thermal losses + grid losses → single losses node
-      if (hasThermal) addLink(thermalLossNode, lossNode, thermalLossTotal, COL.Loss.replace('0.75','0.18'));
-      addLink(gridNode, lossNode, totalGW * GRID_LOSS,       'rgba(160,175,190,0.25)');
-      addLink(gridNode, delNode,  totalGW * (1 - GRID_LOSS), 'rgba(26,77,122,0.22)');
-
-      const sankeyData = { nodeLabels, nodeColors, nodeX, nodeY, lSrc, lTgt, lVal, lCol };
-
-      new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.plot.ly/plotly-2.27.0.min.js';
-        s.onload = res; s.onerror = rej;
-        document.head.appendChild(s);
-      }).then(() => {
-        Plotly.newPlot('sankey-chart', [{
-          type: 'sankey',
-          orientation: 'h',
-          arrangement: 'fixed',
-          node: {
-            pad: 14, thickness: 20,
-            line: { color: '#fff', width: 0.5 },
-            label: sankeyData.nodeLabels, color: sankeyData.nodeColors,
-            x: sankeyData.nodeX, y: sankeyData.nodeY,
-            hovertemplate: '<b>%{label}</b><br>%{value:.2f} GW<extra></extra>',
-          },
-          link: {
-            source: sankeyData.lSrc, target: sankeyData.lTgt,
-            value: sankeyData.lVal,  color: sankeyData.lCol,
-            hovertemplate: '%{source.label} → %{target.label}<br><b>%{value:.2f} GW</b><extra></extra>',
-          },
-        }], {
-          font: { family: "'DM Sans','Segoe UI',Arial,sans-serif", size: 11.5, color: '#0F172A' },
-          paper_bgcolor: 'rgba(0,0,0,0)',
-          plot_bgcolor:  'rgba(0,0,0,0)',
-          margin: { l: 10, r: 10, t: 10, b: 10 },
-        }, { responsive: true, displayModeBar: false });
-        hideLoader('sankey-chart');
-      }).catch(() => {
-        hideLoader('sankey-chart');
-        const el = document.getElementById('sankey-chart');
-        if (el) el.style.display = 'none';
-      });
-    }
   }
 
   // ── Carbon intensity bar chart ───────────────────────────────
