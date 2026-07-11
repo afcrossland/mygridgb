@@ -31,7 +31,7 @@ const NAV_HTML = `
             <li><a href="/carbon-tracker/">Carbon Tracker</a></li>
           </ul>
         </li>
-        <li><a href="/2030grid/">The 2030 Blueprint</a></li>
+        <li><a href="/2030grid/">My 2030 Blueprint</a></li>
         <li>
           <a href="/map/">Resources ▾</a>
           <ul>
@@ -40,10 +40,9 @@ const NAV_HTML = `
             <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
             <li><a href="/educational-resources/">Educational Resources</a></li>
             <li><a href="https://substack.com/@afcrossland" target="_blank">Substack</a></li>
+            <li><a href="/podcast/">In the Media</a></li>
           </ul>
         </li>
-
-        <li><a href="/podcast/">In the Media</a></li>
         <li><a href="/about/">About</a></li>
         <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
       </ul>
