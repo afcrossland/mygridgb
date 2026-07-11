@@ -526,6 +526,42 @@
     }
     .hero-guide-link a { color: var(--brand); text-decoration: none; }
     .hero-guide-link a:hover { text-decoration: underline; }
+
+    /* ── Local installer preview ── */
+    .local-installers-preview {
+      background: #f0f7ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 16px 18px 14px;
+      margin-bottom: 20px;
+    }
+    .lip-heading {
+      font-size: 13.5px; font-weight: 600; color: var(--brand);
+      margin-bottom: 12px;
+    }
+    .lip-list {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .lip-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .lip-card-left { display: flex; flex-direction: column; gap: 2px; }
+    .lip-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+    .lip-meta { font-size: 12px; color: var(--muted); }
+    .lip-certs { display: flex; gap: 6px; }
+    .lip-cert { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+    .lip-cert-yes { background: #d1fae5; color: #065f46; }
+    .lip-cert-no  { background: #f3f4f6; color: #9ca3af; }
+    .lip-rating { font-size: 13px; color: #92400e; font-weight: 700; white-space: nowrap; }
+    .lip-cta-note {
+      font-size: 12.5px; color: #1e40af; margin: 4px 0 0;
+      line-height: 1.5;
+    }
     .hero-prompt {
       font-size: 15px; font-weight: 600; color: var(--muted);
       text-align: center; margin-bottom: 10px; letter-spacing: .01em;
@@ -1105,19 +1141,19 @@
 <body>
 <div class="page-wrap">
   <main>
-    <h1 class="page-title">Solar quotes, done properly</h1>
-    <p class="page-intro">See what solar could save you, then get quotes from MCS-registered local installers — compared fairly, on the same assumptions as your estimate. MyGridGB is an introduction service; your contract is with the installer.</p>
+    <h1 class="page-title">Solar quotes you can actually compare</h1>
+    <p class="page-intro">Most people get solar quotes for completely different things from different installers — impossible to compare fairly. We fix that. Enter your postcode to find MCS-registered installers near you, then describe your home so we can build a standard design brief they all quote against. Same spec, fixed format, equal terms.</p>
     <div class="how-it-works">
-      <div class="hiw-step"><span class="hiw-num">1</span>Estimate what solar could do for your home</div>
+      <div class="hiw-step"><span class="hiw-num">1</span>Describe your home — we build a design brief</div>
       <div class="hiw-sep">→</div>
-      <div class="hiw-step"><span class="hiw-num">2</span>Choose MCS-registered local installers to invite</div>
+      <div class="hiw-step"><span class="hiw-num">2</span>Installers quote on the same spec</div>
       <div class="hiw-sep">→</div>
-      <div class="hiw-step"><span class="hiw-num">3</span>Compare their quotes in one place, fairly</div>
+      <div class="hiw-step"><span class="hiw-num">3</span>You compare price, hardware and warranty fairly</div>
     </div>
 
     <!-- Postcode lookup — shown immediately -->
     <div class="postcode-row">
-      <label class="postcode-label">Enter your postcode or address — we use it to look up how much sunshine your area gets</label>
+      <label class="postcode-label">Enter your postcode or address — we'll find local installers and look up sunshine hours for your area</label>
       <div class="postcode-input-row">
         <div class="pc-input-wrap">
           <input id="pc-input" class="pc-input" type="text" placeholder="e.g. SW1A 1AA or 14 Green Lane, Sheffield" autocomplete="off" style="width:280px">
@@ -1130,15 +1166,25 @@
 
     <!-- Mode chooser — revealed after postcode -->
     <div id="hero-section" style="display:none">
-      <p class="hero-prompt">How would you like to start?</p>
+
+      <!-- Local installer preview -->
+      <div class="local-installers-preview" id="local-installers-preview" style="display:none">
+        <div class="lip-heading">
+          <span id="lip-count">MCS-registered installers</span> serve your area
+        </div>
+        <div class="lip-list" id="lip-list"></div>
+        <p class="lip-cta-note">Complete the home assessment below — we'll build a standard design brief that all of these installers can quote against.</p>
+      </div>
+
+      <p class="hero-prompt">Before you approach them — could solar be right for your home?</p>
       <div id="calc-hero" class="calc-hero">
         <button class="hero-card" id="hero-explore">
-          <div class="hero-card-title">Quick estimate</div>
-          <div class="hero-card-sub">Answer a few questions and see roughly what solar could save you — rooftop or plug-in</div>
+          <div class="hero-card-title">Show me what solar could do</div>
+          <div class="hero-card-sub">Answer a few questions about your home and see what a typical system might deliver — rooftop or plug-in</div>
         </button>
         <button class="hero-card" id="hero-detailed">
-          <div class="hero-card-title">Design and get quotes</div>
-          <div class="hero-card-sub">Specify your exact system, see detailed financials, and invite MCS-registered local installers to quote</div>
+          <div class="hero-card-title">I want to spec it precisely</div>
+          <div class="hero-card-sub">Set exact panel count, battery size, roof angles and tariffs — then send the brief directly to local installers to quote</div>
         </button>
       </div>
       <p class="hero-guide-link">New to solar? <a href="https://substack.com/home/post/p-193602024" target="_blank" rel="noopener">Read our beginner's guide ↗</a></p>
@@ -1830,6 +1876,39 @@ const pcBtn    = document.getElementById('pc-btn');
 const pcStatus = document.getElementById('pc-status');
 const pcAcDrop = document.getElementById('pc-ac-dropdown');
 
+let _localInstallersCache = null;
+function loadLocalInstallers() {
+  if (_localInstallersCache) return Promise.resolve(_localInstallersCache);
+  return fetch('../mygridgb-quotes/data/quotes.json')
+    .then(r => r.json())
+    .then(data => { _localInstallersCache = data.local_installers || []; return _localInstallersCache; })
+    .catch(() => []);
+}
+
+function renderInstallerPreview(installers) {
+  const preview = document.getElementById('local-installers-preview');
+  const countEl = document.getElementById('lip-count');
+  const list    = document.getElementById('lip-list');
+  const n = installers.length;
+  countEl.textContent = `${n} MCS-registered installer${n !== 1 ? 's' : ''}`;
+  const shown = installers.slice(0, 3);
+  list.innerHTML = shown.map(ins => `
+    <div class="lip-card">
+      <div class="lip-card-left">
+        <div class="lip-name">${ins.name}</div>
+        <div class="lip-meta">${ins.address}</div>
+        <div class="lip-certs">
+          ${ins.mcs  ? '<span class="lip-cert lip-cert-yes">MCS</span>'  : '<span class="lip-cert lip-cert-no">MCS</span>'}
+          ${ins.recc ? '<span class="lip-cert lip-cert-yes">RECC</span>' : ''}
+          ${ins.hies ? '<span class="lip-cert lip-cert-yes">HIES</span>' : ''}
+        </div>
+      </div>
+      <div class="lip-rating">★ ${ins.google_rating}</div>
+    </div>
+  `).join('');
+  preview.style.display = '';
+}
+
 function resolveLocation(lat, lon, displayCode, zoom = 16) {
   const zone = nearestZone(lat, lon);
   currentZoneKey = zone.key;
@@ -1840,6 +1919,7 @@ function resolveLocation(lat, lon, displayCode, zoom = 16) {
   setMapLocation(lat, lon);
   document.getElementById('hero-section').style.display = '';
   revealCurrentMode();
+  loadLocalInstallers().then(renderInstallerPreview);
 }
 
 async function lookupPostcode() {

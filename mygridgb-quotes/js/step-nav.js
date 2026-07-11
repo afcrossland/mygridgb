@@ -3,7 +3,7 @@
 const STEPS = [
   { label: 'Estimate what solar could do for your home', href: '/solar-matcher/' },
   { label: 'Choose MCS-registered local installers',     href: '/mygridgb-quotes/' },
-  { label: 'Compare indicative quotes, select for survey', href: '/mygridgb-quotes/room.html' },
+  { label: 'Compare indicative proposals, select for survey', href: '/mygridgb-quotes/room.html' },
   { label: 'Review binding post-survey quotes',           href: '/mygridgb-quotes/survey.html' },
   { label: 'Leave a review',                             href: '/mygridgb-quotes/review.html' },
 ];

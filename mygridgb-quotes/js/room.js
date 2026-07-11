@@ -121,7 +121,7 @@ function renderWaitingGroup(quote) {
     </div>
     <div class="q-waiting-row">
       <div class="waiting-spinner"></div>
-      <span>Waiting for quote…</span>
+      <span>Waiting for proposal…</span>
     </div>
   </div>`;
 }
@@ -136,7 +136,7 @@ function renderPendingGroup(quote) {
       </div>
     </div>
     <div class="q-waiting-row" style="opacity:.55">
-      Invited — quote not yet submitted. Firms that miss the window lose their place on future rounds.
+      Invited — proposal not yet submitted. Firms that miss the window lose their place on future rounds.
     </div>
   </div>`;
 }
@@ -239,7 +239,7 @@ fetch('data/quotes.json')
 
     function updateRatio() {
       document.getElementById('room-ratio').textContent =
-        `${arrived} of ${invitedIds.size} quotes in`;
+        `${arrived} of ${invitedIds.size} proposals in`;
     }
 
     // Render all groups initially as waiting/pending
@@ -299,7 +299,7 @@ fetch('data/quotes.json')
     document.body.insertAdjacentHTML('beforeend', `
       <div class="survey-bar" id="survey-bar" hidden>
         <span id="survey-bar-count"></span>
-        <a href="survey.html" class="survey-bar-btn">Proceed to survey quotes →</a>
+        <a href="survey.html" class="survey-bar-btn">Proceed to binding quotes →</a>
       </div>`);
   })
   .catch(err => {

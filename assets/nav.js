@@ -23,7 +23,7 @@ const NAV_HTML = `
     <nav id="main-nav">
       <ul>
         <li>
-          <a href="/last-28-days/">Electricity Data ▾</a>
+          <a href="/last-28-days/">Detailed Data ▾</a>
           <ul>
             <li><a href="/last-28-days/">Last 28 Days</a></li>
             <li><a href="/last-12-months/">Last 12 Months</a></li>
@@ -45,13 +45,7 @@ const NAV_HTML = `
         </li>
 
         <li><a href="/podcast/">In the Media</a></li>
-        <li>
-          <a href="/about/">About ▾</a>
-          <ul>
-            <li><a href="/about/">About MyGridGB</a></li>
-            <li><a href="/about-me/">About Me</a></li>
-          </ul>
-        </li>
+        <li><a href="/about/">About</a></li>
       </ul>
     </nav>
   </div>

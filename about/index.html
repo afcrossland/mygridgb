@@ -44,6 +44,87 @@
       font-size: 14px;
       line-height: 1.8;
     }
+    /* ── About me ── */
+    .profile-layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+    .profile-photo {
+      width: 180px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.12);
+    }
+    .profile-photo img { width: 100%; display: block; }
+    .profile-bio p { margin-bottom: 14px; line-height: 1.7; }
+    .section-heading {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin: 22px 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--brand-bg);
+    }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+    }
+    .portfolio-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .portfolio-card h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    .qual-list, .member-list {
+      list-style: none;
+      padding: 0;
+    }
+    .qual-list li, .member-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .qual-list li:last-child, .member-list li:last-child { border-bottom: none; }
+    .cta-strip {
+      background: var(--brand-bg);
+      border-left: 4px solid var(--brand);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 18px;
+      margin: 16px 0 24px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 14px;
+    }
+    .cta-strip a {
+      background: var(--brand);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 13px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .cta-strip a:hover { opacity: .85; }
+    @media (max-width: 600px) {
+      .profile-layout { flex-direction: column; }
+      .profile-photo { width: 130px; }
+    }
     .carbon-table {
       width: 100%;
       border-collapse: collapse;
@@ -83,6 +164,72 @@
       <p>It provides analysis of the volumes of electricity being produced and consumed, and where that electricity comes from. It shows this in real time as well as using historical data. It uses data from Sheffield University and Elexon, the company responsible for managing the electricity and trading arrangements of England and Wales. Blogs by myself and guest authors also provide the latest insights.</p>
       <p>The analysis is not limited to the volumes of electricity. MyGridGB also charts carbon emissions from electricity – of critical importance for a country with carbon reduction targets.</p>
       <p>My <a href="../2030grid/index.html">Clean Power 2030 Plan</a> shows an alternative electricity mix. This alternative is a simulation of a different mix of power stations and energy which would meet our carbon objectives. It is simulated in real time on the website and includes a stimulus for solar and batteries on our homes – as I strongly believe that homes are the power stations of the future.</p>
+    </div>
+
+    <div class="about-section">
+      <h2>About Me</h2>
+      <div class="profile-layout">
+        <div class="profile-photo">
+          <img src="/images/d90d2b90-bb66-469e-8f88-d4d883fa743b.jpeg" alt="Prof Andrew Crossland">
+        </div>
+        <div class="profile-bio">
+          <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:10px;">Prof Andrew Crossland</h3>
+          <p><em>My mission is to help enable global decarbonisation, making energy more affordable and empowering people to take ownership.</em></p>
+          <p>I'm Andrew, an energy engineer. I started MyGridGB in 2015 to answer a simple question: where does Britain's electricity actually come from, right now? A decade later it's still running, and it's used by journalists, researchers, and anyone curious about how fast we're decarbonising.</p>
+          <p>I did my PhD at Durham University, modelling 9,000 low-voltage networks to work out what happens when millions of homes install solar and batteries. Since then I've worked on solar and storage projects across the UK, East Africa, New Zealand, and South Asia, written a book about it for Routledge, and become a Professor in Practice at the Durham Energy Institute.</p>
+          <p>I believe energy data should be understandable by anyone, not just people who work in the industry. That's what this site is for.</p>
+          <p>For consulting work, see <a href="https://www.future-zero.com" target="_blank" rel="noopener">Future Zero</a>.</p>
+        </div>
+      </div>
+
+      <div class="cta-strip">
+        <span>Connect with me on LinkedIn</span>
+        <a href="https://www.linkedin.com/in/afcrossland" target="_blank">LinkedIn →</a>
+      </div>
+
+      <h3 class="section-heading">Qualifications</h3>
+      <ul class="qual-list">
+        <li><strong>PhD in Engineering</strong> — Durham University &nbsp;·&nbsp; <a href="https://etheses.dur.ac.uk/10819/" target="_blank">View thesis</a></li>
+        <li><strong>MEng in General Engineering with New and Renewable Energy</strong> — Durham University</li>
+        <li><strong>MSc</strong> — University of Southampton</li>
+        <li><strong>PgDip in Railway Systems Engineering</strong></li>
+      </ul>
+
+      <h3 class="section-heading">Portfolio (Selected)</h3>
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <h4>Rotohiko Battery</h4>
+          <p>Battery energy storage system project in New Zealand. <a href="https://stg.infratec.co.nz/projects/rotohiko-bess/" target="_blank">View project →</a></p>
+        </div>
+        <div class="portfolio-card">
+          <h4>Project PARC Advisory</h4>
+          <p>Advisory role on a community renewable energy project. <a href="https://www.projectparc.org/" target="_blank">View project →</a></p>
+        </div>
+        <div class="portfolio-card">
+          <h4>SolarZero VPP</h4>
+          <p>Virtual power plant development in New Zealand using residential solar and battery assets.</p>
+        </div>
+        <div class="portfolio-card">
+          <h4>Tonga Microgrids</h4>
+          <p>Design and deployment of renewable energy microgrids for remote Pacific Island communities.</p>
+        </div>
+        <div class="portfolio-card">
+          <h4>MCS Self-Consumption Standard</h4>
+          <p>Contributed to the Microgeneration Certification Scheme standard for solar self-consumption.</p>
+        </div>
+        <div class="portfolio-card">
+          <h4>First UK Grid-Scale Batteries</h4>
+          <p>Involved in some of the earliest grid-scale battery storage projects deployed in Great Britain.</p>
+        </div>
+        <div class="portfolio-card">
+          <h4>Lecturing &amp; Advocacy</h4>
+          <p>Regular speaker on energy transition, decarbonisation policy, and the future of the British grid.</p>
+        </div>
+        <div class="portfolio-card">
+          <h4>Published Work</h4>
+          <p><a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">Decarbonising Electricity</a> — published by Routledge. A practical guide to the energy transition.</p>
+        </div>
+      </div>
     </div>
 
     <div class="about-section">
