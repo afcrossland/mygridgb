@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GB Gas Dashboard - MyGridGB</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/nav.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .gas-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .stat-card.highlight {
+      background: var(--brand-bg);
+      border-color: #a8cce4;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-val {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--brand);
+      line-height: 1.1;
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .range-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .range-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .range-btn:hover { border-color: #a8cce4; color: #1a4d7a; }
+    .range-btn.active {
+      background: #1a4d7a;
+      border-color: #1a4d7a;
+      color: #fff;
+    }
+
+    .chart-section { margin-bottom: 48px; }
+    .chart-section h2 {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #1a4d7a;
+      margin-bottom: 6px;
+    }
+    .chart-section p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 56px 20px;
+      color: var(--muted);
+    }
+    .loading-state::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(26,77,122,.15);
+      border-top-color: #1a4d7a;
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      color: #991b1b;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .data-note {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 8px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <main>
+    <h1 class="page-title">Great Britain Gas</h1>
+    <p class="page-intro">Daily natural gas supply and demand across Great Britain. Data from National Gas Transmission.</p>
+
+    <div id="loading" class="loading-state">Loading gas data...</div>
+    <div id="error"   class="error-state" style="display:none"></div>
+
+    <div id="content" style="display:none">
+
+      <div class="gas-stats" id="stats-row"></div>
+
+      <div class="range-controls" id="range-controls">
+        <button class="range-btn" data-days="28">28 days</button>
+        <button class="range-btn" data-days="365">1 year</button>
+        <button class="range-btn active" data-days="1095">3 years</button>
+      </div>
+
+      <div class="chart-section">
+        <h2>Where is the gas going?</h2>
+        <p>Daily demand split between heating (LDZ distribution networks), power generation, industrial use, exports to Europe, and gas put into storage. Values in gigawatt hours (GWh).</p>
+        <div style="position:relative; height:340px;">
+          <div class="chart-loading" id="demand-loading"></div>
+          <canvas id="demand-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h2>Where is the gas coming from?</h2>
+        <p>Daily supply split between UK Continental Shelf (UKCS), LNG terminals, interconnectors from Europe, and withdrawal from storage. Values in gigawatt hours (GWh).</p>
+        <div style="position:relative; height:340px;">
+          <div class="chart-loading" id="supply-loading"></div>
+          <canvas id="supply-chart"></canvas>
+        </div>
+      </div>
+
+      <p class="data-note">Carbon figures use BEIS combustion factor (202 gCO<sub>2</sub>/kWh) and do not include upstream emissions. LNG days will be understated.</p>
+    </div>
+
+  </main>
+  <div id="sidebar-placeholder"></div>
+</div>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1sECfXJOZx1MGoRDIllBhPoyijTe0UGri2wBYF-VM5HI/gviz/tq?tqx=out:csv&sheet=data';
+
+const DEMAND_KEYS   = ['ldz_total', 'power', 'industrial', 'exports', 'storage_injection'];
+const DEMAND_LABELS = ['Heating (LDZ)', 'Power generation', 'Industrial', 'Exports', 'Into storage'];
+const DEMAND_COLORS = ['#f59e0b', '#1a4d7a', '#6b7280', '#d1d5db', '#8b5cf6'];
+
+const SUPPLY_KEYS   = ['supply_ukcs', 'supply_lng', 'supply_interconnectors', 'supply_storage'];
+const SUPPLY_LABELS = ['North Sea (UKCS)', 'LNG', 'Interconnectors', 'Storage withdrawal'];
+const SUPPLY_COLORS = ['#059669', '#f59e0b', '#3b82f6', '#8b5cf6'];
+
+// Sheet stores flows in mcm; the charts display energy in GWh (1 mcm ≈ 11.0 GWh)
+const MCM_TO_GWH = 11.0;
+
+const hideLoader = id => {
+  const el = document.getElementById(id + '-loading');
+  if (!el) return;
+  el.classList.add('done');
+  setTimeout(() => el.remove(), 380);
+};
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  // Row 0 = column headers, Row 1 = second header row (skipped), Row 2+ = data
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+
+  return lines.slice(2).map(line => {
+    const vals = [];
+    let inQ = false, cur = '';
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    vals.push(cur.trim());
+
+    const row = {};
+    headers.forEach((h, i) => {
+      const v = (vals[i] || '').replace(/"/g, '').trim();
+      row[h] = v === '' || isNaN(v) ? v : parseFloat(v);
+    });
+    return row;
+  }).filter(r => r.date && r.gwh_total > 0);
+}
+
+function fmt(n, dp = 0) {
+  if (n == null || isNaN(n)) return '--';
+  return n.toLocaleString('en-GB', { maximumFractionDigits: dp, minimumFractionDigits: dp });
+}
+
+function renderStats(rows) {
+  const latest = rows[rows.length - 1];
+  const demandMcm = DEMAND_KEYS.reduce((s, k) => s + (latest[k] || 0), 0);
+
+  const tiles = [
+    { label: 'Gas consumed',  val: fmt(latest.gwh_total),    sub: 'GWh &mdash; ' + latest.date, hi: true },
+    { label: 'Carbon',        val: fmt(latest.carbon_ktco2), sub: 'ktCO&thinsp;&sup2; &mdash; ' + latest.date, hi: true },
+    { label: 'Heating share', val: demandMcm > 0 ? fmt(100 * (latest.ldz_total || 0) / demandMcm, 0) + '%' : '--', sub: 'of total demand' },
+    { label: 'Power share',   val: demandMcm > 0 ? fmt(100 * (latest.power      || 0) / demandMcm, 0) + '%' : '--', sub: 'of total demand' },
+  ];
+
+  document.getElementById('stats-row').innerHTML = tiles.map(t => `
+    <div class="stat-card${t.hi ? ' highlight' : ''}">
+      <div class="stat-label">${t.label}</div>
+      <div class="stat-val">${t.val}</div>
+      <div class="stat-sub">${t.sub}</div>
+    </div>`).join('');
+}
+
+const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const monthYr = iso => {
+  if (!iso) return '';
+  const [y, m] = iso.split('-');
+  return MONTH_ABBR[parseInt(m, 10) - 1] + '-' + y.slice(2); // MMM-yy
+};
+
+function stackedBarChart(canvasId, rows, keys, labels, colors) {
+  const xLabels = rows.map(r => monthYr(r.date));
+
+  // Choose which x labels to show so they never overlap: one per month, then
+  // thinned to at most ~13 evenly-spaced month markers regardless of range.
+  const monthStarts = [];
+  xLabels.forEach((lab, i) => { if (lab !== xLabels[i - 1]) monthStarts.push(i); });
+  const step = Math.ceil(monthStarts.length / 13) || 1;
+  const showLabelAt = new Set(monthStarts.filter((_, k) => k % step === 0));
+
+  const datasets = keys.map((k, i) => ({
+    label: labels[i],
+    data: rows.map(r => +((r[k] || 0) * MCM_TO_GWH).toFixed(1)),
+    backgroundColor: colors[i],
+    borderWidth: 0,
+    barPercentage: 1.0,
+    categoryPercentage: 1.0,
+  }));
+
+  return new Chart(document.getElementById(canvasId), {
+    type: 'bar',
+    data: { labels: xLabels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: { family: "'DM Sans', sans-serif", size: 12 },
+            usePointStyle: true,
+            pointStyleWidth: 10,
+            padding: 16,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            title: items => (rows[items[0].dataIndex] || {}).date || '',
+            label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y, 0)} GWh`,
+          },
+          bodyFont: { family: "'DM Sans', sans-serif" },
+          titleFont: { family: "'DM Sans', sans-serif" },
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { display: false },
+          ticks: {
+            font: { family: "'DM Sans', sans-serif", size: 11 },
+            color: '#94a3b8',
+            autoSkip: false,
+            maxRotation: 0,
+            // Show a thinned set of MMM-yy month markers so labels never overlap
+            callback: (val, index) => (showLabelAt.has(index) ? xLabels[index] : ''),
+          },
+        },
+        y: {
+          stacked: true,
+          grid: { color: '#f1f5f9' },
+          ticks: {
+            font: { family: "'DM Sans', sans-serif", size: 11 },
+            color: '#94a3b8',
+            callback: v => fmt(v) + ' GWh',
+          },
+        },
+      },
+    },
+  });
+}
+
+(async () => {
+  try {
+    const resp = await fetch(SHEET_URL);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    const rows = parseCSV(text).sort((a, b) =>
+      a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+
+    document.getElementById('loading').style.display = 'none';
+
+    if (!rows.length) {
+      document.getElementById('error').style.display = '';
+      document.getElementById('error').textContent = 'No data in the sheet yet - check back once the Apps Script has run.';
+      return;
+    }
+
+    document.getElementById('content').style.display = '';
+
+    renderStats(rows);
+
+    let demandChart = null, supplyChart = null;
+
+    function renderRange(days) {
+      const latest = new Date(rows[rows.length - 1].date);
+      const cutoff = new Date(latest);
+      cutoff.setDate(cutoff.getDate() - days);
+      const cutoffStr = cutoff.toISOString().slice(0, 10);
+      const recent = rows.filter(r => r.date >= cutoffStr);
+
+      if (demandChart) demandChart.destroy();
+      if (supplyChart) supplyChart.destroy();
+      demandChart = stackedBarChart('demand-chart', recent, DEMAND_KEYS, DEMAND_LABELS, DEMAND_COLORS);
+      supplyChart = stackedBarChart('supply-chart', recent, SUPPLY_KEYS, SUPPLY_LABELS, SUPPLY_COLORS);
+    }
+
+    const buttons = document.querySelectorAll('#range-controls .range-btn');
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderRange(parseInt(btn.dataset.days, 10));
+    }));
+
+    // Initial render matches the button marked active (3 years)
+    const initial = document.querySelector('#range-controls .range-btn.active');
+    renderRange(parseInt(initial.dataset.days, 10));
+    hideLoader('demand');
+    hideLoader('supply');
+
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = '';
+    document.getElementById('error').textContent = 'Failed to load data: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>
