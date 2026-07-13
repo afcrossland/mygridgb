@@ -71,6 +71,16 @@
       color: #fff;
     }
 
+    .assump {
+      margin: 0 0 18px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+    .assump li { margin-bottom: 4px; }
+    .assump strong { color: #1a4d7a; }
+
     .chart-section { margin-bottom: 48px; }
     .chart-section h2 {
       font-family: 'DM Serif Display', Georgia, serif;
@@ -133,33 +143,71 @@
 
     <div id="content" style="display:none">
 
-      <div class="gas-stats" id="stats-row"></div>
-
       <div class="range-controls" id="range-controls">
-        <button class="range-btn" data-days="28">28 days</button>
-        <button class="range-btn" data-days="365">1 year</button>
-        <button class="range-btn active" data-days="1095">3 years</button>
+        <button class="range-btn" data-days="28"   data-label="last 28 days">28 days</button>
+        <button class="range-btn active" data-days="365" data-label="last 12 months">1 year</button>
+        <button class="range-btn" data-days="1095" data-label="last 3 years">3 years</button>
       </div>
+
+      <div class="gas-stats" id="stats-row"></div>
 
       <div class="chart-section">
         <h2>Where is the gas going?</h2>
-        <p>Daily demand split between heating (LDZ distribution networks), power generation, industrial use, exports to Europe, and gas put into storage. Values in gigawatt hours (GWh).</p>
+        <p>Demand split between heating (LDZ distribution networks), power generation, industrial use, exports to Europe, and gas put into storage. Values in gigawatt hours (GWh).</p>
         <div style="position:relative; height:340px;">
-          <div class="chart-loading" id="demand-loading"></div>
           <canvas id="demand-chart"></canvas>
         </div>
       </div>
 
       <div class="chart-section">
+        <h2>What is the gas used for?</h2>
+        <p>Share of gas across its end uses over the selected period. Storage is excluded &mdash; gas put into storage is consumed later, not used now.</p>
+        <div style="position:relative; height:320px;">
+          <canvas id="use-pie"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
         <h2>Where is the gas coming from?</h2>
-        <p>Daily supply split between UK Continental Shelf (UKCS), LNG terminals, interconnectors from Europe, and withdrawal from storage. Values in gigawatt hours (GWh).</p>
+        <p>Supply split between UK production (UKCS), the St Fergus terminal (which lands commingled UK and Norwegian gas), Norway via the Langeled pipeline, LNG terminals, continental interconnectors, and withdrawal from storage. Values in gigawatt hours (GWh).</p>
         <div style="position:relative; height:340px;">
-          <div class="chart-loading" id="supply-loading"></div>
           <canvas id="supply-chart"></canvas>
         </div>
       </div>
 
-      <p class="data-note">Carbon figures use BEIS combustion factor (202 gCO<sub>2</sub>/kWh) and do not include upstream emissions. LNG days will be understated.</p>
+      <div class="chart-section">
+        <h2>What are the gas sources?</h2>
+        <p>Share of supply by source over the selected period. Storage withdrawal is excluded &mdash; stored gas was itself supplied earlier.</p>
+        <div style="position:relative; height:320px;">
+          <canvas id="supply-pie"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h2>Trade with connected countries</h2>
+        <p>Net daily gas flow across each interconnector. Above the line = imports into GB; below = exports. Norway (Langeled pipeline) and Ireland (Moffat) flow one way; Belgium (IUK) and the Netherlands (BBL) reverse with the seasons. Britain has no direct gas link to France. Values in gigawatt hours (GWh).</p>
+        <div style="position:relative; height:340px;">
+          <canvas id="xborder-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h2>What if homes used heat pumps instead of gas?</h2>
+        <p>A simulation replacing gas boilers with electric heat pumps for the heat currently met by gas distribution (LDZ) demand, comparing the <strong>primary energy</strong> required.</p>
+        <ul class="assump">
+          <li>Heating demand is approximated by LDZ (gas distribution) offtake &mdash; this includes homes plus some commercial use on the distribution network.</li>
+          <li>Existing gas boiler efficiency: <strong>90%</strong> (gross calorific value).</li>
+          <li>Heat pump seasonal performance factor (SCOP): <strong>3.0</strong> units of heat per unit of electricity.</li>
+          <li>Electricity primary energy factor: <strong>1.8</strong>, reflecting today's GB generation mix; this falls further as the grid decarbonises.</li>
+          <li>Illustrative only: assumes 100% conversion, and excludes network losses, hybrid systems, and reduced heat-pump performance in cold snaps.</li>
+        </ul>
+        <div style="position:relative; height:340px;">
+          <canvas id="heatpump-chart"></canvas>
+        </div>
+        <p class="data-note" id="hp-note"></p>
+      </div>
+
+      <p class="data-note">Carbon figures use the BEIS combustion factor (202 gCO<sub>2</sub>/kWh) and exclude upstream emissions. LNG-heavy days understate lifecycle carbon.</p>
     </div>
 
   </main>
@@ -173,19 +221,41 @@ const DEMAND_KEYS   = ['ldz_total', 'power', 'industrial', 'exports', 'storage_i
 const DEMAND_LABELS = ['Heating (LDZ)', 'Power generation', 'Industrial', 'Exports', 'Into storage'];
 const DEMAND_COLORS = ['#f59e0b', '#1a4d7a', '#6b7280', '#d1d5db', '#8b5cf6'];
 
-const SUPPLY_KEYS   = ['supply_ukcs', 'supply_lng', 'supply_interconnectors', 'supply_storage'];
-const SUPPLY_LABELS = ['North Sea (UKCS)', 'LNG', 'Interconnectors', 'Storage withdrawal'];
-const SUPPLY_COLORS = ['#059669', '#f59e0b', '#3b82f6', '#8b5cf6'];
+// Pie of end uses — same as demand minus "into storage" (storage isn't a use)
+const USE_KEYS   = ['ldz_total', 'power', 'industrial', 'exports'];
+const USE_LABELS = ['Heating (LDZ)', 'Power generation', 'Industrial', 'Exports'];
+const USE_COLORS = ['#f59e0b', '#1a4d7a', '#6b7280', '#d1d5db'];
+
+const SUPPLY_KEYS   = ['supply_ukcs', 'supply_stfergus', 'supply_norway', 'supply_lng', 'supply_interconnectors', 'supply_storage'];
+const SUPPLY_LABELS = ['UK (UKCS)', 'UKCS + Norway (St Fergus)', 'Norway (Langeled)', 'LNG', 'Interconnectors', 'Storage withdrawal'];
+const SUPPLY_COLORS = ['#059669', '#14b8a6', '#e4181f', '#f59e0b', '#3b82f6', '#8b5cf6'];
+
+// Supply pie — sources only, excluding storage withdrawal (all but the last key)
+const SOURCE_KEYS   = SUPPLY_KEYS.slice(0, 5);
+const SOURCE_LABELS = SUPPLY_LABELS.slice(0, 5);
+const SOURCE_COLORS = SUPPLY_COLORS.slice(0, 5);
+
+// Cross-border net flows by country (+ = import into GB, - = export)
+// Colours follow each country's flag: Norway red, Belgium black, NL orange, Ireland green
+const XB_KEYS   = ['supply_norway', 'flow_belgium', 'flow_netherlands', 'flow_ireland'];
+const XB_LABELS = ['Norway', 'Belgium (IUK)', 'Netherlands (BBL)', 'Ireland (Moffat)'];
+const XB_COLORS = ['#e4181f', '#1f2937', '#f97316', '#169b62'];
 
 // Sheet stores flows in mcm; the charts display energy in GWh (1 mcm ≈ 11.0 GWh)
 const MCM_TO_GWH = 11.0;
 
-const hideLoader = id => {
-  const el = document.getElementById(id + '-loading');
-  if (!el) return;
-  el.classList.add('done');
-  setTimeout(() => el.remove(), 380);
-};
+// Heat-pump switch assumptions (see bullets on the page)
+const HP = { boilerEff: 0.90, scop: 3.0, gridPEF: 1.8 };
+
+const FONT = "'DM Sans', sans-serif";
+
+// Shared legend style — circle markers, matching the site's 28-day timeseries
+const legend = (position = 'top') => ({
+  position,
+  labels: { font: { family: FONT, size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'circle', boxWidth: 10, boxHeight: 10 },
+});
+
+const revd = a => [...a].reverse();
 
 function parseCSV(text) {
   const lines = text.trim().split('\n');
@@ -216,25 +286,6 @@ function fmt(n, dp = 0) {
   return n.toLocaleString('en-GB', { maximumFractionDigits: dp, minimumFractionDigits: dp });
 }
 
-function renderStats(rows) {
-  const latest = rows[rows.length - 1];
-  const demandMcm = DEMAND_KEYS.reduce((s, k) => s + (latest[k] || 0), 0);
-
-  const tiles = [
-    { label: 'Gas consumed',  val: fmt(latest.gwh_total),    sub: 'GWh &mdash; ' + latest.date, hi: true },
-    { label: 'Carbon',        val: fmt(latest.carbon_ktco2), sub: 'ktCO&thinsp;&sup2; &mdash; ' + latest.date, hi: true },
-    { label: 'Heating share', val: demandMcm > 0 ? fmt(100 * (latest.ldz_total || 0) / demandMcm, 0) + '%' : '--', sub: 'of total demand' },
-    { label: 'Power share',   val: demandMcm > 0 ? fmt(100 * (latest.power      || 0) / demandMcm, 0) + '%' : '--', sub: 'of total demand' },
-  ];
-
-  document.getElementById('stats-row').innerHTML = tiles.map(t => `
-    <div class="stat-card${t.hi ? ' highlight' : ''}">
-      <div class="stat-label">${t.label}</div>
-      <div class="stat-val">${t.val}</div>
-      <div class="stat-sub">${t.sub}</div>
-    </div>`).join('');
-}
-
 const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const monthYr = iso => {
   if (!iso) return '';
@@ -242,15 +293,65 @@ const monthYr = iso => {
   return MONTH_ABBR[parseInt(m, 10) - 1] + '-' + y.slice(2); // MMM-yy
 };
 
-function stackedBarChart(canvasId, rows, keys, labels, colors) {
-  const xLabels = rows.map(r => monthYr(r.date));
+// Monday (ISO week start) for a YYYY-MM-DD date, as YYYY-MM-DD
+function weekStart(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  const g = d.getUTCDay();                       // 0=Sun..6=Sat
+  d.setUTCDate(d.getUTCDate() + (g === 0 ? -6 : 1 - g));
+  return d.toISOString().slice(0, 10);
+}
 
-  // Choose which x labels to show so they never overlap: one per month, then
-  // thinned to at most ~13 evenly-spaced month markers regardless of range.
+// Sum all numeric columns into buckets keyed by keyOf(date) → one row per bucket
+function aggregate(rows, keyOf) {
+  const groups = {};
+  rows.forEach(r => {
+    const key = keyOf(r.date);
+    (groups[key] || (groups[key] = [])).push(r);
+  });
+  return Object.keys(groups).sort().map(key => {
+    const out = { date: key, mAgg: true };
+    groups[key].forEach(r => Object.keys(r).forEach(k => {
+      if (typeof r[k] === 'number') out[k] = (out[k] || 0) + r[k];
+    }));
+    return out;
+  });
+}
+
+// Which x labels to show so they never overlap: one per month, thinned to ~13
+function labelGate(xLabels) {
   const monthStarts = [];
   xLabels.forEach((lab, i) => { if (lab !== xLabels[i - 1]) monthStarts.push(i); });
   const step = Math.ceil(monthStarts.length / 13) || 1;
-  const showLabelAt = new Set(monthStarts.filter((_, k) => k % step === 0));
+  return new Set(monthStarts.filter((_, k) => k % step === 0));
+}
+
+const tipTitle = rows => items => {
+  const r = rows[items[0].dataIndex] || {};
+  return r.mAgg ? 'Week of ' + r.date : (r.date || '');
+};
+
+// Inline plugin: label the import (above zero) and export (below zero) halves
+const importExportLabels = {
+  id: 'importExportLabels',
+  afterDraw(chart) {
+    const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
+    const zeroY = Math.max(top, Math.min(bottom, y.getPixelForValue(0)));
+    ctx.save();
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(left, zeroY); ctx.lineTo(right, zeroY); ctx.stroke();
+    ctx.font = '700 11px ' + FONT;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#64748b';
+    if (zeroY - top > 18)    { ctx.textBaseline = 'top';    ctx.fillText('▲ IMPORTS TO GB', right - 6, top + 4); }
+    if (bottom - zeroY > 18) { ctx.textBaseline = 'bottom'; ctx.fillText('▼ EXPORTS FROM GB', right - 6, bottom - 4); }
+    ctx.restore();
+  },
+};
+
+function stackedBarChart(canvasId, rows, keys, labels, colors, opts = {}) {
+  const xLabels = rows.map(r => monthYr(r.date));
+  const showLabelAt = labelGate(xLabels);
 
   const datasets = keys.map((k, i) => ({
     label: labels[i],
@@ -264,54 +365,147 @@ function stackedBarChart(canvasId, rows, keys, labels, colors) {
   return new Chart(document.getElementById(canvasId), {
     type: 'bar',
     data: { labels: xLabels, datasets },
+    plugins: opts.plugins || [],
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            font: { family: "'DM Sans', sans-serif", size: 12 },
-            usePointStyle: true,
-            pointStyleWidth: 10,
-            padding: 16,
-          },
-        },
+        legend: legend('top'),
         tooltip: {
           callbacks: {
-            title: items => (rows[items[0].dataIndex] || {}).date || '',
-            label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y, 0)} GWh`,
+            title: tipTitle(rows),
+            label: ctx => {
+              const v = ctx.parsed.y;
+              if (opts.signed) {
+                const dir = v > 0 ? ' (import)' : v < 0 ? ' (export)' : '';
+                return `${ctx.dataset.label}: ${fmt(Math.abs(v), 0)} GWh${dir}`;
+              }
+              return `${ctx.dataset.label}: ${fmt(v, 0)} GWh`;
+            },
           },
-          bodyFont: { family: "'DM Sans', sans-serif" },
-          titleFont: { family: "'DM Sans', sans-serif" },
+          bodyFont: { family: FONT }, titleFont: { family: FONT },
         },
       },
       scales: {
         x: {
-          stacked: true,
-          grid: { display: false },
+          stacked: true, grid: { display: false },
           ticks: {
-            font: { family: "'DM Sans', sans-serif", size: 11 },
-            color: '#94a3b8',
-            autoSkip: false,
-            maxRotation: 0,
-            // Show a thinned set of MMM-yy month markers so labels never overlap
+            font: { family: FONT, size: 11 }, color: '#94a3b8', autoSkip: false, maxRotation: 0,
             callback: (val, index) => (showLabelAt.has(index) ? xLabels[index] : ''),
           },
         },
         y: {
-          stacked: true,
-          grid: { color: '#f1f5f9' },
-          ticks: {
-            font: { family: "'DM Sans', sans-serif", size: 11 },
-            color: '#94a3b8',
-            callback: v => fmt(v) + ' GWh',
-          },
+          stacked: true, grid: { color: '#f1f5f9' },
+          ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' GWh' },
         },
       },
     },
   });
+}
+
+// Doughnut of shares, aggregated over the selected period (values shown in TWh)
+function pieChart(canvasId, rows, keys, labels, colors) {
+  const totals = keys.map(k => rows.reduce((s, r) => s + (r[k] || 0) * MCM_TO_GWH, 0));
+  const sum = totals.reduce((a, b) => a + b, 0);
+
+  return new Chart(document.getElementById(canvasId), {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: totals, backgroundColor: colors, borderColor: '#fff', borderWidth: 2 }] },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: legend('bottom'),
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const v = ctx.parsed, pct = sum ? 100 * v / sum : 0;
+              return `${ctx.label}: ${fmt(v / 1000, 1)} TWh (${pct.toFixed(0)}%)`;
+            },
+          },
+          bodyFont: { family: FONT }, titleFont: { family: FONT },
+        },
+      },
+    },
+  });
+}
+
+// Primary energy: gas boilers today vs heat pumps, for LDZ heating demand
+function heatPumpChart(canvasId, rows) {
+  const xLabels = rows.map(r => monthYr(r.date));
+  const showLabelAt = labelGate(xLabels);
+
+  const boiler = rows.map(r => +((r.ldz_total || 0) * MCM_TO_GWH).toFixed(1));
+  const hp = rows.map(r => {
+    const gasGwh = (r.ldz_total || 0) * MCM_TO_GWH;      // primary gas today
+    const heat   = gasGwh * HP.boilerEff;                // useful heat delivered
+    const elec   = heat / HP.scop;                       // electricity for heat pumps
+    return +(elec * HP.gridPEF).toFixed(1);              // primary energy for that electricity
+  });
+
+  const totB = boiler.reduce((a, b) => a + b, 0);
+  const totH = hp.reduce((a, b) => a + b, 0);
+  const pct  = totB ? Math.round(100 * (1 - totH / totB)) : 0;
+  document.getElementById('hp-note').innerHTML =
+    `Over this period, switching heating from gas boilers to heat pumps would cut heating primary energy by about ` +
+    `<strong>${pct}%</strong> &mdash; from ${fmt(totB / 1000, 1)} to ${fmt(totH / 1000, 1)} TWh.`;
+
+  return new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    data: {
+      labels: xLabels,
+      datasets: [
+        { label: 'Gas boilers (today)', data: boiler, borderColor: '#b91c1c', backgroundColor: 'rgba(185,28,28,.08)', fill: true, tension: .25, pointRadius: 0, borderWidth: 2 },
+        { label: 'Heat pumps',          data: hp,     borderColor: '#059669', backgroundColor: 'rgba(5,150,105,.10)', fill: true, tension: .25, pointRadius: 0, borderWidth: 2 },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: legend('top'),
+        tooltip: {
+          callbacks: {
+            title: tipTitle(rows),
+            label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y, 0)} GWh`,
+          },
+          bodyFont: { family: FONT }, titleFont: { family: FONT },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: {
+            font: { family: FONT, size: 11 }, color: '#94a3b8', autoSkip: false, maxRotation: 0,
+            callback: (val, index) => (showLabelAt.has(index) ? xLabels[index] : ''),
+          },
+        },
+        y: {
+          beginAtZero: true, grid: { color: '#f1f5f9' },
+          ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' GWh' },
+        },
+      },
+    },
+  });
+}
+
+function renderStats(rows, label, dp) {
+  const totGwh    = rows.reduce((s, r) => s + (r.gwh_total || 0), 0);
+  const totCarbon = rows.reduce((s, r) => s + (r.carbon_ktco2 || 0), 0);
+
+  const tiles = [
+    { label: 'Gas consumed', val: fmt(totGwh / 1000, dp),    sub: 'TWh &middot; ' + label },
+    { label: 'Carbon',       val: fmt(totCarbon / 1000, dp), sub: 'MtCO&thinsp;&sup2; &middot; ' + label },
+  ];
+
+  document.getElementById('stats-row').innerHTML = tiles.map(t => `
+    <div class="stat-card highlight">
+      <div class="stat-label">${t.label}</div>
+      <div class="stat-val">${t.val}</div>
+      <div class="stat-sub">${t.sub}</div>
+    </div>`).join('');
 }
 
 (async () => {
@@ -332,35 +526,40 @@ function stackedBarChart(canvasId, rows, keys, labels, colors) {
 
     document.getElementById('content').style.display = '';
 
-    renderStats(rows);
+    const charts = {};
+    const make = (key, factory) => { if (charts[key]) charts[key].destroy(); charts[key] = factory(); };
 
-    let demandChart = null, supplyChart = null;
+    const latest = new Date(rows[rows.length - 1].date);
 
-    function renderRange(days) {
-      const latest = new Date(rows[rows.length - 1].date);
+    function renderRange(days, label) {
       const cutoff = new Date(latest);
       cutoff.setDate(cutoff.getDate() - days);
       const cutoffStr = cutoff.toISOString().slice(0, 10);
       const recent = rows.filter(r => r.date >= cutoffStr);
 
-      if (demandChart) demandChart.destroy();
-      if (supplyChart) supplyChart.destroy();
-      demandChart = stackedBarChart('demand-chart', recent, DEMAND_KEYS, DEMAND_LABELS, DEMAND_COLORS);
-      supplyChart = stackedBarChart('supply-chart', recent, SUPPLY_KEYS, SUPPLY_LABELS, SUPPLY_COLORS);
+      // Aggregate daily → weekly for the long (3-year) view
+      const chartRows = days > 366 ? aggregate(recent, weekStart) : recent;
+      const dp = days <= 28 ? 1 : 0; // decimals on the hero tiles only for 28-day view
+
+      renderStats(recent, label, dp);
+      make('use',       () => pieChart('use-pie', recent, USE_KEYS, USE_LABELS, USE_COLORS));
+      make('demand',    () => stackedBarChart('demand-chart', chartRows, revd(DEMAND_KEYS), revd(DEMAND_LABELS), revd(DEMAND_COLORS)));
+      make('supply',    () => stackedBarChart('supply-chart', chartRows, SUPPLY_KEYS, SUPPLY_LABELS, SUPPLY_COLORS));
+      make('supplyPie', () => pieChart('supply-pie', recent, SOURCE_KEYS, SOURCE_LABELS, SOURCE_COLORS));
+      make('xborder',   () => stackedBarChart('xborder-chart', chartRows, XB_KEYS, XB_LABELS, XB_COLORS, { signed: true, plugins: [importExportLabels] }));
+      make('hp',        () => heatPumpChart('heatpump-chart', chartRows));
     }
 
     const buttons = document.querySelectorAll('#range-controls .range-btn');
     buttons.forEach(btn => btn.addEventListener('click', () => {
       buttons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      renderRange(parseInt(btn.dataset.days, 10));
+      renderRange(parseInt(btn.dataset.days, 10), btn.dataset.label);
     }));
 
     // Initial render matches the button marked active (3 years)
     const initial = document.querySelector('#range-controls .range-btn.active');
-    renderRange(parseInt(initial.dataset.days, 10));
-    hideLoader('demand');
-    hideLoader('supply');
+    renderRange(parseInt(initial.dataset.days, 10), initial.dataset.label);
 
   } catch (e) {
     document.getElementById('loading').style.display = 'none';

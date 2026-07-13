@@ -23,9 +23,11 @@
 // C:NW  D:NE  E:NO  F:EM  G:WM  H:EA  I:NT  J:SE  K:SO  L:SW  M:WA  N:SC   (per-LDZ)
 // O:power  P:industrial  Q:exports
 // R:supply_ukcs  S:supply_lng  T:supply_interconnectors  U:supply_storage
-// V:gwh_total  W:carbon_ktco2  X:storage_injection
+// V:gwh_total  W:carbon_ktco2  X:storage_injection  Y:supply_norway
+// Z:flow_belgium  AA:flow_netherlands  AB:flow_ireland  (net cross-border, + = import)
+// AC:supply_stfergus (mcm, UK + Norwegian Vesterled, split out of UKCS)
 //
-// All flow columns (B–U, X) are stored in mcm (million cubic metres) so the
+// All flow columns (B–U, X–AC) are stored in mcm (million cubic metres) so the
 // page charts them on one scale. gwh_total (V) is GB gas *consumption* energy
 // (LDZ + power + industrial) — the basis for the carbon figure. Exports and
 // storage injection are shown on the demand chart but excluded from the
@@ -52,10 +54,33 @@ const PUB_DEMAND = {
 
 // Supply summary publication objects (volume, mscm = mcm)
 const PUB_SUPPLY = {
-  ukcs:            'PUBOBJ1620', // Beach Including Norway - Daily Flow
+  beachInclNorway: 'PUBOBJ1620', // Beach Including Norway - Daily Flow
+  norway:          'PUBOB452',   // Easington - Langeled (Norwegian pipeline import)
+  stFergusMobil:   'PUBOB428',   // St Fergus - Mobil  (UK + Norwegian Vesterled, commingled)
+  stFergusNSMP:    'PUBOB434',   // St Fergus - NSMP
+  stFergusShell:   'PUBOB431',   // St Fergus - Shell
   lng:             'PUBOBJ1621', // Aggregate LNG Importations - Daily Flow
-  interconnectors: 'PUBOB262',   // Interconnector - Daily Flow (imports)
+  interconnectors: 'PUBOB262',   // Interconnector - Daily Flow (imports from continent)
   storage:         'PUBOB264',   // Storage - Daily Flow (withdrawal)
+};
+// UK-only beach production = "Beach Including Norway" minus the Langeled flow.
+// Note: Norwegian gas via Vesterled into St Fergus is commingled with UK gas at
+// the terminal and cannot be cleanly separated, so it remains inside UKCS. The
+// Langeled flow at Easington is the dominant, unambiguously-Norwegian import.
+
+// Cross-border interconnector flows (volume, mscm). Net per country = entry
+// (import into GB) minus physical exit flow (export from GB). + = net import.
+//   Belgium    = Bacton IUK        (bidirectional)
+//   Netherlands= Bacton BBL        (bidirectional)
+//   Ireland    = Moffat            (export only, GB -> Ireland)
+//   Norway     = Langeled          (import only; already captured as supply_norway)
+// Britain has no direct gas pipeline to France (that link is electricity only).
+const PUB_XBORDER = {
+  beIn:  'PUBOB386',   // Bacton IUK entry  (import from Belgium)
+  beOut: 'PUBOB2038',  // Bacton IUK physical flow (export to Belgium)
+  nlIn:  'PUBOB449',   // BBL entry (import from Netherlands)
+  nlOut: 'PUBOBJ1307', // BBL physical flow (export to Netherlands)
+  ieOut: 'PUBOB2039',  // Moffat physical flow (export to Ireland)
 };
 
 // Per-LDZ offtake points grouped into the 12 sheet columns (C–N), in column order.
@@ -196,10 +221,13 @@ function fillBlanks() {
 }
 
 
-// All publication ids we request (demand totals + supply + every LDZ point)
+// All publication ids we request (demand totals + supply + cross-border + LDZ)
 function allPublicationIds() {
   const ldzIds = LDZ_COLUMNS.reduce((acc, c) => acc.concat(c.ids), []);
-  return [].concat(Object.values(PUB_DEMAND), Object.values(PUB_SUPPLY), ldzIds);
+  return [].concat(
+    Object.values(PUB_DEMAND), Object.values(PUB_SUPPLY),
+    Object.values(PUB_XBORDER), ldzIds
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -247,6 +275,16 @@ function buildValues(byId) {
 
   // Supply: already mscm (= mcm)
   const sup = key => byId[PUB_SUPPLY[key]] || 0;
+  const norway   = sup('norway');
+  const stFergus = sup('stFergusMobil') + sup('stFergusNSMP') + sup('stFergusShell');
+  // UKCS = other UK beach terminals (beach total minus Langeled and St Fergus)
+  const ukcs = sup('beachInclNorway') - norway - stFergus;
+
+  // Cross-border net flows (mscm, + = net import into GB)
+  const xb = key => byId[PUB_XBORDER[key]] || 0;
+  const flowBelgium     = xb('beIn') - xb('beOut');
+  const flowNetherlands = xb('nlIn') - xb('nlOut');
+  const flowIreland     = -xb('ieOut');
 
   return {
     ldzTotalMcm: ldzTotalMcm,
@@ -255,12 +293,17 @@ function buildValues(byId) {
     indMcm:      indGwh   / MCM_TO_GWH,
     expMcm:      expGwh   / MCM_TO_GWH,
     injMcm:      injGwh   / MCM_TO_GWH,
-    supplyUkcs:            sup('ukcs'),
+    supplyUkcs:            ukcs,
+    supplyStFergus:        stFergus,
+    supplyNorway:          norway,
     supplyLng:             sup('lng'),
     supplyInterconnectors: sup('interconnectors'),
     supplyStorage:         sup('storage'),
     gwhTotal:    gwhTotal,
     carbonKtco2: carbonKtco2,
+    flowBelgium:     flowBelgium,
+    flowNetherlands: flowNetherlands,
+    flowIreland:     flowIreland,
   };
 }
 
@@ -295,13 +338,18 @@ function writeRow(dateStr, v) {
     round(v.powerMcm),           // O: power (mcm)
     round(v.indMcm),             // P: industrial (mcm)
     round(v.expMcm),             // Q: exports (mcm)
-    round(v.supplyUkcs),            // R: supply_ukcs (mcm)
+    round(v.supplyUkcs),            // R: supply_ukcs (mcm, UK-only beach)
     round(v.supplyLng),             // S: supply_lng (mcm)
     round(v.supplyInterconnectors), // T: supply_interconnectors (mcm)
     round(v.supplyStorage),         // U: supply_storage (mcm)
     round(v.gwhTotal, 1),        // V: gwh_total
     round(v.carbonKtco2, 2),     // W: carbon_ktco2
     round(v.injMcm),             // X: storage_injection (mcm)
+    round(v.supplyNorway),       // Y: supply_norway (mcm, Langeled import)
+    round(v.flowBelgium),        // Z: flow_belgium (mcm, net import +)
+    round(v.flowNetherlands),    // AA: flow_netherlands (mcm, net import +)
+    round(v.flowIreland),        // AB: flow_ireland (mcm, net import +, usually export -)
+    round(v.supplyStFergus),     // AC: supply_stfergus (mcm, UK + Norwegian Vesterled)
   ]);
 
   sheet.appendRow(row);
