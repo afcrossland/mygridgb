@@ -286,6 +286,18 @@
     </div>
 
     <div class="about-section">
+      <h2>Gas Data</h2>
+      <p>The <a href="/gas-tracker/">Gas Tracker</a> shows where Great Britain's gas comes from and goes each day. Data is taken from the <a href="https://www.nationalgas.com/" target="_blank">National Gas Transmission</a> Gas Operational Data API, which publishes daily supply, demand and cross-border flows for the National Transmission System.</p>
+      <ul>
+        <li><strong>Demand</strong> (heating, power generation, industry, exports and gas put into storage) uses the daily NTS energy-offtaken publications, with the regional heating figure built up from every local distribution offtake point.</li>
+        <li><strong>Supply</strong> is split into UK production, the St Fergus terminal (which lands a mix of UK and Norwegian gas that cannot be separated in the published data), Norwegian pipeline imports (Langeled), imported LNG, and continental interconnectors.</li>
+        <li><strong>Cross-border trade</strong> nets each interconnector's entry and exit flows to show imports from and exports to Norway, Belgium, the Netherlands and Ireland. Britain has no direct gas pipeline to France.</li>
+        <li><strong>Carbon</strong> uses the BEIS/DESNZ gross combustion factor of 202 gCO₂/kWh and excludes upstream emissions. The comparison with electricity carbon uses MyGridGB's own annual electricity emissions estimates.</li>
+      </ul>
+      <p>Volumes are converted to energy at roughly 11.0 GWh per million cubic metres. Figures are indicative and refined as National Gas revises its published data.</p>
+    </div>
+
+    <div class="about-section">
       <h2>Carbon Dioxide Equivalent Estimation</h2>
       <p>Carbon Dioxide equivalent is the combined effect of all greenhouse gases (not just CO₂) from different electricity generation sources over their lifetime. Where CO₂ figures are reported, values are taken from the Intergovernmental Panel on Climate Change (IPCC): <a href="https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources" target="_blank">Life-cycle greenhouse-gas emissions of energy sources</a>.</p>
       <p>Note that other websites (Drax, NESO) use lower values for the carbon intensity of biomass - I apply IPCC/independent analysis in my figures.</p>

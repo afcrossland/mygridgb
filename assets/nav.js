@@ -29,6 +29,7 @@ const NAV_HTML = `
             <li><a href="/last-12-months/">Last 12 Months</a></li>
             <li><a href="/historicaldata/">Generation History</a></li>
             <li><a href="/carbon-tracker/">Carbon Tracker</a></li>
+            <li><a href="/gas-tracker/">Gas Tracker</a></li>
           </ul>
         </li>
         <li><a href="/2030grid/">My 2030 Blueprint</a></li>
