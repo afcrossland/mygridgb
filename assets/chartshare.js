@@ -20,14 +20,40 @@
 
   const fmtDate = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
+  // Resolve the pixel source to draw for a given chart element + type.
+  // Chart.js: draws straight from the live canvas. Plotly: renders a fresh
+  // PNG via Plotly.toImage (Plotly draws to an internal canvas that isn't
+  // reliably readable directly) and loads it into an <img>.
+  async function resolveSource(id, opts) {
+    const el = document.getElementById(id);
+    if (!el) throw new Error('No chart found for #' + id);
+    if (opts.type === 'plotly') {
+      if (!window.Plotly) throw new Error('Plotly not loaded for #' + id);
+      const rect = el.getBoundingClientRect();
+      const cw = Math.round(rect.width) || el.clientWidth;
+      const ch = Math.round(rect.height) || el.clientHeight;
+      const dataUrl = await Plotly.toImage(el, { format: 'png', width: cw, height: ch, scale: 2 });
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = dataUrl;
+      });
+      return { src: img, cw, ch };
+    }
+    const chart = window.Chart && Chart.getChart(id);
+    if (!chart) throw new Error('No chart found for #' + id);
+    const rect = chart.canvas.getBoundingClientRect();
+    const cw = Math.round(rect.width) || chart.canvas.width;
+    const ch = Math.round(rect.height) || chart.canvas.height;
+    return { src: chart.canvas, cw, ch };
+  }
+
   // Draw the branded card and return a canvas.
-  async function buildCard(chart, opts) {
+  async function buildCard(source, opts) {
     if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
 
-    const src = chart.canvas;
-    const rect = src.getBoundingClientRect();
-    const cw = Math.round(rect.width) || src.width;
-    const ch = Math.round(rect.height) || src.height;
+    const { src, cw, ch } = source;
 
     const PAD = 32;
     const rowWord = 34, rowTitle = opts.title ? 30 : 0, rowSub = opts.subtitle ? 22 : 0, gap = 18;
@@ -94,9 +120,8 @@
   }
 
   async function makeImage(canvasId, opts) {
-    const chart = window.Chart && Chart.getChart(canvasId);
-    if (!chart) throw new Error('No chart found for #' + canvasId);
-    const card = await buildCard(chart, opts);
+    const source = await resolveSource(canvasId, opts);
+    const card = await buildCard(source, opts);
     const blob = await canvasToBlob(card);
     return { blob, dataUrl: card.toDataURL('image/png') };
   }
@@ -221,20 +246,24 @@
   // data-share-source="..." data-share-filename="..."> gets a toolbar once its
   // Chart.js chart exists (charts are usually created after an async fetch).
   function waitAndAttach(cv) {
+    const isPlotly = cv.dataset.shareType === 'plotly';
     let n = 0;
     const t = setInterval(() => {
-      if (window.Chart && Chart.getChart(cv)) {
+      const ready = isPlotly ? !!(window.Plotly && cv.data) : !!(window.Chart && Chart.getChart(cv));
+      if (ready) {
         clearInterval(t);
         ChartShare.attach(cv.id, {
           title: cv.dataset.shareTitle || '',
           subtitle: cv.dataset.shareSubtitle || '',
           source: cv.dataset.shareSource || '',
           filename: cv.dataset.shareFilename || cv.id,
+          container: cv.dataset.shareContainer || null,
+          type: isPlotly ? 'plotly' : 'chartjs',
         });
       } else if (++n > 150) { clearInterval(t); }   // give up after ~30s
     }, 200);
   }
-  function autoInit() { document.querySelectorAll('canvas[data-share]').forEach(waitAndAttach); }
+  function autoInit() { document.querySelectorAll('[data-share]').forEach(waitAndAttach); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoInit);
   else autoInit();
 })();
