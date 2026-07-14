@@ -19,6 +19,9 @@
   const SITE  = 'mygridgb.co.uk';
 
   const fmtDate = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const fmtDateTime = d => d.toLocaleString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London'
+  }) + ' UK time';
 
   // Resolve the pixel source to draw for a given chart element + type.
   // Chart.js: draws straight from the live canvas. Plotly: renders a fresh
@@ -55,12 +58,21 @@
 
     const { src, cw, ch } = source;
 
+    // Optional side list (e.g. the homepage's per-fuel bars) drawn to the
+    // right of the chart image, mirroring the on-page .fuel-list layout.
+    const list = opts.sideList || null;
+    const LIST_GAP = list ? 28 : 0;
+    const LIST_W = list ? 250 : 0;
+    const ROW_H = 27;
+    const listH = list ? list.length * ROW_H : 0;
+    const bodyH = Math.max(ch, listH);
+
     const PAD = 32;
     const rowWord = 34, rowTitle = opts.title ? 30 : 0, rowSub = opts.subtitle ? 22 : 0, gap = 18;
     const HEAD = PAD + rowWord + rowTitle + rowSub + gap;    // matches the draw cursor below
     const FOOT = 44;
-    const W = cw + PAD * 2;
-    const H = HEAD + ch + FOOT + PAD;
+    const W = cw + LIST_GAP + LIST_W + PAD * 2;
+    const H = HEAD + bodyH + FOOT + PAD;
     const S = 2;                                             // retina scale
 
     const out = document.createElement('canvas');
@@ -101,15 +113,50 @@
     y += gap;
 
     // ── chart ──
-    g.drawImage(src, PAD, y, cw, ch);
+    g.drawImage(src, PAD, y + (bodyH - ch) / 2, cw, ch);
+
+    // ── side list ──
+    if (list) {
+      const lx = PAD + cw + LIST_GAP;
+      const barX = lx + 128, barW = 60;
+      let ly = y + (bodyH - listH) / 2;
+      list.forEach(item => {
+        const cy = ly + ROW_H / 2;
+        g.fillStyle = item.color;
+        g.beginPath(); g.arc(lx + 5, cy, 5, 0, Math.PI * 2); g.fill();
+
+        g.font = `600 12.5px ${SANS}`;
+        g.fillStyle = INK;
+        g.textAlign = 'left';
+        g.fillText(item.gwLabel, lx + 16, cy + 4);
+        const gwW = g.measureText(item.gwLabel).width;
+
+        g.font = `400 12.5px ${SANS}`;
+        g.fillStyle = MUTED;
+        g.fillText(item.label, lx + 24 + gwW, cy + 4, barX - (lx + 24 + gwW) - 10);
+
+        g.fillStyle = '#eef1f4';
+        g.fillRect(barX, cy - 3, barW, 6);
+        g.fillStyle = item.color;
+        g.fillRect(barX, cy - 3, barW * Math.min(1, item.pct / 100), 6);
+
+        g.font = `600 12.5px ${SANS}`;
+        g.fillStyle = INK;
+        g.textAlign = 'right';
+        g.fillText(item.pct + '%', W - PAD, cy + 4);
+        g.textAlign = 'left';
+
+        ly += ROW_H;
+      });
+    }
 
     // ── footer ──
-    const fy = y + ch + PAD - 8;
+    const fy = HEAD + bodyH + PAD - 8;
     g.font = `400 12px ${SANS}`;
     g.fillStyle = MUTED;
-    if (opts.source) g.fillText(opts.source, PAD, fy + 14, W - PAD * 2 - 130);
+    if (opts.source) g.fillText(opts.source, PAD, fy + 14, W - PAD * 2 - 160);
     g.textAlign = 'right';
-    g.fillText('As of ' + fmtDate(new Date()), W - PAD, fy + 14);
+    g.fillText('As of ' + (opts.timestamp ? fmtDateTime(new Date()) : fmtDate(new Date())), W - PAD, fy + 14);
     g.textAlign = 'left';
 
     return out;

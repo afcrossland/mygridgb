@@ -46,8 +46,10 @@ const NAV_HTML = `
           </ul>
         </li>
         <li>
-          <a href="/map/">Resources ▾</a>
+          <a href="/about/">About &amp; Resources ▾</a>
           <ul>
+            <li><a href="/about/">About</a></li>
+            <li><a href="/press/">Press</a></li>
             <li><a href="/blog/">Blog</a></li>
             <li><a href="/map/">UK Renewable Energy Map</a></li>
             <li><a href="https://renewables-map.robinhawkes.com/#5/55/-3.2" target="_blank">GB Renewables Map (External)</a></li>
@@ -56,14 +58,7 @@ const NAV_HTML = `
             <li><a href="/podcast/">In the Media</a></li>
           </ul>
         </li>
-        <li>
-          <a href="/about/">About ▾</a>
-          <ul>
-            <li><a href="/about/">About</a></li>
-            <li><a href="/press/">Press</a></li>
-          </ul>
-        </li>
-        <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
+        <li><a href="/solar-calculator/" class="nav-solar"><span class="nav-new">NEW</span> Solar Calculator</a></li>
       </ul>
     </nav>
   </div>
@@ -77,21 +72,27 @@ const FOOTER_HTML = `
 
 const SIDEBAR_HTML = `
 <div class="bottom-cards">
-  <div class="bottom-card">
+  <div class="bottom-card bottom-card--consulting">
+    <div class="bottom-card-label">Consulting</div>
+    <div class="consulting-name">Future Zero</div>
+    <p>Andrew's energy consultancy. Independent advice on decarbonisation, clean power and storage.</p>
+    <a href="https://www.future-zero.com" target="_blank" class="consulting-link">Visit future-zero.com →</a>
+  </div>
+  <div class="bottom-card bottom-card--durham">
     <div class="bottom-card-label">Supported by</div>
     <a href="https://www.dur.ac.uk/dei/" target="_blank" style="display:block;">
-      <img src="/images/dei.jpg" alt="Durham Energy Institute" style="display:block; margin:0 auto; max-width:100%; height:auto;">
+      <img src="/images/dei.jpg" alt="Durham Energy Institute" style="display:block; margin:0 auto; max-width:150px; width:100%; height:auto;">
     </a>
     <p>MyGridGB is kindly supported by the Durham Energy Institute.</p>
   </div>
-  <div class="bottom-card">
+  <div class="bottom-card bottom-card--book">
     <div class="bottom-card-label">Book</div>
     <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank" style="display:block; text-align:center;">
       <img src="/images/9780367203320.jpg" alt="Decarbonising Electricity Made Simple" style="display:block; margin:0 auto 10px; max-width:120px; width:100%; height:auto; border-radius:4px; box-shadow:0 2px 10px rgba(0,0,0,.18);">
     </a>
-    <p style="text-align:center;">Decarbonising Electricity Made Simple — <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">buy on Amazon</a></p>
+    <p style="text-align:center;">Decarbonising Electricity Made Simple. <a href="https://www.amazon.co.uk/Decarbonising-Electricity-Routledge-Explorations-Studies/dp/0367203324" target="_blank">Buy on Amazon</a></p>
   </div>
-  <div class="bottom-card">
+  <div class="bottom-card bottom-card--connect">
     <div class="bottom-card-label">Connect</div>
     <div class="social-grid">
       <a href="https://twitter.com/intent/follow?screen_name=mygridgb" target="_blank" class="social-btn social-btn--x">
@@ -113,10 +114,6 @@ const SIDEBAR_HTML = `
       <a href="https://www.researchgate.net/profile/Andrew-Crossland" target="_blank" class="social-btn social-btn--researchgate">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M19.586 0H4.414A4.414 4.414 0 0 0 0 4.414v15.172A4.414 4.414 0 0 0 4.414 24h15.172A4.414 4.414 0 0 0 24 19.586V4.414A4.414 4.414 0 0 0 19.586 0zm-7.41 5.808h2.034c.57 0 1.036.077 1.397.232.361.154.638.37.83.647.192.277.288.6.288.97 0 .31-.067.592-.2.847a1.74 1.74 0 0 1-.57.637c-.248.17-.548.285-.9.345l1.862 2.99h-1.56l-1.713-2.857h-.468v2.857h-1.3V5.808zm1.3 1.056v1.77h.683c.38 0 .674-.086.882-.257.208-.171.312-.412.312-.722 0-.298-.1-.527-.3-.687-.199-.16-.49-.24-.872-.24h-.705zm4.163 2.27c0-.71.158-1.345.474-1.903a3.38 3.38 0 0 1 1.316-1.312c.561-.313 1.194-.47 1.898-.47.51 0 .978.084 1.403.252.426.168.793.41 1.102.725l-.838.872a2.37 2.37 0 0 0-.747-.497 2.19 2.19 0 0 0-.883-.175c-.43 0-.816.1-1.157.3a2.1 2.1 0 0 0-.8.836c-.19.357-.286.762-.286 1.214 0 .457.096.866.287 1.227.19.36.458.642.8.844.343.202.733.303 1.17.303.27 0 .527-.036.77-.108.244-.072.457-.176.64-.312v-.97h-1.56v-1.03h2.8v2.59a4.21 4.21 0 0 1-1.228.671 4.47 4.47 0 0 1-1.48.238c-.694 0-1.32-.155-1.876-.465a3.35 3.35 0 0 1-1.295-1.295c-.309-.553-.464-1.183-.464-1.89zM3.9 14.4h16.2v1.2H3.9zm0 3h16.2v1.2H3.9z"/></svg>
         <span>ResearchGate</span>
-      </a>
-      <a href="https://www.future-zero.com" target="_blank" class="social-btn social-btn--website">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-        <span>future-zero.com</span>
       </a>
     </div>
   </div>

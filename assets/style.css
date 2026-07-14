@@ -120,6 +120,16 @@ nav > ul > li > a.nav-solar:hover {
   background: #fbbf24;
   color: #1c1917;
 }
+.nav-new {
+  background: #1c1917;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  vertical-align: middle;
+}
 
 /* Dropdown */
 nav ul ul {
@@ -233,23 +243,56 @@ nav ul ul li a:hover {
 }
 
 /* ===== BOTTOM CARDS ===== */
+/* Left column stacks consulting over Durham; Book and the narrower Connect
+   column (~25%) each span both rows. 3fr 3fr 2fr = 37.5% / 37.5% / 25%. */
 .bottom-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 3fr 3fr 2fr;
+  grid-template-rows: auto auto;
   gap: 20px;
+  align-items: stretch;
 }
+
+.bottom-card--consulting { grid-column: 1; grid-row: 1; }
+.bottom-card--durham     { grid-column: 1; grid-row: 2; }
+.bottom-card--book       { grid-column: 2; grid-row: 1 / span 2; }
+.bottom-card--connect    { grid-column: 3; grid-row: 1 / span 2; }
+
+.bottom-card--consulting { justify-content: flex-start; }
+.consulting-name {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  color: var(--brand);
+  line-height: 1.15;
+}
+.consulting-link {
+  margin-top: auto;
+  background: #2d8c5a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 16px;
+  border-radius: 7px;
+  text-decoration: none;
+  transition: opacity .15s, transform .1s;
+}
+.consulting-link:hover { opacity: .88; text-decoration: none; color: #fff; transform: translateY(-1px); }
 
 .bottom-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 28px 28px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
+  gap: 10px;
 }
+
+/* Keep the Durham logo compact so its stacked column doesn't tower */
+.bottom-card--durham img { max-width: 140px; }
+.bottom-card--durham p { margin: 0; }
 
 .bottom-card-label {
   font-size: 11px;
@@ -307,9 +350,10 @@ nav ul ul li a:hover {
 .social-btn svg { flex-shrink: 0; }
 .social-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 6px;
   margin-top: 8px;
+  width: 100%;
 }
 .social-btn--website      { background: #2d8c5a; }
 .social-btn--x            { background: #000; }
@@ -432,7 +476,11 @@ nav ul ul li a:hover {
 
   .page-wrap > main { padding: 28px 22px; }
 
-  .bottom-cards { grid-template-columns: 1fr; }
+  .bottom-cards { grid-template-columns: 1fr; grid-template-rows: none; }
+  .bottom-card--consulting,
+  .bottom-card--book,
+  .bottom-card--durham,
+  .bottom-card--connect { grid-column: auto; grid-row: auto; }
 
   #nav-toggle { display: flex; }
 

@@ -549,12 +549,7 @@
       <div class="mix-layout">
         <div class="pie-col">
           <div class="chart-loading" id="mix-chart-loading"></div>
-          <canvas id="mix-chart" data-share
-            data-share-title="Great Britain's present electricity mix"
-            data-share-subtitle="Live generation by source"
-            data-share-source="Source: Elexon/BMRS, Sheffield Solar"
-            data-share-filename="mygridgb-present-mix"
-            data-share-container="#mix-chartshare"></canvas>
+          <canvas id="mix-chart"></canvas>
         </div>
         <div class="fuel-list" id="fuel-list"></div>
       </div>
@@ -805,19 +800,22 @@ const hideLoader = id => {
 
     // Sort entries by GW descending for the fuel list
     const sorted = labels
-      .map((label, i) => ({ label, value: values[i], color: bgColors[i] }))
+      .map((label, i) => ({
+        label: label.split(',')[0].trim(),
+        value: values[i],
+        color: bgColors[i],
+        pct: totalGW > 0 ? Math.round(values[i] / totalGW * 100) : 0,
+      }))
       .sort((a, b) => b.value - a.value);
 
     const listEl = document.getElementById('fuel-list');
-    sorted.forEach(({ label, value, color }) => {
-      const source = label.split(',')[0].trim();
-      const pct = totalGW > 0 ? Math.round(value / totalGW * 100) : 0;
+    sorted.forEach(({ label, value, color, pct }) => {
       const row = document.createElement('div');
       row.className = 'fuel-row';
       row.innerHTML = `
         <span class="fuel-dot" style="background:${color}"></span>
         <span class="fuel-gw">${value.toFixed(1)} GW</span>
-        <span class="fuel-name">${source}</span>
+        <span class="fuel-name">${label}</span>
         <div class="fuel-bar-wrap">
           <div class="fuel-bar" style="width:${pct}%;background:${color}"></div>
         </div>
@@ -849,6 +847,18 @@ const hideLoader = id => {
           }
         }
       }
+    });
+
+    ChartShare.attach('mix-chart', {
+      title: "Great Britain's present electricity mix",
+      subtitle: 'Live generation by source',
+      source: 'Source: Elexon/BMRS, Sheffield Solar',
+      filename: 'mygridgb-present-mix',
+      container: '#mix-chartshare',
+      timestamp: true,
+      sideList: sorted.map(({ label, value, color, pct }) => ({
+        label, color, pct, gwLabel: value.toFixed(1) + ' GW',
+      })),
     });
 
   }
