@@ -21,6 +21,7 @@
   <link rel="canonical" href="https://www.mygridgb.co.uk/last-28-days/">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
@@ -36,7 +37,11 @@
     <p style="color:var(--muted); margin-bottom:16px;">Each tile shows the average contribution of a fuel type to British electricity over the last 28 days, sized by its share of the mix. In windy periods, renewables dominate; gas and nuclear fill the gaps when weather-dependent generation is low.</p>
     <div style="position:relative; height:420px;">
       <div class="chart-loading" id="treemap-chart-loading"></div>
-      <canvas id="treemap-chart"></canvas>
+      <canvas id="treemap-chart" data-share
+        data-share-title="GB generation mix, last 28 days"
+        data-share-subtitle="Share of electricity by source"
+        data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+        data-share-filename="mygridgb-generation-mix-28d"></canvas>
     </div>
 
     <!-- Stacked area -->
@@ -50,7 +55,11 @@
     </div>
     <div style="position:relative; height:400px;">
       <div class="chart-loading" id="gen-chart-loading"></div>
-      <canvas id="gen-chart"></canvas>
+      <canvas id="gen-chart" data-share
+        data-share-title="GB electricity generation, last 28 days"
+        data-share-subtitle="Hourly generation by source"
+        data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+        data-share-filename="mygridgb-generation-28d"></canvas>
     </div>
 
     <!-- Carbon intensity -->
@@ -58,7 +67,11 @@
     <p style="color:var(--muted); margin-bottom:20px;">Hourly carbon intensity of British electricity over the last 28 days (gCO₂eq/kWh). The red line marks the 2030 clean power target of 100 gCO₂eq/kWh. Intensity falls when renewables are generating strongly and rises when gas fills a larger share of demand.</p>
     <div style="position:relative; height:320px;">
       <div class="chart-loading" id="carbon-intensity-chart-loading"></div>
-      <canvas id="carbon-intensity-chart"></canvas>
+      <canvas id="carbon-intensity-chart" data-share
+        data-share-title="GB electricity carbon intensity, last 28 days"
+        data-share-subtitle="Grams of CO2 per kWh"
+        data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+        data-share-filename="mygridgb-carbon-intensity-28d"></canvas>
     </div>
 
     <!-- Conversion & grid losses -->

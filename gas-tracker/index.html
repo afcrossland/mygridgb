@@ -19,6 +19,7 @@
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
   <style>
@@ -168,7 +169,11 @@
         <h2>Where did the gas go?</h2>
         <p>Demand split between heating (homes and small businesses), power generation, industry, exports to Europe, and gas put into storage. Values in gigawatt hours (GWh).</p>
         <div style="position:relative; height:340px;">
-          <canvas id="demand-chart"></canvas>
+          <canvas id="demand-chart" data-share
+            data-share-title="Where did Great Britain's gas go?"
+            data-share-subtitle="Gas demand by use"
+            data-share-source="Source: National Gas"
+            data-share-filename="mygridgb-gas-demand"></canvas>
         </div>
       </div>
 
@@ -184,7 +189,11 @@
         <h2>Where did the gas come from?</h2>
         <p>Supply split between UK production, the St Fergus terminal (which lands a mix of UK and Norwegian gas), Norway by pipeline, imported LNG, pipelines from continental Europe, and withdrawal from storage. Values in gigawatt hours (GWh).</p>
         <div style="position:relative; height:340px;">
-          <canvas id="supply-chart"></canvas>
+          <canvas id="supply-chart" data-share
+            data-share-title="Where did Great Britain's gas come from?"
+            data-share-subtitle="Gas supply by source"
+            data-share-source="Source: National Gas"
+            data-share-filename="mygridgb-gas-supply"></canvas>
         </div>
       </div>
 
@@ -200,7 +209,11 @@
         <h2>Trade with connected countries</h2>
         <p>Net daily gas flow with each connected country. Above the line = imports into GB; below = exports. Norway and Ireland flow one way; Belgium and the Netherlands reverse with the seasons. Britain has no direct gas link to France. Values in gigawatt hours (GWh).</p>
         <div style="position:relative; height:340px;">
-          <canvas id="xborder-chart"></canvas>
+          <canvas id="xborder-chart" data-share
+            data-share-title="Great Britain gas trade with connected countries"
+            data-share-subtitle="Imports and exports by interconnector"
+            data-share-source="Source: National Gas"
+            data-share-filename="mygridgb-gas-trade"></canvas>
         </div>
       </div>
 
@@ -208,7 +221,11 @@
         <h2>Sources of gas, by year</h2>
         <p>Where the gas GB consumed came from each year (net imports, excluding exports and storage), showing how Britain's supply mix is shifting. Values in terawatt hours (TWh). The latest year is only part-complete.</p>
         <div style="position:relative; height:340px;">
-          <canvas id="annual-chart"></canvas>
+          <canvas id="annual-chart" data-share
+            data-share-title="Great Britain gas sources, by year"
+            data-share-subtitle="Annual gas supply by source"
+            data-share-source="Source: National Gas"
+            data-share-filename="mygridgb-gas-sources-annual"></canvas>
         </div>
       </div>
 
@@ -223,7 +240,11 @@
           <li>Illustrative only: assumes 100% conversion, and excludes network losses, hybrid systems, and reduced heat-pump performance in cold snaps.</li>
         </ul>
         <div style="position:relative; height:340px;">
-          <canvas id="heatpump-chart"></canvas>
+          <canvas id="heatpump-chart" data-share
+            data-share-title="What if GB homes used heat pumps instead of gas?"
+            data-share-subtitle="Primary energy: gas boilers vs heat pumps"
+            data-share-source="Source: National Gas, MyGridGB analysis"
+            data-share-filename="mygridgb-gas-vs-heatpumps"></canvas>
         </div>
         <p class="data-note" id="hp-note"></p>
       </div>

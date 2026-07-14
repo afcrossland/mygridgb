@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Whole Energy System - MyGridGB</title>
+  <meta name="description" content="Great Britain's whole energy system: the carbon from electricity, gas and oil, how energy flows from source to end use, and what electrifying transport and heating would do.">
+  <link rel="canonical" href="https://www.mygridgb.co.uk/whole-energy-system/">
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://www.mygridgb.co.uk/whole-energy-system/">
+  <meta property="og:title"       content="Whole Energy System - MyGridGB">
+  <meta property="og:description" content="Great Britain's whole energy system: carbon, energy flows source to end use, and an electrification explorer.">
+  <meta property="og:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:site"        content="@mygridgb">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0/dist/chartjs-chart-sankey.min.js"></script>
+  <style>
+    .gas-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 32px; }
+    .stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+    .stat-card.highlight { background: var(--brand-bg); border-color: #a8cce4; }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+    .stat-val { font-family: 'DM Serif Display', Georgia, serif; font-size: 2rem; font-weight: 400; color: var(--brand); line-height: 1.1; }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .stat-card .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+    .stat-sub .up { color:#b91c1c; font-weight:600; } .stat-sub .down { color:#059669; font-weight:600; }
+
+    .range-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .range-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+    .range-btn:hover { border-color: #a8cce4; color: #1a4d7a; }
+    .range-btn.active { background: #1a4d7a; border-color: #1a4d7a; color: #fff; }
+
+    .sliders { display:flex; flex-wrap:wrap; gap:26px; margin: 4px 0 22px; }
+    .sliders label { font-size:13.5px; color:var(--muted); display:flex; flex-direction:column; gap:7px; min-width:280px; flex:1; }
+    .sliders .sl-top { display:flex; justify-content:space-between; }
+    .sliders b { color:#1a4d7a; font-size:15px; font-variant-numeric: tabular-nums; }
+    .sliders input[type=range] { width:100%; accent-color:#1a4d7a; }
+
+    .chart-section { margin-bottom: 48px; }
+    .chart-section h2 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; font-weight: 400; color: #1a4d7a; margin-bottom: 6px; }
+    .chart-section p { color: var(--muted); font-size: 14px; line-height: 1.65; margin-bottom: 16px; }
+    .loading-state { text-align: center; padding: 56px 20px; color: var(--muted); }
+    .loading-state::before { content:''; display:block; width:32px; height:32px; border:3px solid rgba(26,77,122,.15); border-top-color:#1a4d7a; border-radius:50%; animation:spin .75s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-state { background:#fef2f2; border:1px solid #fca5a5; border-radius:var(--radius); padding:16px 20px; color:#991b1b; font-size:14px; margin-bottom:24px; }
+    .data-note { font-size: 12.5px; color: var(--muted); margin-top: 8px; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <main>
+    <h1 class="page-title">Whole Energy System</h1>
+    <p class="page-intro">Great Britain's energy beyond the power grid - the carbon from electricity, gas and oil, how energy flows from source to end use, and what electrifying transport and heating would do to it.</p>
+
+    <div id="loading" class="loading-state">Loading energy data...</div>
+    <div id="error"   class="error-state" style="display:none"></div>
+
+    <div id="content" style="display:none">
+
+      <div class="range-controls" id="range-controls">
+        <button class="range-btn active" data-months="12" data-label="last 12 months">1 year</button>
+        <button class="range-btn" data-months="99" data-label="last 3 years">3 years</button>
+      </div>
+
+      <div class="gas-stats" id="stats-row"></div>
+
+      <div class="chart-section">
+        <h2>How energy flows, and what electrifying it would do</h2>
+        <p>Primary energy on the left flows through the fuels that make electricity, to the useful energy actually delivered on the right - broken out by end use - with everything else lost as waste heat. The losses are huge for road engines (~75%) and power stations (~50%), small for boilers (~10%). Values in terawatt hours (TWh).</p>
+        <p>Use the sliders to swap petrol and diesel cars for electric ones, and gas and oil boilers for heat pumps. Both are far more efficient than burning fuel, so primary energy and waste heat fall sharply. Here the extra electricity is met by scaling up today's mix of nuclear, wind, solar and gas in proportion, so only part of it adds emissions. Homes stay just as warm and cars drive just as far.</p>
+        <div class="sliders">
+          <label>
+            <span class="sl-top"><span>Road transport electrified</span><b id="road-val">0%</b></span>
+            <input type="range" id="road-slider" min="0" max="100" value="0" step="5">
+          </label>
+          <label>
+            <span class="sl-top"><span>Home heating electrified (heat pumps)</span><b id="heat-val">0%</b></span>
+            <input type="range" id="heat-slider" min="0" max="100" value="0" step="5">
+          </label>
+        </div>
+        <div class="gas-stats" id="scenario-row"></div>
+        <div style="position:relative; height:560px;">
+          <canvas id="sankey2"></canvas>
+        </div>
+      </div>
+
+      <p class="data-note">Combustion CO<sub>2</sub> only, Great Britain. Gas here is heating &amp; industry (power-station gas sits in electricity); oil is scaled from UK to GB. Efficiencies: boilers 90%, engines 25%, industry 75%, heat pumps SCOP 3, EVs 85%, gas power 50%. Electricity fuels use the physical-energy-content convention. Full method on the <a href="/about/#energy-carbon">About page</a>.</p>
+    </div>
+
+  </main>
+  <div id="sidebar-placeholder"></div>
+</div>
+
+<script>
+const SHEET = t => `https://docs.google.com/spreadsheets/d/1sECfXJOZx1MGoRDIllBhPoyijTe0UGri2wBYF-VM5HI/gviz/tq?tqx=out:csv&sheet=${t}`;
+const DATA  = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data';
+const FONT  = "'DM Sans', sans-serif";
+const MON   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONI  = {}; MON.forEach((m,i)=>MONI[m]=i+1);
+
+const MCM_GWH=11.0, KT_GWH=11.9, GAS_C=0.202, OIL_C=0.266;   // ktCO2 per GWh
+const OIL_FAC = { petrol:3.15, diesel_road:3.17, jet_fuel:3.15, kerosene_heating:3.15, red_diesel:3.19, fuel_oil:3.20 };
+const GB_POP=0.972, GB_HEAT=0.70;
+// device efficiencies
+const HEAT_EFF=0.90, ROAD_EFF=0.25, OTHER_EFF=0.35, IND_EFF=0.75, EV_EFF=0.85, SCOP=3.0, GAS_GEN_EFF=0.50;
+const E_FUELS = [
+  { gen:'Nuclear', node:'Nuclear', eff:0.36 }, { gen:'Biomass', node:'Biomass', eff:0.38 },
+  { gen:'Wind', node:'Wind', eff:1 }, { gen:'Solar', node:'Solar', eff:1 },
+  { gen:'Large Hydro', node:'Hydro', eff:1 }, { gen:'Imports', node:'Imports', eff:1 },
+];
+const NODE_COL = {
+  Gas:'#6b7280', Oil:'#374151', Nuclear:'#4ade80', Biomass:'#824e1a', Wind:'#0d9e6e', Solar:'#f59e0b',
+  Hydro:'#3b82f6', Imports:'#7100e2',
+  'Thermal power stations':'#64748b', 'Residential boilers':'#f97316', 'Vehicle engines':'#475569',
+  Electricity:'#2f6f9f', 'Heat pumps':'#14b8a6', 'EV motors':'#6366f1',
+  'Home heating':'#ef4444', 'Road transport':'#334155', 'Other transport':'#78716c',
+  Industry:'#a16207', 'Appliances & other':'#60a5fa', Losses:'#d1d5db',
+};
+const col = c => NODE_COL[c] || '#cbd5e1';
+// Vertical stacking order within each column (lower = higher up). Every node
+// must have a value or the sankey priority layout throws.
+const PRIORITY = {
+  Oil:1, Gas:2, Nuclear:3, Biomass:4, Wind:5, Imports:6, Solar:7, Hydro:8,
+  'Vehicle engines':10, 'Residential boilers':11, 'Thermal power stations':12,
+  Electricity:20, 'Heat pumps':25, 'EV motors':26,
+  Losses:30, 'Home heating':31, 'Appliances & other':32,
+  'Road transport':33, 'Other transport':34, Industry:35,
+};
+
+async function fetchGviz(url){ const t=await (await fetch(url)).text(); return JSON.parse(t.slice(t.indexOf('(')+1,t.lastIndexOf(')'))).table; }
+function parseCsv(text){
+  const lines=text.trim().split('\n'), head=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  return lines.slice(1).map(line=>{ const v=[];let q=false,c='';for(const ch of line){if(ch==='"'){q=!q;continue;}if(ch===','&&!q){v.push(c);c='';continue;}c+=ch;}v.push(c);
+    const o={};head.forEach((h,i)=>o[h]=(v[i]||'').replace(/"/g,'').trim());return o;});
+}
+const num=v=>{const n=parseFloat(v);return isNaN(n)?0:n;};
+const fmt=(n,dp=0)=>n==null||isNaN(n)?'--':n.toLocaleString('en-GB',{maximumFractionDigits:dp,minimumFractionDigits:0});
+const pct=(a,b)=>b?Math.round(100*(a-b)/b):0;
+
+(async () => {
+  try {
+    const [genT, carT, gasR, fuelR] = await Promise.all([
+      fetchGviz(`${DATA}/12month-generation.json`), fetchGviz(`${DATA}/12month-carbon.json`),
+      fetch(SHEET('data')).then(r=>r.text()).then(parseCsv), fetch(SHEET('fuel_data')).then(r=>r.text()).then(parseCsv),
+    ]);
+    const gcols = genT.cols.map(c=>c.label);
+    const mk = m => { const [a,b]=m.split('-'); return `20${b}-${String(MONI[a]).padStart(2,'0')}`; };
+    const gen={}; genT.rows.forEach(r=>{ const o={}; for(let i=1;i<gcols.length;i++) o[gcols[i]]=r.c[i]?r.c[i].v:0; gen[mk(r.c[0].v)]=o; });
+    const inten={}; carT.rows.forEach(r=>inten[mk(r.c[0].v)]=r.c[1]?r.c[1].v:0);
+
+    const gas={};
+    gasR.forEach(r=>{ const d=(r.date||'').slice(0,7),ldz=num(r.ldz_total),ind=num(r.industrial),pow=num(r.power);
+      if(!/^\d{4}-\d{2}$/.test(d)||(ldz===0&&ind===0))return;
+      const g=gas[d]||(gas[d]={heat:0,ind:0,pow:0,carbon:0});
+      g.heat+=ldz*MCM_GWH/1000; g.ind+=ind*MCM_GWH/1000; g.pow+=pow*MCM_GWH/1000; g.carbon+=(ldz+ind)*MCM_GWH*GAS_C/1000; });
+    const oil={};
+    fuelR.forEach(r=>{ const d=(r.date||'').slice(0,7); if(!/^\d{4}-\d{2}$/.test(d))return; const g=k=>num(r[k]);
+      oil[d]={ road:(g('petrol')+g('diesel_road'))*KT_GWH/1000*GB_POP, other:(g('jet_fuel')+g('fuel_oil'))*KT_GWH/1000*GB_POP,
+        ind:g('red_diesel')*KT_GWH/1000*GB_POP, heat:g('kerosene_heating')*KT_GWH/1000*GB_HEAT,
+        carbon:(g('petrol')*OIL_FAC.petrol+g('diesel_road')*OIL_FAC.diesel_road+g('jet_fuel')*OIL_FAC.jet_fuel+g('red_diesel')*OIL_FAC.red_diesel+g('fuel_oil')*OIL_FAC.fuel_oil)/1000*GB_POP + g('kerosene_heating')*OIL_FAC.kerosene_heating/1000*GB_HEAT }; });
+
+    document.getElementById('loading').style.display='none';
+    const overlap = Object.keys(gen).filter(m=>inten[m]!=null&&gas[m]&&oil[m]).sort();
+    if(!overlap.length){ const e=document.getElementById('error'); e.style.display=''; e.textContent='Not enough overlapping data yet.'; return; }
+    document.getElementById('content').style.display='';
+
+    function computeAgg(months){
+      const S=k=>months.reduce((s,m)=>s+k(m),0);
+      const a={
+        gasHeat:S(m=>gas[m].heat), gasInd:S(m=>gas[m].ind), gasPow:S(m=>gas[m].pow), gasOut:S(m=>gen[m]['Gas']||0),
+        oilRoad:S(m=>oil[m].road), oilOther:S(m=>oil[m].other), oilInd:S(m=>oil[m].ind), oilHeat:S(m=>oil[m].heat),
+        elecC:S(m=>Object.values(gen[m]).reduce((x,y)=>x+y,0)*inten[m]/1000), gasC:S(m=>gas[m].carbon), oilC:S(m=>oil[m].carbon),
+        eFuel:{}, G_nonGas:0, P_nonGas:0,
+      };
+      E_FUELS.forEach(f=>{ const o=S(m=>gen[m][f.gen]||0); a.eFuel[f.node]={out:o,prim:o/f.eff}; a.G_nonGas+=o; a.P_nonGas+=o/f.eff; });
+      return a;
+    }
+
+    // Build the flow list + summary for a scenario (fR, fH = electrified fractions)
+    function scenario(a, fR, fH){
+      const F=[]; const add=(from,to,flow)=>{ if(flow>0.4) F.push({from,to,flow}); };
+      const usefulRoad=a.oilRoad*ROAD_EFF, usefulHeat=(a.gasHeat+a.oilHeat)*HEAT_EFF;
+      const oilRoadICE=a.oilRoad*(1-fR), gasHeatB=a.gasHeat*(1-fH), oilHeatB=a.oilHeat*(1-fH);
+      const elecRoad=usefulRoad*fR/EV_EFF;                 // electricity into EVs
+      const usefulHeatHP=usefulHeat*fH, elecHeat=usefulHeatHP/SCOP, ambient=usefulHeatHP-elecHeat;
+      const addedElec=elecRoad+elecHeat;
+      // New electricity demand is met by scaling up nuclear, wind, solar and gas
+      // in proportion to their current output (not by gas alone).
+      const baseFour = a.gasOut + a.eFuel.Nuclear.out + a.eFuel.Wind.out + a.eFuel.Solar.out;
+      const scaleUp = baseFour>0 ? (baseFour+addedElec)/baseFour : 1;
+      const genScale = n => (n==='Nuclear'||n==='Wind'||n==='Solar') ? scaleUp : 1;
+      const extraGasOut = a.gasOut*(scaleUp-1);
+      const gasOut=a.gasOut+extraGasOut, gasPow=a.gasPow+extraGasOut/GAS_GEN_EFF;
+      const applianceElec=a.gasOut+a.G_nonGas;             // original electricity demand
+      // --- primary fuel -> conversion devices / direct ---
+      add('Gas','Residential boilers', gasHeatB); add('Gas','Industry', a.gasInd*IND_EFF); add('Gas','Losses', a.gasInd*(1-IND_EFF));
+      add('Oil','Residential boilers', oilHeatB); add('Oil','Vehicle engines', oilRoadICE);
+      add('Oil','Other transport', a.oilOther*OTHER_EFF); add('Oil','Industry', a.oilInd*IND_EFF);
+      add('Oil','Losses', a.oilOther*(1-OTHER_EFF)+a.oilInd*(1-IND_EFF));
+      // Thermal power stations: gas + nuclear + biomass (primary heat) in, electricity + waste heat out
+      let thermIn=gasPow, thermOut=gasOut, pNonGas=0;
+      add('Gas','Thermal power stations', gasPow);
+      E_FUELS.forEach(f=>{ const e=a.eFuel[f.node], sc=genScale(f.node), out=e.out*sc, prim=e.prim*sc;
+        pNonGas+=prim;
+        if(f.eff<1){ thermIn+=prim; thermOut+=out; add(f.node,'Thermal power stations',prim); }
+        else add(f.node,'Electricity',out); });                 // wind/solar/hydro/imports bypass thermal
+      add('Thermal power stations','Electricity', thermOut);
+      add('Thermal power stations','Losses', thermIn-thermOut);
+      // --- fossil devices -> useful energy + losses ---
+      const boilerIn = gasHeatB + oilHeatB;
+      add('Residential boilers','Home heating', boilerIn*HEAT_EFF);
+      add('Residential boilers','Losses', boilerIn*(1-HEAT_EFF));
+      add('Vehicle engines','Road transport', oilRoadICE*ROAD_EFF);
+      add('Vehicle engines','Losses', oilRoadICE*(1-ROAD_EFF));
+      // --- electricity -> appliances + electrified devices ---
+      add('Electricity','Appliances & other', applianceElec);
+      add('Electricity','Heat pumps', elecHeat); add('Heat pumps','Home heating', usefulHeatHP);  // heat pumps deliver ~3x their electricity
+      add('Electricity','EV motors', elecRoad); add('EV motors','Road transport', usefulRoad*fR); add('EV motors','Losses', elecRoad-usefulRoad*fR);
+      // summary
+      const primary = (gasHeatB+a.gasInd+gasPow) + (oilHeatB+oilRoadICE+a.oilOther+a.oilInd) + pNonGas;
+      const losses  = F.filter(f=>f.to==='Losses').reduce((s,f)=>s+f.flow,0);
+      const gasCarbon=(gasHeatB+a.gasInd)*GAS_C, oilCarbon=(oilHeatB+oilRoadICE+a.oilOther+a.oilInd)*OIL_C;
+      const elecCarbon=a.elecC + (extraGasOut/GAS_GEN_EFF)*GAS_C;
+      // Useful energy actually delivered (end-use flows) as % of primary. Rises with
+      // electrification because heat pumps deliver ~3x their electricity input.
+      const END_USE = new Set(['Home heating','Road transport','Other transport','Industry','Appliances & other']);
+      const useful = F.filter(f=>END_USE.has(f.to)).reduce((s,f)=>s+f.flow,0);
+      const efficiency = primary>0 ? useful/primary*100 : 0;
+      return { flows:F, primary, losses, efficiency, carbon:gasCarbon+oilCarbon+elecCarbon };
+    }
+
+    let charts = {};
+    function drawSankey(id, flows){
+      if(charts[id]){ charts[id].data.datasets[0].data = flows; charts[id].update(); return; }
+      charts[id] = new Chart(document.getElementById(id), {
+        type:'sankey',
+        data:{ datasets:[{ data:flows, colorFrom:c=>col(c.raw.from), colorTo:c=>col(c.raw.to), colorMode:'gradient',
+          alpha:0.6, borderWidth:0, nodeWidth:13, priority:PRIORITY, font:{family:FONT,size:11,weight:'600'} }] },
+        options:{ responsive:true, maintainAspectRatio:false, animation:{duration:400},
+          plugins:{ legend:{display:false},
+          tooltip:{ callbacks:{ label:c=>` ${c.raw.from} → ${c.raw.to}: ${fmt(c.raw.flow)} TWh` } } } },
+      });
+    }
+    function heroTiles(id, tiles){
+      document.getElementById(id).innerHTML = tiles.map(t=>`
+        <div class="stat-card highlight">
+          <div class="stat-label">${t.dot?`<span class="dot" style="background:${t.dot}"></span>`:''}${t.label}</div>
+          <div class="stat-val">${t.val}</div>
+          <div class="stat-sub">${t.sub}</div>
+        </div>`).join('');
+    }
+
+    let agg = null, base = null;
+    function renderRange(monthsBack){
+      agg = computeAgg(overlap.slice(-monthsBack));
+      const total = agg.elecC+agg.gasC+agg.oilC;
+      heroTiles('stats-row', [
+        { label:'Total energy CO₂', val:fmt(total), sub:'MtCO&thinsp;&sup2;' },
+        { label:'Electricity', val:fmt(agg.elecC), sub:'MtCO&thinsp;&sup2; &middot; power sector', dot:NODE_COL.Electricity },
+        { label:'Gas', val:fmt(agg.gasC), sub:'MtCO&thinsp;&sup2; &middot; heating &amp; industry', dot:NODE_COL.Gas },
+        { label:'Oil', val:fmt(agg.oilC), sub:'MtCO&thinsp;&sup2; &middot; transport &amp; heating', dot:NODE_COL.Oil },
+      ]);
+      base = scenario(agg,0,0);
+      renderScenario();
+    }
+
+    function renderScenario(){
+      const fR = +document.getElementById('road-slider').value/100;
+      const fH = +document.getElementById('heat-slider').value/100;
+      document.getElementById('road-val').textContent = Math.round(fR*100)+'%';
+      document.getElementById('heat-val').textContent = Math.round(fH*100)+'%';
+      const s = scenario(agg, fR, fH);
+      const arrow = d => d===0 ? '' : (d<0 ? `<span class="down">${d}%</span>` : `<span class="up">+${d}%</span>`);
+      // efficiency: higher is better, so a rise is coloured green (the "down" class)
+      const effPpt = Math.round(s.efficiency - base.efficiency);
+      const effArrow = effPpt===0 ? '' : (effPpt>0 ? `<span class="down">+${effPpt} pts</span>` : `<span class="up">${effPpt} pts</span>`);
+      heroTiles('scenario-row', [
+        { label:'System efficiency', val:Math.round(s.efficiency)+'%', sub:'of primary energy'+(effPpt?' &middot; '+effArrow+' vs today':'') },
+        { label:'Primary energy', val:fmt(s.primary), sub:'TWh &middot; '+arrow(pct(s.primary,base.primary))+' vs today' },
+        { label:'Wasted as heat', val:fmt(s.losses), sub:'TWh &middot; '+arrow(pct(s.losses,base.losses))+' vs today' },
+        { label:'Energy CO₂', val:fmt(s.carbon), sub:'MtCO&thinsp;&sup2; &middot; '+arrow(pct(s.carbon,base.carbon))+' vs today' },
+      ]);
+      drawSankey('sankey2', s.flows);
+    }
+
+    document.querySelectorAll('#range-controls .range-btn').forEach(b=>b.addEventListener('click',()=>{
+      document.querySelectorAll('#range-controls .range-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+      renderRange(parseInt(b.dataset.months,10));
+    }));
+    document.getElementById('road-slider').addEventListener('input', renderScenario);
+    document.getElementById('heat-slider').addEventListener('input', renderScenario);
+    renderRange(12);
+
+    if(window.ChartShare){
+      ChartShare.attach('sankey2', { title:'How GB energy flows, and electrifying it',
+        subtitle:'Primary energy to useful energy, with an electrification explorer', filename:'mygridgb-energy-flows',
+        source:'Source: Elexon/BMRS, Sheffield Solar, National Gas, DESNZ' });
+    }
+
+  } catch(e){ document.getElementById('loading').style.display='none'; const el=document.getElementById('error'); el.style.display=''; el.textContent='Failed to load data: '+e.message; }
+})();
+</script>
+</body>
+</html>

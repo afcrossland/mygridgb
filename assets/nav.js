@@ -23,16 +23,28 @@ const NAV_HTML = `
     <nav id="main-nav">
       <ul>
         <li>
-          <a href="/last-28-days/">Detailed Data ▾</a>
+          <a href="/last-28-days/">Electricity Data ▾</a>
           <ul>
             <li><a href="/last-28-days/">Last 28 Days</a></li>
             <li><a href="/last-12-months/">Last 12 Months</a></li>
             <li><a href="/historicaldata/">Generation History</a></li>
             <li><a href="/carbon-tracker/">Carbon Tracker</a></li>
-            <li><a href="/gas-tracker/">Gas Tracker</a></li>
           </ul>
         </li>
-        <li><a href="/2030grid/">My 2030 Blueprint</a></li>
+        <li>
+          <a href="/gas-tracker/">Energy System Data ▾</a>
+          <ul>
+            <li><a href="/gas-tracker/">Gas Tracker</a></li>
+            <li><a href="/fuel-tracker/">Fuel Tracker</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="/2030grid/">Future Energy ▾</a>
+          <ul>
+            <li><a href="/2030grid/">My 2030 Blueprint</a></li>
+            <li><a href="/whole-energy-system/">Whole Energy System</a></li>
+          </ul>
+        </li>
         <li>
           <a href="/map/">Resources ▾</a>
           <ul>
@@ -44,8 +56,13 @@ const NAV_HTML = `
             <li><a href="/podcast/">In the Media</a></li>
           </ul>
         </li>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/press/">Press</a></li>
+        <li>
+          <a href="/about/">About ▾</a>
+          <ul>
+            <li><a href="/about/">About</a></li>
+            <li><a href="/press/">Press</a></li>
+          </ul>
+        </li>
         <li><a href="/solar-calculator/" class="nav-solar">☀️ Solar Calculator</a></li>
       </ul>
     </nav>

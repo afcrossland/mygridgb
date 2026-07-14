@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UK Fuel Demand Tracker - MyGridGB</title>
+  <meta name="description" content="UK demand for petrol, diesel, jet fuel and heating oils, and where Britain's oil comes from - domestic production and imports by country. Monthly data from DESNZ Energy Trends.">
+  <link rel="canonical" href="https://www.mygridgb.co.uk/fuel-tracker/">
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://www.mygridgb.co.uk/fuel-tracker/">
+  <meta property="og:title"       content="UK Fuel Demand Tracker - MyGridGB">
+  <meta property="og:description" content="UK demand for petrol, diesel, jet fuel and heating oils, and where Britain's oil comes from.">
+  <meta property="og:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:site"        content="@mygridgb">
+  <meta name="twitter:title"       content="UK Fuel Demand Tracker - MyGridGB">
+  <meta name="twitter:description" content="UK fuel demand and where Britain's oil comes from.">
+  <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
+  <style>
+    .gas-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-bottom: 32px; }
+    .stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+    .stat-card.highlight { background: var(--brand-bg); border-color: #a8cce4; }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+    .stat-val { font-family: 'DM Serif Display', Georgia, serif; font-size: 2rem; font-weight: 400; color: var(--brand); line-height: 1.1; }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .range-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+    .range-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+    .range-btn:hover { border-color: #a8cce4; color: #1a4d7a; }
+    .range-btn.active { background: #1a4d7a; border-color: #1a4d7a; color: #fff; }
+
+    .chart-section { margin-bottom: 48px; }
+    .chart-section h2 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; font-weight: 400; color: #1a4d7a; margin-bottom: 6px; }
+    .chart-section p { color: var(--muted); font-size: 14px; line-height: 1.65; margin-bottom: 16px; }
+
+    .loading-state { text-align: center; padding: 56px 20px; color: var(--muted); }
+    .loading-state::before { content: ''; display: block; width: 32px; height: 32px; border: 3px solid rgba(26,77,122,.15); border-top-color: #1a4d7a; border-radius: 50%; animation: spin .75s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-state { background: #fef2f2; border: 1px solid #fca5a5; border-radius: var(--radius); padding: 16px 20px; color: #991b1b; font-size: 14px; margin-bottom: 24px; }
+    .data-note { font-size: 12.5px; color: var(--muted); margin-top: 8px; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <main>
+    <h1 class="page-title">UK Fuel Demand</h1>
+    <p class="page-intro">Monthly demand for petrol, diesel, jet fuel and heating oils across the UK. Deliveries of petroleum products for inland consumption, from DESNZ Energy Trends.</p>
+
+    <div id="loading" class="loading-state">Loading fuel data...</div>
+    <div id="error"   class="error-state" style="display:none"></div>
+
+    <div id="content" style="display:none">
+
+      <div class="gas-stats" id="stats-row"></div>
+
+      <div class="range-controls" id="range-controls">
+        <button class="range-btn" data-months="12"  data-label="last 12 months">1 year</button>
+        <button class="range-btn active" data-months="60" data-label="last 5 years">5 years</button>
+        <button class="range-btn" data-months="120" data-label="last 10 years">10 years</button>
+        <button class="range-btn" data-months="9999" data-label="since 1998">All</button>
+      </div>
+
+      <div class="chart-section">
+        <h2>Fuel used</h2>
+        <p>Monthly deliveries of petroleum products for inland consumption, by product. Values in thousand tonnes (kt).</p>
+        <div style="position:relative; height:360px;">
+          <canvas id="demand-chart" data-share
+            data-share-title="UK fuel used, by product"
+            data-share-subtitle="Petrol, diesel, jet fuel and more"
+            data-share-source="Source: DESNZ Energy Trends"
+            data-share-filename="mygridgb-fuel-used"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h2>Fuel mix</h2>
+        <p>Share of total petroleum demand over the selected period.</p>
+        <div style="position:relative; height:320px;">
+          <canvas id="fuel-pie" data-share
+            data-share-title="UK fuel mix"
+            data-share-subtitle="Share of demand by product"
+            data-share-source="Source: DESNZ Energy Trends"
+            data-share-filename="mygridgb-fuel-mix"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h2>Oil supply by source</h2>
+        <p>Monthly share of oil supply by source &mdash; UK domestic (North Sea) production plus imports by country. Choose a product to see where that specific fuel is sourced, and watch Russian supply disappear after 2022. UK production is crude oil, so it shows only on the All-oil and Crude views. Data from 2018.</p>
+        <div class="range-controls" id="product-controls">
+          <button class="range-btn active" data-product="total">All oil</button>
+          <button class="range-btn" data-product="crude">Crude oil</button>
+          <button class="range-btn" data-product="petrol">Petrol</button>
+          <button class="range-btn" data-product="diesel_road">Diesel</button>
+          <button class="range-btn" data-product="jet_fuel">Jet fuel</button>
+        </div>
+        <div style="position:relative; height:300px; margin-bottom:20px;">
+          <canvas id="imports-tree"></canvas>
+        </div>
+        <div style="position:relative; height:360px;">
+          <canvas id="imports-chart" data-share
+            data-share-title="UK oil supply by source country"
+            data-share-subtitle="Share of oil imports and domestic production"
+            data-share-source="Source: DESNZ Energy Trends"
+            data-share-filename="mygridgb-oil-supply"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h2>Petrol vs diesel</h2>
+        <p>Monthly road-fuel demand since 1998. Diesel overtook petrol in the mid-2000s as the car fleet dieselised; petrol has roughly halved. Values in thousand tonnes (kt).</p>
+        <div style="position:relative; height:320px;">
+          <canvas id="road-chart" data-share
+            data-share-title="UK petrol vs diesel demand"
+            data-share-subtitle="Road fuel use over time"
+            data-share-source="Source: DESNZ Energy Trends"
+            data-share-filename="mygridgb-petrol-vs-diesel"></canvas>
+        </div>
+      </div>
+
+      <p class="data-note">Source: DESNZ Energy Trends ET 3.13 (deliveries of petroleum products for inland consumption), monthly, ~2 months in arrears. The most recent months are provisional and get revised.</p>
+    </div>
+
+  </main>
+  <div id="sidebar-placeholder"></div>
+</div>
+
+<script>
+const SHEET_BASE  = 'https://docs.google.com/spreadsheets/d/1sECfXJOZx1MGoRDIllBhPoyijTe0UGri2wBYF-VM5HI/gviz/tq?tqx=out:csv&sheet=';
+const SHEET_URL   = SHEET_BASE + 'fuel_data';
+const IMPORTS_URL = SHEET_BASE + 'fuel_imports';
+
+const IMPORT_PRODUCTS = [
+  { key: 'total', label: 'All oil' },
+  { key: 'crude', label: 'Crude oil' },
+  { key: 'petrol', label: 'Petrol' },
+  { key: 'diesel_road', label: 'Diesel' },
+  { key: 'jet_fuel', label: 'Jet fuel' },
+];
+const COUNTRY_COLORS = ['#1a4d7a', '#059669', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#14b8a6', '#f97316', '#6366f1', '#84cc16', '#e11d48'];
+// Flag-inspired national colours (kept distinct for the big adjacent bands)
+const COUNTRY_COLOR = {
+  'United Kingdom':       '#012169', // Union navy
+  'United States':        '#b31942', // Old Glory red
+  'Norway':               '#2563eb', // Norwegian blue
+  'Netherlands':          '#f97316', // Dutch orange
+  'Russian Federation':   '#991b1b', // deep red
+  'Belgium':              '#f2c500', // Belgian gold
+  'Kuwait':               '#14b8a6', // teal
+  'Nigeria':              '#16a34a', // Nigerian green
+  'Saudi Arabia':         '#065f46', // Saudi green
+  'Libya':                '#4b5563', // slate (black stripe)
+  'Qatar':                '#8d1b3d', // Qatari maroon
+  'Canada':               '#d80621', // maple red
+  'France':               '#3b82f6', // French blue
+  'Germany':              '#111827', // black
+  'Sweden':               '#1d4ed8', // Swedish blue
+  'Ireland':              '#22c55e', // Irish green
+  'Algeria':              '#15803d', // green
+  'India':                '#ff9933', // saffron
+  'Spain':                '#c60b1e', // red
+  'Turkey':               '#e30a17', // red
+  'United Arab Emirates': '#00843d', // green
+  'Other':                '#cbd5e1',
+};
+
+const FUEL_KEYS   = ['petrol', 'diesel_road', 'jet_fuel', 'kerosene_heating', 'red_diesel', 'fuel_oil', 'other'];
+const FUEL_LABELS = ['Petrol', 'Diesel (road)', 'Jet fuel', 'Heating oil', 'Red diesel', 'Fuel oil', 'Other products'];
+const FUEL_COLORS = ['#10b981', '#334155', '#0ea5e9', '#f59e0b', '#ef4444', '#6b7280', '#cbd5e1'];
+
+const FONT = "'DM Sans', sans-serif";
+const legend = (position = 'top') => ({
+  position,
+  labels: { font: { family: FONT, size: 12 }, padding: 16, usePointStyle: true, pointStyle: 'circle', boxWidth: 10, boxHeight: 10 },
+});
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+  return lines.slice(1).map(line => {
+    const vals = []; let inQ = false, cur = '';
+    for (const ch of line) {
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    vals.push(cur.trim());
+    const row = {};
+    headers.forEach((h, i) => { const v = (vals[i] || '').replace(/"/g, '').trim(); row[h] = v === '' || isNaN(v) ? v : parseFloat(v); });
+    return row;
+  }).filter(r => r.date && r.total > 0);
+}
+
+function fmt(n, dp = 1) {
+  if (n == null || isNaN(n)) return '--';
+  return n.toLocaleString('en-GB', { maximumFractionDigits: Math.min(dp, 1), minimumFractionDigits: 0 });
+}
+
+const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const monthYr = iso => { if (!iso) return ''; const [y, m] = iso.split('-'); return MONTH_ABBR[parseInt(m, 10) - 1] + '-' + y.slice(2); };
+const yearOf  = iso => (iso || '').slice(0, 4);
+
+// Sum numeric columns by year → one row per year (date = YYYY-01-01, yr flag)
+function aggregateToYears(rows) {
+  const g = {};
+  rows.forEach(r => { const y = yearOf(r.date); (g[y] || (g[y] = [])).push(r); });
+  return Object.keys(g).sort().map(y => {
+    const out = { date: y + '-01-01', yr: y };
+    g[y].forEach(r => Object.keys(r).forEach(k => { if (typeof r[k] === 'number') out[k] = (out[k] || 0) + r[k]; }));
+    return out;
+  });
+}
+
+function labelGate(labels) {
+  const starts = [];
+  labels.forEach((l, i) => { if (l !== labels[i - 1]) starts.push(i); });
+  const step = Math.ceil(starts.length / 13) || 1;
+  return new Set(starts.filter((_, k) => k % step === 0));
+}
+
+function stackedBarChart(canvasId, rows, keys, labels, colors, yearly, opts = {}) {
+  const unit = opts.unit || 'kt';
+  const xLabels = rows.map(r => yearly ? r.yr : monthYr(r.date));
+  const showAt = labelGate(xLabels);
+  const datasets = keys.map((k, i) => ({
+    label: labels[i], data: rows.map(r => +(r[k] || 0).toFixed(1)),
+    backgroundColor: colors[i], borderWidth: 0, barPercentage: 1.0, categoryPercentage: 1.0,
+  }));
+  return new Chart(document.getElementById(canvasId), {
+    type: 'bar',
+    data: { labels: xLabels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: legend('top'),
+        tooltip: {
+          callbacks: {
+            title: items => { const r = rows[items[0].dataIndex] || {}; return r.yr ? r.yr : monthYr(r.date); },
+            label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)} ${unit}`,
+          },
+          bodyFont: { family: FONT }, titleFont: { family: FONT },
+        },
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', autoSkip: false, maxRotation: 90, minRotation: 0, callback: (v, i) => showAt.has(i) ? xLabels[i] : '' } },
+        y: { stacked: true, max: opts.max, grid: { color: '#f1f5f9' }, ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' ' + unit } },
+      },
+    },
+  });
+}
+
+function treemapChart(canvasId, rows, keys, labels, colors) {
+  const totals = keys.map(k => rows.reduce((s, r) => s + (r[k] || 0), 0));
+  const sum = totals.reduce((a, b) => a + b, 0);
+  const tree = keys.map((k, i) => ({ label: labels[i], color: colors[i], value: Math.max(0, totals[i]), pct: sum ? Math.round(100 * totals[i] / sum) : 0 })).filter(t => t.value > 0);
+  return new Chart(document.getElementById(canvasId), {
+    type: 'treemap',
+    data: { datasets: [{
+      tree, key: 'value', spacing: 0, borderWidth: 2, borderColor: '#fff',
+      backgroundColor: ctx => (ctx.type !== 'data' ? 'transparent' : (ctx.raw._data.color || '#9CA3AF')),
+      labels: { display: 'auto', color: '#fff', padding: 6, font: { family: FONT, size: 13, weight: '600' },
+        formatter: ctx => { const d = ctx.raw._data; return [d.label, fmt(d.value / 1000) + ' Mt', d.pct + '%']; } },
+    }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: {
+        title: ctx => ctx[0]?.raw?._data?.label ?? '',
+        label: ctx => { const d = ctx.raw._data; return [` ${fmt(d.value / 1000)} Mt`, ` ${d.pct}% of total`]; },
+      }, bodyFont: { family: FONT }, titleFont: { family: FONT } },
+    } },
+  });
+}
+
+// Reshape imports into a stacked-timeseries dataset (top origins + Other)
+function importsSeries(importRows, product, cutoffStr, yearly) {
+  const recent = importRows.filter(r => r.date >= cutoffStr);
+
+  const totByOrigin = {};
+  recent.forEach(r => { totByOrigin[r.origin] = (totByOrigin[r.origin] || 0) + (r[product] || 0); });
+  const named = Object.keys(totByOrigin)
+    .filter(o => o.toLowerCase() !== 'other' && totByOrigin[o] > 0)
+    .sort((a, b) => totByOrigin[b] - totByOrigin[a]).slice(0, 8);
+  // Always surface Russia (post-2022 collapse) and the UK (domestic production)
+  const RU = 'Russian Federation';
+  if (totByOrigin[RU] > 0 && !named.includes(RU)) named.push(RU);
+  if (totByOrigin['United Kingdom'] > 0 && !named.includes('United Kingdom')) named.unshift('United Kingdom');
+  const namedSet = new Set(named);
+
+  const periods = {};
+  recent.forEach(r => {
+    const p = yearly ? yearOf(r.date) : r.date.slice(0, 7);
+    if (!periods[p]) periods[p] = {};
+    const bucket = namedSet.has(r.origin) ? r.origin : 'Other';
+    periods[p][bucket] = (periods[p][bucket] || 0) + (r[product] || 0);
+  });
+
+  const keys = named.concat(['Other']);
+  const rows = Object.keys(periods).sort().map(p => {
+    const tot = keys.reduce((s, k) => s + (periods[p][k] || 0), 0) || 1;
+    const row = yearly ? { date: p + '-01-01', yr: p } : { date: p + '-01' };
+    keys.forEach(k => row[k] = +(100 * (periods[p][k] || 0) / tot).toFixed(1)); // share %
+    return row;
+  });
+  const colors = keys.map((k, i) => COUNTRY_COLOR[k] || COUNTRY_COLORS[i % COUNTRY_COLORS.length]);
+  return { rows, keys, colors };
+}
+
+// Snapshot treemap: origin countries for one product, aggregated over the range
+function importsTreemap(canvasId, importRows, product, cutoffStr) {
+  const recent = importRows.filter(r => r.date >= cutoffStr);
+  const byOrigin = {};
+  recent.forEach(r => { byOrigin[r.origin] = (byOrigin[r.origin] || 0) + (r[product] || 0); });
+
+  let items = Object.keys(byOrigin).map(o => ({ label: o, value: byOrigin[o] }))
+    .filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+  const TOP = 11;
+  if (items.length > TOP) {
+    const top = items.slice(0, TOP);
+    const tail = items.slice(TOP).reduce((s, x) => s + x.value, 0);
+    const ex = top.find(x => x.label.toLowerCase() === 'other');
+    if (ex) ex.value += tail; else if (tail > 0) top.push({ label: 'Other', value: tail });
+    items = top;
+  }
+  const sum = items.reduce((s, x) => s + x.value, 0);
+  items.forEach((x, i) => {
+    x.color = COUNTRY_COLOR[x.label] || COUNTRY_COLORS[i % COUNTRY_COLORS.length];
+    x.pct = sum ? Math.round(100 * x.value / sum) : 0;
+  });
+
+  return new Chart(document.getElementById(canvasId), {
+    type: 'treemap',
+    data: { datasets: [{
+      tree: items, key: 'value', spacing: 0, borderWidth: 2, borderColor: '#fff',
+      backgroundColor: ctx => (ctx.type !== 'data' ? 'transparent' : (ctx.raw._data.color || '#9CA3AF')),
+      labels: { display: 'auto', color: '#fff', padding: 6, font: { family: FONT, size: 13, weight: '600' },
+        formatter: ctx => { const d = ctx.raw._data; return [d.label, fmt(d.value / 1000) + ' Mt', d.pct + '%']; } },
+    }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: {
+        title: ctx => ctx[0]?.raw?._data?.label ?? '',
+        label: ctx => { const d = ctx.raw._data; return [` ${fmt(d.value / 1000)} Mt`, ` ${d.pct}% of supply`]; },
+      }, bodyFont: { family: FONT }, titleFont: { family: FONT } },
+    } },
+  });
+}
+
+// Petrol vs road diesel over the whole history (the dieselisation crossover)
+function roadChart(canvasId, rows) {
+  const xLabels = rows.map(r => monthYr(r.date));
+  const showAt = labelGate(xLabels);
+  const line = (k, col) => ({ label: k === 'petrol' ? 'Petrol' : 'Diesel (road)', data: rows.map(r => +(r[k] || 0).toFixed(1)), borderColor: col, backgroundColor: 'transparent', pointRadius: 0, borderWidth: 2, tension: .2 });
+  return new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    data: { labels: xLabels, datasets: [line('petrol', '#10b981'), line('diesel_road', '#334155')] },
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: legend('top'),
+        tooltip: { callbacks: { title: items => monthYr(rows[items[0].dataIndex].date), label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)} kt` }, bodyFont: { family: FONT }, titleFont: { family: FONT } },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', autoSkip: false, maxRotation: 90, minRotation: 0, callback: (v, i) => showAt.has(i) ? xLabels[i] : '' } },
+        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' kt' } },
+      },
+    },
+  });
+}
+
+// Heroes = trailing 12 months (current annual demand), in million tonnes
+function renderStats(rows) {
+  const last12 = rows.slice(-12);
+  const sum = k => last12.reduce((s, r) => s + (r[k] || 0), 0) / 1000; // Mt
+  const road = sum('petrol') + sum('diesel_road');
+  const tiles = [
+    { label: 'All oil products', val: fmt(sum('total')), sub: 'Mt &middot; last 12 months' },
+    { label: 'Road fuels', val: fmt(road), sub: 'Mt &middot; petrol + diesel' },
+    { label: 'Aviation (jet)', val: fmt(sum('jet_fuel')), sub: 'Mt &middot; last 12 months' },
+  ];
+  document.getElementById('stats-row').innerHTML = tiles.map(t => `
+    <div class="stat-card highlight">
+      <div class="stat-label">${t.label}</div>
+      <div class="stat-val">${t.val}</div>
+      <div class="stat-sub">${t.sub}</div>
+    </div>`).join('');
+}
+
+(async () => {
+  try {
+    const [dResp, iResp] = await Promise.all([fetch(SHEET_URL), fetch(IMPORTS_URL)]);
+    if (!dResp.ok) throw new Error(`HTTP ${dResp.status}`);
+    const rows = parseCSV(await dResp.text()).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+    const importRows = iResp.ok ? parseCSV(await iResp.text()).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0) : [];
+
+    document.getElementById('loading').style.display = 'none';
+    if (!rows.length) {
+      document.getElementById('error').style.display = '';
+      document.getElementById('error').textContent = 'No data in the fuel_data tab yet - run the Apps Script (updateAllFuel) and make sure the sheet is published.';
+      return;
+    }
+    document.getElementById('content').style.display = '';
+
+    renderStats(rows);
+
+    const charts = {};
+    const make = (k, f) => { if (charts[k]) charts[k].destroy(); charts[k] = f(); };
+    const latest = new Date(rows[rows.length - 1].date);
+
+    let cutoffStr = '0000';       // current range cutoff (shared with imports)
+    let product = 'total';        // current imports product
+
+    function renderRange(months) {
+      const cutoff = new Date(latest); cutoff.setMonth(cutoff.getMonth() - months);
+      cutoffStr = months >= 9999 ? '0000' : cutoff.toISOString().slice(0, 10);
+      const recent = rows.filter(r => r.date >= cutoffStr);
+
+      // Always monthly — even the 10-year / All views stay as monthly bars
+      make('demand', () => stackedBarChart('demand-chart', recent, FUEL_KEYS, FUEL_LABELS, FUEL_COLORS, false));
+      make('pie',    () => treemapChart('fuel-pie', recent, FUEL_KEYS, FUEL_LABELS, FUEL_COLORS));
+      renderImports();
+    }
+
+    function renderImports() {
+      if (!importRows.length) return;
+      make('imports-tree', () => importsTreemap('imports-tree', importRows, product, cutoffStr));
+      const s = importsSeries(importRows, product, cutoffStr, false);
+      make('imports', () => stackedBarChart('imports-chart', s.rows, s.keys, s.keys, s.colors, false, { unit: '%', max: 100 }));
+    }
+
+    const buttons = document.querySelectorAll('#range-controls .range-btn');
+    buttons.forEach(b => b.addEventListener('click', () => {
+      buttons.forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      renderRange(parseInt(b.dataset.months, 10));
+    }));
+
+    const pButtons = document.querySelectorAll('#product-controls .range-btn');
+    pButtons.forEach(b => b.addEventListener('click', () => {
+      pButtons.forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      product = b.dataset.product;
+      renderImports();
+    }));
+
+    // Fixed full-history road-fuel line (independent of range)
+    make('road', () => roadChart('road-chart', rows));
+
+    const init = document.querySelector('#range-controls .range-btn.active');
+    renderRange(parseInt(init.dataset.months, 10));
+
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = '';
+    document.getElementById('error').textContent = 'Failed to load data: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>

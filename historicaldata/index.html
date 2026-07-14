@@ -19,6 +19,7 @@
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     .charts-grid {
@@ -54,7 +55,11 @@
         <p class="chart-p">Absolute electricity generation in terawatt-hours by fuel type each year since 2012. The steep decline in coal and steady growth of wind and solar is clear - as is the overall fall in total generation driven by efficiency improvements and reduced industrial demand. The most recent year is partial.</p>
         <div style="position:relative; height:440px;">
           <div class="chart-loading" id="twh-chart-loading"></div>
-          <canvas id="twh-chart"></canvas>
+          <canvas id="twh-chart" data-share
+            data-share-title="GB annual generation by fuel type"
+            data-share-subtitle="Terawatt hours per year since 2012"
+            data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+            data-share-filename="mygridgb-annual-generation-twh"></canvas>
         </div>
       </div>
       <div>
@@ -62,7 +67,11 @@
         <p class="chart-p">How Britain's electricity generation mix has changed since 2012. Coal has been almost entirely replaced by renewables and gas; wind and solar have grown from a small fraction to major contributors. Each bar shows the proportional share of generation from each fuel type for that year.</p>
         <div style="position:relative; height:440px;">
           <div class="chart-loading" id="history-chart-loading"></div>
-          <canvas id="history-chart"></canvas>
+          <canvas id="history-chart" data-share
+            data-share-title="GB annual electricity mix"
+            data-share-subtitle="Share of generation by fuel type since 2012"
+            data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+            data-share-filename="mygridgb-annual-mix"></canvas>
         </div>
       </div>
     </div>
@@ -70,7 +79,11 @@
     <p style="color:var(--muted); margin-bottom:16px;">Megatons of CO₂ equivalent from British electricity generation each year. The long-term downward trend reflects the rapid decarbonisation of the grid. The most recent bar is a partial estimate based on data available so far this year.</p>
     <div style="position:relative; height:300px;">
       <div class="chart-loading" id="carbon-emissions-chart-loading"></div>
-      <canvas id="carbon-emissions-chart"></canvas>
+      <canvas id="carbon-emissions-chart" data-share
+        data-share-title="GB electricity annual carbon emissions"
+        data-share-subtitle="Megatonnes of CO2 per year"
+        data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+        data-share-filename="mygridgb-annual-carbon"></canvas>
     </div>
   </main>
   <div id="sidebar-placeholder"></div>

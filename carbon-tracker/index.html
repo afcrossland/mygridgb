@@ -19,6 +19,7 @@
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     .chart-section {
@@ -43,25 +44,47 @@
 <div class="page-wrap">
   <main>
     <h1 class="page-title">Carbon Tracker</h1>
-    <p class="page-intro">Tracking how many hours each year the GB grid runs at or below the government's 2030 clean power target carbon intensity. The more hours at the target, the closer we are to a decarbonised grid.</p>
+    <p class="page-intro">Tracking Great Britain's energy carbon dioxide - from electricity, gas and transport fuels - and how many hours each year the grid runs at the government's 2030 clean power target.</p>
+
+    <!-- Sector carbon: electricity + gas + oil, monthly -->
+    <div class="chart-section">
+      <h2>UK energy CO<sub>2</sub> by sector, per month</h2>
+      <p>Monthly CO<sub>2</sub> from burning energy in Great Britain, split with no double-counting into <strong>electricity</strong> generation, <strong>gas</strong> for heating and industry, and <strong>oil</strong> broken down by end use - road, aviation, heating and other. It shows how small the power sector's emissions now are next to heating and transport. <a href="/about/#energy-carbon">How this is calculated</a>.</p>
+      <div style="position:relative; height:400px;">
+        <div class="chart-loading" id="sector-chart-loading"></div>
+        <canvas id="sector-chart" data-share
+          data-share-title="GB energy CO2 by sector, per month"
+          data-share-subtitle="Electricity, gas and oil, no double-counting"
+          data-share-source="Source: Elexon/BMRS, Sheffield Solar, National Gas, DESNZ"
+          data-share-filename="mygridgb-energy-co2-sector"></canvas>
+      </div>
+    </div>
 
     <!-- Bar chart: annual hours at target -->
     <div class="chart-section">
-      <h2>Hours at the 2030 target per year</h2>
+      <h2>Hours of electricity at the 2030 target, per year</h2>
       <p>Total hours in each calendar year when GB electricity carbon intensity met the 2030 target. The count rises as more wind, solar and nuclear displace gas - years with higher renewable output typically score more hours. The most recent year may be incomplete.</p>
       <div style="position:relative; height:380px;">
         <div class="chart-loading" id="bar-chart-loading"></div>
-        <canvas id="bar-chart"></canvas>
+        <canvas id="bar-chart" data-share
+          data-share-title="Hours of electricity at the 2030 target, per year"
+          data-share-subtitle="Hours GB met the 2030 carbon-intensity target"
+          data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+          data-share-filename="mygridgb-hours-at-target"></canvas>
       </div>
     </div>
 
     <!-- Line chart: cumulative hours by month -->
     <div class="chart-section">
-      <h2>Cumulative hours at the 2030 target - by year</h2>
+      <h2>Cumulative hours of electricity at the 2030 target, by year</h2>
       <p>How the cumulative count of hours at the target builds through the year, compared across years since 2016. Steeper lines indicate periods of low-carbon generation - typically high wind and solar months. Comparing years shows how the grid is improving over time.</p>
       <div style="position:relative; height:420px;">
         <div class="chart-loading" id="line-chart-loading"></div>
-        <canvas id="line-chart"></canvas>
+        <canvas id="line-chart" data-share
+          data-share-title="Cumulative hours of electricity at the 2030 target"
+          data-share-subtitle="Running total by year"
+          data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+          data-share-filename="mygridgb-cumulative-hours-target"></canvas>
       </div>
     </div>
   </main>
@@ -86,6 +109,103 @@ const hideLoader = id => {
     const t = await r.text();
     return JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table;
   }
+
+  // ── Sector carbon chart (electricity + gas heat/industry + oil transport) ──
+  (async () => {
+    const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const MONI = {}; MON.forEach((m, i) => MONI[m] = i + 1);
+    const OIL_FAC = { petrol: 3.15, diesel_road: 3.17, jet_fuel: 3.15, kerosene_heating: 3.15, red_diesel: 3.19, fuel_oil: 3.20 }; // tCO2/tonne
+    // Oil data is UK-wide; gas & electricity are GB. Scale oil to GB so all three
+    // sectors share one footprint. Most products scale by population (NI ≈ 2.8%),
+    // but HEATING OIL scales down harder: NI heats ~68% of homes with oil vs ~4%
+    // in GB, so NI is roughly a third of UK kerosene — leaving ~70% for GB.
+    const GB_POP_SHARE     = 0.972;
+    const GB_HEATING_SHARE = 0.70;
+    // Oil products grouped by end use, with the GB scaling factor for each group
+    const OIL_GROUPS = [
+      { key: 'road',     label: 'Road (petrol + diesel)', keys: ['petrol', 'diesel_road'],   share: GB_POP_SHARE,     color: '#374151' },
+      { key: 'aviation', label: 'Aviation (jet)',         keys: ['jet_fuel'],                share: GB_POP_SHARE,     color: '#64748b' },
+      { key: 'heating',  label: 'Heating oil',            keys: ['kerosene_heating'],        share: GB_HEATING_SHARE, color: '#94a3b8' },
+      { key: 'other',    label: 'Other oil',              keys: ['red_diesel', 'fuel_oil'],  share: GB_POP_SHARE,     color: '#cbd5e1' },
+    ];
+    const CSV = t => `https://docs.google.com/spreadsheets/d/1sECfXJOZx1MGoRDIllBhPoyijTe0UGri2wBYF-VM5HI/gviz/tq?tqx=out:csv&sheet=${t}`;
+
+    function parseCsv(text) {
+      const lines = text.trim().split('\n');
+      const head = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+      return lines.slice(1).map(line => {
+        const vals = []; let q = false, cur = '';
+        for (const ch of line) {
+          if (ch === '"') { q = !q; continue; }
+          if (ch === ',' && !q) { vals.push(cur); cur = ''; continue; }
+          cur += ch;
+        }
+        vals.push(cur);
+        const o = {}; head.forEach((h, i) => o[h] = (vals[i] || '').replace(/"/g, '').trim());
+        return o;
+      });
+    }
+
+    try {
+      const [genT, carT, gasR, fuelR] = await Promise.all([
+        fetchSheet(`${DATA}/12month-generation.json`),
+        fetchSheet(`${DATA}/12month-carbon.json`),
+        fetch(CSV('data')).then(r => r.text()).then(parseCsv),
+        fetch(CSV('fuel_data')).then(r => r.text()).then(parseCsv),
+      ]);
+
+      const mkey = m => { const [a, b] = m.split('-'); return `20${b}-${String(MONI[a]).padStart(2, '0')}`; };
+      // Electricity monthly MtCO2 = total generation (TWh) x intensity (gCO2/kWh) / 1000
+      const inten = {}; carT.rows.forEach(r => inten[r.c[0].v] = r.c[1] ? r.c[1].v : 0);
+      const elec = {};
+      genT.rows.forEach(r => {
+        const m = r.c[0].v, tot = r.c.slice(1).reduce((s, c) => s + (c ? c.v : 0), 0);
+        if (inten[m] != null) elec[mkey(m)] = tot * inten[m] / 1000;
+      });
+      // Gas heating + industry (exclude power — that's in electricity)
+      const gas = {};
+      gasR.forEach(r => {
+        const d = (r.date || '').slice(0, 7), ldz = parseFloat(r.ldz_total), ind = parseFloat(r.industrial);
+        if (!/^\d{4}-\d{2}$/.test(d) || isNaN(ldz) || isNaN(ind)) return;
+        gas[d] = (gas[d] || 0) + (ldz + ind) * 11 * 0.202 / 1000; // mcm→GWh→ktCO2→MtCO2
+      });
+      // Oil by end-use group (combusted products), scaled UK→GB per group
+      const oilG = {}; OIL_GROUPS.forEach(g => oilG[g.key] = {});
+      fuelR.forEach(r => {
+        const d = (r.date || '').slice(0, 7);
+        if (!/^\d{4}-\d{2}$/.test(d)) return;
+        OIL_GROUPS.forEach(g => {
+          let s = 0; g.keys.forEach(k => { const v = parseFloat(r[k]); if (!isNaN(v)) s += v * OIL_FAC[k]; });
+          oilG[g.key][d] = s / 1000 * g.share; // kt·(tCO2/t)=ktCO2 → MtCO2, UK→GB
+        });
+      });
+
+      const months = Object.keys(elec).filter(m => gas[m] != null && oilG.road[m] != null).sort();
+      const labels = months.map(m => { const [y, mo] = m.split('-'); return MON[+mo - 1] + '-' + y.slice(2); });
+      const ds = (label, src, color) => ({ label, data: months.map(m => +(src[m] || 0).toFixed(2)), backgroundColor: color, borderWidth: 0 });
+
+      new Chart(document.getElementById('sector-chart'), {
+        type: 'bar',
+        data: { labels, datasets: [
+          ...OIL_GROUPS.map(g => ds(g.label, oilG[g.key], g.color)),
+          ds('Gas (heating & industry)', gas, '#f59e0b'),
+          ds('Electricity', elec, '#2f6f9f'),
+        ] },
+        options: {
+          responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: FONT, size: 12 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 10, boxHeight: 10, padding: 16 } },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} MtCO₂` } },
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { family: FONT, size: 11 }, color: '#555', autoSkip: false, maxRotation: 90, minRotation: 0, callback: (v, i) => ['01', '04', '07', '10'].includes(months[i].slice(5)) ? labels[i] : '' } },
+            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'MtCO₂ per month', font: { family: FONT, size: 12 }, color: '#555' }, grid: { color: '#eeeeee' }, ticks: { font: { family: FONT, size: 11 } } },
+          },
+        },
+      });
+      hideLoader('sector-chart');
+    } catch (e) { hideLoader('sector-chart'); }
+  })();
 
   const [barResult, lineResult] = await Promise.allSettled([
     fetchSheet(BAR_URL),
@@ -122,7 +242,7 @@ const hideLoader = id => {
           tooltip: {
             callbacks: {
               title: ctx => ctx[0].label,
-              label: ctx => ` ${ctx.parsed.y.toLocaleString()} hours at target`,
+              label: ctx => ` ${ctx.parsed.y.toLocaleString()} hours of electricity at target`,
             }
           }
         },
@@ -135,7 +255,7 @@ const hideLoader = id => {
             beginAtZero: true,
             title: {
               display: true,
-              text: 'Hours at 2030 target',
+              text: 'Hours of electricity at 2030 target',
               font: { family: FONT, size: 12 },
               color: '#555',
             },
@@ -226,7 +346,7 @@ const hideLoader = id => {
             beginAtZero: true,
             title: {
               display: true,
-              text: 'Cumulative hours at target',
+              text: 'Cumulative hours of electricity at target',
               font: { family: FONT, size: 12 },
               color: '#555',
             },

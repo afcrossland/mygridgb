@@ -19,6 +19,7 @@
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@3.0.0/dist/chartjs-chart-treemap.min.js"></script>
   <style>
@@ -93,7 +94,11 @@
       </div>
       <div style="position:relative; height:360px;">
         <div class="chart-loading" id="treemap-chart-loading"></div>
-        <canvas id="treemap-chart"></canvas>
+        <canvas id="treemap-chart" data-share
+          data-share-title="GB generation mix, last 12 months"
+          data-share-subtitle="Share of electricity by source"
+          data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+          data-share-filename="mygridgb-generation-mix-12m"></canvas>
       </div>
     </div>
 
@@ -112,7 +117,11 @@
       <p>Electricity generation (TWh) by fuel type per month. Winter months typically see higher total generation and more wind; summer brings solar peaks. Gas acts as the primary balancing fuel, rising when renewables are low.</p>
       <div style="position:relative; height:420px;">
         <div class="chart-loading" id="gen-chart-loading"></div>
-        <canvas id="gen-chart"></canvas>
+        <canvas id="gen-chart" data-share
+          data-share-title="GB monthly generation and carbon intensity"
+          data-share-subtitle="Last 12 months, by source"
+          data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+          data-share-filename="mygridgb-generation-12m"></canvas>
       </div>
     </div>
 
@@ -121,7 +130,11 @@
       <p>Average carbon intensity of British electricity (gCO₂eq/kWh) for each month. Carbon intensity falls when wind and solar output is high and rises when gas fills a larger share of demand.</p>
       <div style="position:relative; height:320px;">
         <div class="chart-loading" id="carbon-chart-loading"></div>
-        <canvas id="carbon-chart"></canvas>
+        <canvas id="carbon-chart" data-share
+          data-share-title="GB monthly carbon intensity"
+          data-share-subtitle="Grams of CO2 per kWh, last 12 months"
+          data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+          data-share-filename="mygridgb-carbon-intensity-12m"></canvas>
       </div>
     </div>
 

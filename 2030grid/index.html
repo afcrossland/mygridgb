@@ -21,6 +21,7 @@
   <meta name="twitter:image"       content="https://www.mygridgb.co.uk/images/mygridgb-logo.png">
   <link rel="stylesheet" href="../assets/style.css">
   <script src="../assets/nav.js" defer></script>
+  <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     .section-h2 {
@@ -319,7 +320,11 @@
     </div>
     <div style="position:relative; height:420px;">
       <div class="chart-loading" id="timeseries-chart-loading"></div>
-      <canvas id="timeseries-chart"></canvas>
+      <canvas id="timeseries-chart" data-share
+        data-share-title="The 2030 Blueprint in action"
+        data-share-subtitle="Modelled GB generation and demand"
+        data-share-source="Source: MyGridGB 2030 Blueprint"
+        data-share-filename="mygridgb-2030-blueprint"></canvas>
     </div>
 
     <!-- Curtailment -->
@@ -327,7 +332,11 @@
     <p class="section-p">With 3× more wind and solar, some renewable generation must be curtailed - switched off when output exceeds demand and storage is full. The chart shows what happens to each unit of wind and solar generation under the 2030 Blueprint.</p>
     <div style="position:relative; height:160px;">
       <div class="chart-loading" id="curtailment-chart-loading"></div>
-      <canvas id="curtailment-chart"></canvas>
+      <canvas id="curtailment-chart" data-share
+        data-share-title="Renewable curtailment in the 2030 Blueprint"
+        data-share-subtitle="Wind and solar spilled when supply exceeds demand"
+        data-share-source="Source: MyGridGB 2030 Blueprint"
+        data-share-filename="mygridgb-2030-curtailment"></canvas>
     </div>
 
   </main>
