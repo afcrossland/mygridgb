@@ -965,8 +965,16 @@ const hideLoader = id => {
     'Gas':           '#6b7280', 'Storage':       '#f96c00',
   };
   const STACK_SOURCES = [
-    'Nuclear','Biomass','Large Hydro','Onshore Wind',
-    'Offshore Wind','Solar','Imports','Coal','Gas','Storage',
+    { label: 'Nuclear',       col: 1  },
+    { label: 'Biomass',       col: 2  },
+    { label: 'Large Hydro',   col: 3  },
+    { label: 'Imports',       col: 7  },
+    { label: 'Onshore Wind',  col: 4  },
+    { label: 'Offshore Wind', col: 5  },
+    { label: 'Solar',         col: 6  },
+    { label: 'Coal',          col: 8  },
+    { label: 'Gas',           col: 9  },
+    { label: 'Storage',       col: 10 },
   ];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -985,11 +993,11 @@ const hideLoader = id => {
       return rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
     }
     function weekDatasets(rows) {
-      return STACK_SOURCES.map((name, i) => ({
-        label: name,
-        data: rows.map(r => r.c[i + 1]?.v ?? null),
-        backgroundColor: PALETTE[name],
-        borderColor: PALETTE[name],
+      return STACK_SOURCES.map(({ label, col }) => ({
+        label,
+        data: rows.map(r => r.c[col]?.v ?? null),
+        backgroundColor: PALETTE[label],
+        borderColor: PALETTE[label],
         borderWidth: 0.5,
         fill: true,
         pointRadius: 0,
