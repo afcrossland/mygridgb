@@ -155,8 +155,42 @@
       text-align: center;
       color: var(--muted);
       font-size: 1rem;
-      margin-bottom: 24px;
+      margin-bottom: 12px;
     }
+
+    /* ── Live-data meta (timestamp + refresh) ── */
+    .mix-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .mix-datatime {
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .mix-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a4d7a;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .mix-refresh:hover { border-color: #a8cce4; }
+    .mix-refresh:disabled { opacity: .55; cursor: default; }
+    .mix-refresh .mix-refresh-icon { display: inline-block; }
+    .mix-refresh.spin .mix-refresh-icon { animation: mix-spin .7s linear infinite; }
+    @keyframes mix-spin { to { transform: rotate(360deg); } }
 
     /* ── Pie + fuel list layout ── */
     .mix-layout {
@@ -536,14 +570,14 @@
       <p><em>Charting the decarbonisation of British electricity in real time.</em></p>
     </div>
 
-    <div class="site-intro">
-      <p>Britain is transitioning to low carbon electricity. Coal power stations are being decommissioned and new low carbon power stations are taking their place. But how much can wind turbines, solar farms, biomass and nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide low carbon energy for electric vehicles?</p>
-      <p>MyGridGB charts all of this change. It tells you how much electricity is produced, where that electricity comes from and how much carbon is being emitted - all in real time so you can come back again and again to see how Britain is tracking against carbon targets. <a href="/about/">Read more about MyGridGB.</a></p>
-    </div>
-
     <section>
       <h2 class="mix-title">Britain's Present Electricity Mix</h2>
-      <p class="mix-subtitle" style="margin-bottom:4px;">How is your electricity being generated right now?</p>
+      <div class="mix-meta">
+        <span class="mix-datatime" id="mix-datatime"></span>
+        <button class="mix-refresh" id="mix-refresh" type="button" aria-label="Refresh live data">
+          <span class="mix-refresh-icon" aria-hidden="true">&#8635;</span> Refresh
+        </button>
+      </div>
 
       <!-- Pie left + fuel list right -->
       <div class="mix-layout">
@@ -593,6 +627,11 @@
         <span class="explore-link-title">My 2030 Blueprint →</span>
         <span class="explore-link-desc">My vision for low carbon, low cost British electricity. A simulation replacing gas with wind, solar and storage, run against real weather and demand to show it can work.</span>
       </a>
+    </div>
+
+    <div class="site-intro">
+      <p>Britain is transitioning to low carbon electricity. Coal power stations are being decommissioned and new low carbon power stations are taking their place. But how much can wind turbines, solar farms, biomass and nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide low carbon energy for electric vehicles?</p>
+      <p>MyGridGB charts all of this change. It tells you how much electricity is produced, where that electricity comes from and how much carbon is being emitted - all in real time so you can come back again and again to see how Britain is tracking against carbon targets. <a href="/about/">Read more about MyGridGB.</a></p>
     </div>
 
     <section style="margin:32px 0;">
@@ -738,19 +777,24 @@ const hideLoader = id => {
 
 
   async function fetchSheet(url) {
-    const resp = await fetch(url);
+    // Cache-bust so refreshes bypass the raw.githubusercontent CDN cache
+    const bust = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+    const resp = await fetch(bust, { cache: 'no-store' });
     const text = await resp.text();
     return JSON.parse(text.slice(text.indexOf('(') + 1, text.lastIndexOf(')'))).table;
   }
 
-  const [mixResult, historyResult] = await Promise.allSettled([
-    fetchSheet(MIX_URL),
-    fetchSheet(HISTORY_URL),
-  ]);
+  let mixChart = null;
+
+  // Column label reads e.g. "Electricity mix at 08:00am on 26 July 2026"
+  function fmtDataTime(label) {
+    const m = String(label || '').match(/mix at\s+(.+)/i);
+    return m ? m[1].trim() : '';
+  }
 
   // ── Stats + pie from mix sheet ───────────────────────────────
-  if (mixResult.status === 'fulfilled') {
-    const { rows } = mixResult.value;
+  function renderMix(table) {
+    const { rows } = table;
 
     const labels = [], values = [], bgColors = [];
     let totalGW = 0, lowCarbonGW = 0, carbonWeighted = 0;
@@ -787,6 +831,10 @@ const hideLoader = id => {
       document.getElementById('stat-independence').textContent = energyIndPct;
       document.getElementById('stat-carbon').textContent       = carbonIntensity;
 
+      // Clear any colour classes from a previous render before re-colouring
+      ['lowcarbon-card','generation-card','independence-card','carbon-card'].forEach(id =>
+        document.getElementById(id).classList.remove('stat-card--low','stat-card--mid','stat-card--high'));
+
       // Colour each card
       document.getElementById('lowcarbon-card').classList.add(
         lowCarbonPct > 80 ? 'stat-card--low' : lowCarbonPct > 60 ? 'stat-card--mid' : 'stat-card--high');
@@ -809,6 +857,7 @@ const hideLoader = id => {
       .sort((a, b) => b.value - a.value);
 
     const listEl = document.getElementById('fuel-list');
+    listEl.innerHTML = '';
     sorted.forEach(({ label, value, color, pct }) => {
       const row = document.createElement('div');
       row.className = 'fuel-row';
@@ -824,7 +873,8 @@ const hideLoader = id => {
     });
 
     hideLoader('mix-chart');
-    new Chart(document.getElementById('mix-chart'), {
+    if (mixChart) mixChart.destroy();
+    mixChart = new Chart(document.getElementById('mix-chart'), {
       type: 'pie',
       data: {
         labels,
@@ -849,6 +899,7 @@ const hideLoader = id => {
       }
     });
 
+    document.getElementById('mix-chartshare').innerHTML = '';
     ChartShare.attach('mix-chart', {
       title: "Great Britain's present electricity mix",
       subtitle: 'Live generation by source',
@@ -864,8 +915,11 @@ const hideLoader = id => {
   }
 
   // ── Carbon intensity bar chart ───────────────────────────────
-  if (historyResult.status === 'fulfilled') {
-    const rows = historyResult.value.rows;
+  async function loadHistory() {
+    let table;
+    try { table = await fetchSheet(HISTORY_URL); }
+    catch (e) { console.error('History load error:', e); return; }
+    const rows = table.rows;
     const years = rows.map(r => Math.round(r.c[0].v));
     const colB  = rows.map(r => r.c[1]?.v ?? null);
     const colC  = rows.map(r => r.c[2]?.v ?? null);
@@ -920,6 +974,32 @@ const hideLoader = id => {
       }
     });
   }
+
+  // ── Live-mix loader (fetch + render + timestamp) ─────────────
+  async function loadMix() {
+    const btn = document.getElementById('mix-refresh');
+    if (btn) { btn.disabled = true; btn.classList.add('spin'); }
+    try {
+      const table = await fetchSheet(MIX_URL);
+      renderMix(table);
+      const cap = document.getElementById('mix-datatime');
+      if (cap) {
+        const dt = fmtDataTime(table.cols?.[1]?.label);
+        cap.textContent = [dt && ('Data for ' + dt), 'updates every 15 min']
+          .filter(Boolean).join(' · ');
+      }
+    } catch (e) {
+      console.error('Mix load error:', e);
+    } finally {
+      if (btn) { btn.disabled = false; btn.classList.remove('spin'); }
+    }
+  }
+
+  document.getElementById('mix-refresh')?.addEventListener('click', loadMix);
+  loadMix();
+  loadHistory();
+  // Source publishes every 15 min; poll every 5 min to catch new data promptly
+  setInterval(loadMix, 5 * 60 * 1000);
 })();
 
 // ── 2030 Countdown ─────────────────────────────────────────────
