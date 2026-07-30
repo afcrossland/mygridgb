@@ -985,7 +985,7 @@ const hideLoader = id => {
       const cap = document.getElementById('mix-datatime');
       if (cap) {
         const dt = fmtDataTime(table.cols?.[1]?.label);
-        cap.textContent = [dt && ('Data for ' + dt), 'updates every 15 min']
+        cap.textContent = [dt && ('Data for ' + dt), 'updates every 30 min']
           .filter(Boolean).join(' · ');
       }
     } catch (e) {
