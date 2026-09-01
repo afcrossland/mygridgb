@@ -75,7 +75,7 @@ function liveData() {
   // fuel types and latest generation data
     var fuelTypes = getFuelTypes()
     Logger.log(fuelTypes)
-    var bmDataString = getDataFromElexon_v2();
+    var bmDataString = getDataFromElexon_v3();
 
     // get PV generation from PV live
     try {

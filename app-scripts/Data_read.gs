@@ -10,6 +10,44 @@ function getDataFromElexon_v2() {
   return bmdata
 }
 
+function getDataFromElexon_v3() {
+  // used for live data from August 2026
+  // Same output shape as getDataFromElexon_v2, so getGenValue_v2 reads it unchanged,
+  // but exports keep their sign: the FUELINSTHHCUR feed used by _v2 floors negative
+  // interconnector and pumped storage values to zero, FUELINST does not.
+  var now = new Date();
+  var from = Utilities.formatDate(new Date(now.getTime() - 45*60*1000), "UTC", "yyyy-MM-dd'T'HH:mm'Z'");
+  var to   = Utilities.formatDate(new Date(now.getTime() +  5*60*1000), "UTC", "yyyy-MM-dd'T'HH:mm'Z'");
+  var url  = "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELINST/stream?publishDateTimeFrom=" + from + "&publishDateTimeTo=" + to;
+
+  var records = JSON.parse(UrlFetchApp.fetch(url).toString());
+
+  if (records.length == 0) {
+    Logger.log("No FUELINST records in window - falling back to outturn/current")
+    return getDataFromElexon_v2().toString()
+  }
+
+  // the window holds several publications (one every 5 mins), keep the most recent
+  var latest = records[0].publishTime;
+  for (var i = 1; i < records.length; i++) {
+    if (records[i].publishTime > latest) { latest = records[i].publishTime; }
+  }
+
+  var snapshot = records.filter(function(item) {
+    return item.publishTime === latest;
+  }).map(function(item) {
+    return {
+      fuelType: item.fuelType,
+      currentUsage: item.generation,
+      publishTime: item.publishTime,
+      startTime: item.startTime
+    };
+  });
+
+  Logger.log("FUELINST snapshot at " + latest + ", " + snapshot.length + " fuel types")
+  return JSON.stringify(snapshot)
+}
+
 // ELEXON DATA - PROCESS
 function getGenValue_v2(bmData, fuelType) {
   var obj = JSON.parse(bmData);

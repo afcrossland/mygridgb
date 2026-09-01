@@ -630,7 +630,7 @@
     </div>
 
     <div class="site-intro">
-      <p>Britain is transitioning to low carbon electricity. Coal power stations are being decommissioned and new low carbon power stations are taking their place. But how much can wind turbines, solar farms, biomass and nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide low carbon energy for electric vehicles?</p>
+      <p>Britain is transitioning to low carbon electricity. Coal power stations are being decommissioned and new low carbon power stations are taking their place. But how much can wind turbines, solar farms, energy storage and nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide low carbon energy for electric vehicles?</p>
       <p>MyGridGB charts all of this change. It tells you how much electricity is produced, where that electricity comes from and how much carbon is being emitted - all in real time so you can come back again and again to see how Britain is tracking against carbon targets. <a href="/about/">Read more about MyGridGB.</a></p>
     </div>
 
@@ -772,8 +772,13 @@ const hideLoader = id => {
     'Imports':       300,
   };
 
-  // Low carbon = everything except Coal, Gas, Imports
-  const LOW_CARBON = new Set(['Nuclear','Biomass','Wind','Wind*','Embedded Wind','Solar','Large Hydro','Hydro','Storage']);
+  // Low carbon = a life-cycle intensity below 100 gCO2eq/kWh, taken straight from
+  // CARBON_FACTORS above so the two stat cards can never disagree. This excludes
+  // Biomass (230), Imports (300), Gas (490) and Coal (820).
+  const LOW_CARBON_MAX = 100;
+  const LOW_CARBON = new Set(
+    Object.keys(CARBON_FACTORS).filter(source => CARBON_FACTORS[source] < LOW_CARBON_MAX)
+  );
 
 
   async function fetchSheet(url) {
