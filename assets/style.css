@@ -16,11 +16,52 @@
   --bg:           #FAFAFA;
   --surface:      #FFFFFF;
   --nav-bg:       #0d1f35;
+  --overlay:      rgba(255,255,255,.88);
+  --bad:          #ef4444;
+  --chart-bar-strong: #222222;
   --sidebar-width: 260px;
   --nav-height:   60px;
   --radius:       10px;
   --shadow-sm:    0 1px 2px rgba(0,0,0,.04);
   --shadow:       0 1px 3px rgba(0,0,0,.04);
+}
+
+/* ===== DARK MODE =====
+   Follows the OS by default; an explicit choice from the theme toggle
+   (assets/nav.js) sets data-theme and wins over the OS setting either way. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --brand:        #6fb3e0;
+    --brand-dark:   #9fd6f5;
+    --brand-bg:     #16324a;
+    --green:        #4faadb;
+    --green-light:  #7cc4e8;
+    --green-bg:     #16324a;
+    --text:         #E7ECF3;
+    --muted:        #93A5BB;
+    --border:       #223349;
+    --bg:           #0B1420;
+    --surface:      #101C2B;
+    --overlay:      rgba(16,28,43,.88);
+    --bad:          #f87171;
+    --chart-bar-strong: #94a3b8;
+  }
+}
+:root[data-theme="dark"] {
+  --brand:        #6fb3e0;
+  --brand-dark:   #9fd6f5;
+  --brand-bg:     #16324a;
+  --green:        #4faadb;
+  --green-light:  #7cc4e8;
+  --green-bg:     #16324a;
+  --text:         #E7ECF3;
+  --muted:        #93A5BB;
+  --border:       #223349;
+  --bg:           #0B1420;
+  --surface:      #101C2B;
+  --overlay:      rgba(16,28,43,.88);
+  --bad:          #f87171;
+  --chart-bar-strong: #94a3b8;
 }
 
 body {
@@ -164,6 +205,32 @@ nav ul ul li a:hover {
   color: #fff;
   text-decoration: none;
 }
+
+/* ===== THEME TOGGLE ===== */
+#theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.85);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s;
+}
+#theme-toggle:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.3); }
+#theme-toggle svg { width: 17px; height: 17px; }
+#theme-toggle .icon-moon { display: block; }
+#theme-toggle .icon-sun  { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #theme-toggle .icon-moon { display: none; }
+  :root:not([data-theme="light"]) #theme-toggle .icon-sun  { display: block; }
+}
+:root[data-theme="dark"] #theme-toggle .icon-moon { display: none; }
+:root[data-theme="dark"] #theme-toggle .icon-sun  { display: block; }
 
 /* Mobile hamburger */
 #nav-toggle {
@@ -314,10 +381,10 @@ nav ul ul li a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.88);
+  background: var(--overlay);
   z-index: 10;
   border-radius: 6px;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.35s ease, background .2s;
 }
 .chart-loading.done { opacity: 0; pointer-events: none; }
 .chart-loading::after {
@@ -325,7 +392,7 @@ nav ul ul li a:hover {
   width: 36px;
   height: 36px;
   border: 3px solid rgba(26,77,122,0.15);
-  border-top-color: #1a4d7a;
+  border-top-color: var(--brand);
   border-radius: 50%;
   animation: chart-spin 0.75s linear infinite;
 }

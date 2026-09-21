@@ -308,6 +308,14 @@ const hideLoader = id => {
       genChart.options.scales.x.ticks.callback = genTickCallback(lbls);
       genChart.update('none');
     });
+
+    // Deep-link support: ?window=7 preselects the "Last 7 days" filter
+    // (used when arriving from the homepage's "Last 7 days" tab).
+    const requestedWindow = new URLSearchParams(location.search).get('window');
+    if (requestedWindow) {
+      const btn = document.querySelector(`#gen-filter .filter-btn[data-hours="${requestedWindow === '7' ? 168 : requestedWindow}"]`);
+      btn?.click();
+    }
   }
   // ── Carbon intensity line chart ──────────────────────────────────
   if (carbonResult.status === 'fulfilled') {
