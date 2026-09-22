@@ -33,7 +33,7 @@
     <p class="page-intro">British electricity generation over the last 28 days. Data sources: MyGridGB, Elexon Portal, Sheffield University.</p>
 
     <!-- Treemap -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:24px 0 8px;">Generation mix share</h2>
+    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:24px 0 8px;">Generation mix share</h2>
     <p style="color:var(--muted); margin-bottom:16px;">Each tile shows the average contribution of a fuel type to British electricity over the last 28 days, sized by its share of the mix. In windy periods, renewables dominate; gas and nuclear fill the gaps when weather-dependent generation is low.</p>
     <div style="position:relative; height:420px;">
       <div class="chart-loading" id="treemap-chart-loading"></div>
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Stacked area -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:32px 0 12px;">Hourly electricity generation</h2>
+    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:32px 0 12px;">Hourly electricity generation</h2>
     <p style="color:var(--muted); margin-bottom:20px;">Hourly generation across the last 28 days, showing how the electricity mix shifts through the day and across weather patterns. Solar peaks sharply around midday in bright weather. Wind can supply the majority of demand for sustained periods, then drop to near zero as weather fronts pass - these fluctuations drive the need for flexible backup from gas and storage.</p>
     <div class="filter-bar" id="gen-filter">
       <span class="filter-bar-label">Show:</span>
@@ -63,7 +63,7 @@
     </div>
 
     <!-- Carbon intensity -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:40px 0 12px;">Carbon intensity</h2>
+    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:40px 0 12px;">Carbon intensity</h2>
     <p style="color:var(--muted); margin-bottom:20px;">Hourly carbon intensity of British electricity over the last 28 days (gCO₂eq/kWh). The red line marks the 2030 clean power target of 100 gCO₂eq/kWh. Intensity falls when renewables are generating strongly and rises when gas fills a larger share of demand.</p>
     <div style="position:relative; height:320px;">
       <div class="chart-loading" id="carbon-intensity-chart-loading"></div>
@@ -75,7 +75,7 @@
     </div>
 
     <!-- Conversion & grid losses -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:#1a4d7a; margin:40px 0 12px;">Conversion &amp; grid losses</h2>
+    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:40px 0 12px;">Conversion &amp; grid losses</h2>
     <p style="color:var(--muted); margin-bottom:20px;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram shows total TWh over the last 28 days - every unit of energy from source to delivered electricity.</p>
     <div style="position:relative; height:500px; width:100%;">
       <div class="chart-loading" id="sankey-chart-loading"></div>
@@ -91,6 +91,12 @@ const hideLoader = id => {
   if (!el) return;
   el.classList.add('done');
   setTimeout(() => el.remove(), 380);
+};
+const themeColor = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const themeColorAlpha = (name, alpha) => {
+  const hex = themeColor(name).replace('#', '');
+  const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 };
 (async () => {
   const DATA = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data';
@@ -176,7 +182,7 @@ const hideLoader = id => {
             return PALETTE[ctx.raw._data.source] ?? '#9CA3AF';
           },
           borderWidth: 2,
-          borderColor: '#fff',
+          borderColor: themeColor('--surface'),
           labels: {
             display: 'auto',
             formatter(ctx) {
@@ -255,6 +261,7 @@ const hideLoader = id => {
               pointStyle: 'circle',
               boxWidth: 10,
               boxHeight: 10,
+              color: themeColor('--text'),
             }
           },
           tooltip: {
@@ -272,6 +279,7 @@ const hideLoader = id => {
               minRotation: 90,
               autoSkip: false,
               callback: genTickCallback(initLabels),
+              color: themeColor('--muted'),
             },
             grid: { display: false }
           },
@@ -283,13 +291,14 @@ const hideLoader = id => {
               display: true,
               text: 'Power, GW',
               font: { family: "'Segoe UI', Arial, sans-serif", size: 12 },
-              color: '#555'
+              color: themeColor('--muted')
             },
             ticks: {
               font: { family: "'Segoe UI', Arial, sans-serif", size: 11 },
-              stepSize: 5
+              stepSize: 5,
+              color: themeColor('--muted'),
             },
-            grid: { color: '#eeeeee' }
+            grid: { color: themeColor('--border') }
           }
         }
       }
@@ -339,8 +348,8 @@ const hideLoader = id => {
         datasets: [{
           label: 'Carbon intensity',
           data: ciData,
-          borderColor: '#1a4d7a',
-          backgroundColor: 'rgba(26,77,122,0.08)',
+          borderColor: themeColor('--brand'),
+          backgroundColor: themeColorAlpha('--brand', 0.08),
           borderWidth: 1.5,
           fill: true,
           pointRadius: 0,
@@ -359,10 +368,10 @@ const hideLoader = id => {
             annotations: {
               target: {
                 type: 'line', yMin: 100, yMax: 100,
-                borderColor: '#ef4444', borderWidth: 2,
+                borderColor: themeColor('--bad'), borderWidth: 2,
                 label: {
                   display: true, content: '2030 Target', position: 'end',
-                  yAdjust: -14, backgroundColor: 'transparent', color: '#ef4444',
+                  yAdjust: -14, backgroundColor: 'transparent', color: themeColor('--bad'),
                   font: { family: "'DM Sans', sans-serif", size: 13, weight: '600' }, padding: 0
                 }
               }
@@ -374,15 +383,16 @@ const hideLoader = id => {
             ticks: {
               font: { family: "'Segoe UI', Arial, sans-serif", size: 10 },
               maxRotation: 45, minRotation: 0, autoSkip: false,
-              callback: (_, idx) => ciShowAt.has(idx) ? ciLabels[idx] : ''
+              callback: (_, idx) => ciShowAt.has(idx) ? ciLabels[idx] : '',
+              color: themeColor('--muted'),
             },
             grid: { display: false }
           },
           y: {
             beginAtZero: true,
-            title: { display: true, text: 'gCO₂eq/kWh', font: { family: "'Segoe UI', Arial, sans-serif", size: 12 }, color: '#555' },
-            ticks: { font: { family: "'Segoe UI', Arial, sans-serif", size: 11 } },
-            grid: { color: '#eeeeee' }
+            title: { display: true, text: 'gCO₂eq/kWh', font: { family: "'Segoe UI', Arial, sans-serif", size: 12 }, color: themeColor('--muted') },
+            ticks: { font: { family: "'Segoe UI', Arial, sans-serif", size: 11 }, color: themeColor('--muted') },
+            grid: { color: themeColor('--border') }
           }
         }
       }
@@ -476,7 +486,7 @@ const hideLoader = id => {
           type: 'sankey', orientation: 'h', arrangement: 'fixed',
           node: {
             pad: 14, thickness: 20,
-            line: { color: '#fff', width: 0.5 },
+            line: { color: themeColor('--surface'), width: 0.5 },
             label: sankeyData.nodeLabels, color: sankeyData.nodeColors,
             x: sankeyData.nodeX, y: sankeyData.nodeY,
             hoverinfo: 'none',
@@ -487,7 +497,7 @@ const hideLoader = id => {
             hoverinfo: 'none',
           },
         }], {
-          font: { family: "'DM Sans','Segoe UI',Arial,sans-serif", size: 11.5, color: '#0F172A' },
+          font: { family: "'DM Sans','Segoe UI',Arial,sans-serif", size: 11.5, color: themeColor('--text') },
           paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
           margin: { l: 10, r: 10, t: 10, b: 10 },
         }, { responsive: true, displayModeBar: false });
