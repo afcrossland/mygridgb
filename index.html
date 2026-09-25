@@ -87,6 +87,7 @@
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/nav.js" defer></script>
   <script src="assets/chartshare.js" defer></script>
+  <script src="assets/solar-calc.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
@@ -415,6 +416,19 @@
     }
     .view-tab:hover  { color: var(--text); }
     .view-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+    .view-tab--solar {
+      background: #f59e0b;
+      color: #1c1917;
+      font-weight: 700;
+      border-radius: 6px 6px 0 0;
+      padding-left: 10px;
+      padding-right: 10px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .view-tab--solar:hover { color: #1c1917; background: #fbbf24; }
+    .view-tab--solar.active { color: #1c1917; border-bottom-color: #1c1917; background: #fbbf24; }
     .view-pane { display: none; }
     .view-pane.active { display: block; }
 
@@ -445,6 +459,175 @@
       text-transform: uppercase;
       letter-spacing: .06em;
       color: var(--muted);
+    }
+
+    /* ── Solar Calculator tab ── */
+    .solar-calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    @media (max-width: 700px) {
+      .solar-calc-grid { grid-template-columns: 1fr; gap: 28px; }
+    }
+    .solar-promo-panel { margin: 8px 0; }
+    .solar-postcode-label {
+      display: block;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .solar-postcode-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .solar-postcode-input {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      padding: 10px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      width: 220px;
+      max-width: 100%;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .solar-postcode-input:focus { border-color: #f59e0b; }
+    .solar-promo-cta {
+      display: inline-block;
+      background: #f59e0b;
+      color: #1c1917;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: opacity .15s, transform .1s;
+    }
+    .solar-promo-cta:hover { opacity: .9; text-decoration: none; color: #1c1917; transform: translateY(-1px); }
+    .solar-promo-cta:disabled { opacity: .6; cursor: default; transform: none; }
+    .solar-pc-error {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #dc2626;
+    }
+
+    /* ── Left column: postcode + resulting system config ── */
+    .solar-result-location {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .solar-config-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .solar-config-chip {
+      border: 1px solid var(--border);
+      border-left: 3px solid #f59e0b;
+      border-radius: 8px;
+      padding: 10px 18px;
+    }
+    .solar-config-chip-val {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .solar-config-chip-unit { font-size: .85rem; font-weight: 500; color: var(--muted); margin-left: 2px; }
+    .solar-config-chip-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .panel-array {
+      display: grid;
+      grid-template-columns: repeat(4, 9px);
+      grid-auto-rows: 7px;
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+    .panel-cell {
+      background: linear-gradient(135deg, #1e3a5f, #0c2036);
+      border: 1px solid #3b5a7a;
+      border-radius: 1px;
+    }
+    .battery-icon, .cost-icon { display: block; margin-bottom: 8px; }
+    .solar-config-chip-val--range {
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+    .solar-result-assumptions {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .solar-result-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .solar-secondary-cta {
+      display: inline-block;
+      background: var(--surface);
+      color: var(--brand);
+      border: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color .15s, color .15s;
+    }
+    .solar-secondary-cta:hover { border-color: var(--brand); text-decoration: none; }
+
+    /* ── Right column: saving as income lines ── */
+    .solar-income-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .solar-income-list { margin-bottom: 20px; }
+    .solar-income-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .solar-income-label { color: var(--text); }
+    .solar-income-val {
+      font-weight: 600;
+      color: #15803d;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .solar-income-total {
+      border-top: 2px solid var(--text);
+      margin-top: 2px;
+      padding-top: 12px;
+    }
+    .solar-income-total .solar-income-label { font-weight: 700; }
+    .solar-income-total .solar-income-val {
+      font-size: 1.4rem;
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-weight: 400;
+      color: #b45309;
     }
 
     /* ── Mission intro ── */
@@ -497,6 +680,7 @@
     <section class="data-card">
       <div class="view-tabs" id="view-tabs" role="tablist">
         <button class="view-tab active" data-view="live" role="tab" aria-selected="true">Live</button>
+        <button class="view-tab view-tab--solar" data-view="solar" role="tab" aria-selected="false">Solar Calculator</button>
         <button class="view-tab" data-view="recent-7" data-hours="168" role="tab" aria-selected="false">Last 7 days</button>
         <button class="view-tab" data-view="recent-28" data-hours="672" role="tab" aria-selected="false">Last 28 days</button>
         <button class="view-tab" data-view="12mo" role="tab" aria-selected="false">Last 12 months</button>
@@ -659,6 +843,86 @@
         </div>
         <a class="pane-detail-link" href="/2030grid/">Full simulation, incl. cost &amp; curtailment →</a>
       </div>
+
+      <div class="view-pane" id="view-solar" data-view-pane>
+        <h2 class="sr-only">Home Solar Calculator</h2>
+        <p style="color:var(--muted); font-size:14px; margin-bottom:20px;">Enter your postcode for an instant estimate of what solar could do for your home.</p>
+
+        <div class="solar-calc-grid">
+          <div class="solar-calc-col">
+            <div class="solar-promo-panel" id="solar-form-state">
+              <label class="solar-postcode-label" for="home-pc-input">Enter your postcode or address - we use it to look up how much sunshine your area gets</label>
+              <div class="solar-postcode-row">
+                <input id="home-pc-input" class="solar-postcode-input" type="text" placeholder="e.g. SW1A 1AA or 14 Green Lane, Sheffield" autocomplete="off">
+                <button id="home-pc-btn" class="solar-promo-cta" type="button">Find location →</button>
+              </div>
+              <p id="home-pc-error" class="solar-pc-error" hidden></p>
+            </div>
+
+            <div class="solar-result-config" id="solar-result-config" hidden>
+              <div class="solar-result-location" id="solar-result-location"></div>
+              <div class="solar-config-chips">
+                <div class="solar-config-chip">
+                  <div class="panel-array" aria-hidden="true">
+                    <span class="panel-cell"></span><span class="panel-cell"></span><span class="panel-cell"></span><span class="panel-cell"></span>
+                    <span class="panel-cell"></span><span class="panel-cell"></span><span class="panel-cell"></span><span class="panel-cell"></span>
+                    <span class="panel-cell"></span><span class="panel-cell"></span><span class="panel-cell"></span><span class="panel-cell"></span>
+                  </div>
+                  <div class="solar-config-chip-val">12</div>
+                  <div class="solar-config-chip-label">panels</div>
+                </div>
+                <div class="solar-config-chip">
+                  <svg class="battery-icon" viewBox="0 0 44 24" width="44" height="24" aria-hidden="true">
+                    <rect x="1.5" y="1.5" width="37" height="21" rx="4" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                    <rect x="40" y="8" width="3" height="8" rx="1.5" fill="#f59e0b"/>
+                    <rect x="5" y="5" width="30" height="14" rx="1.5" fill="#f59e0b"/>
+                  </svg>
+                  <div class="solar-config-chip-val">10<span class="solar-config-chip-unit">kWh</span></div>
+                  <div class="solar-config-chip-label">battery</div>
+                </div>
+                <div class="solar-config-chip">
+                  <svg class="cost-icon" viewBox="0 0 44 24" width="44" height="24" aria-hidden="true">
+                    <circle cx="12" cy="16" r="6.5" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                    <circle cx="22" cy="12" r="9" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="22" y="15.5" text-anchor="middle" font-size="9" font-weight="700" fill="#f59e0b" font-family="'DM Sans', sans-serif">£</text>
+                  </svg>
+                  <div class="solar-config-chip-val solar-config-chip-val--range" id="solar-cost-range">&mdash;</div>
+                  <div class="solar-config-chip-label">installed cost</div>
+                </div>
+              </div>
+              <p class="solar-result-assumptions">South-facing roof, medium household use, home some of the day.</p>
+            </div>
+          </div>
+
+          <div class="solar-calc-col">
+            <div class="solar-result-panel" id="solar-result-state" hidden>
+              <div class="solar-income-title">Estimated annual saving</div>
+              <div class="solar-income-list">
+                <div class="solar-income-row">
+                  <span class="solar-income-label">Bill saving from solar</span>
+                  <span class="solar-income-val" id="solar-income-bill">&mdash;</span>
+                </div>
+                <div class="solar-income-row">
+                  <span class="solar-income-label">Selling exported power</span>
+                  <span class="solar-income-val" id="solar-income-export">&mdash;</span>
+                </div>
+                <div class="solar-income-row">
+                  <span class="solar-income-label">Battery charging</span>
+                  <span class="solar-income-val" id="solar-income-battery">&mdash;</span>
+                </div>
+                <div class="solar-income-row solar-income-total">
+                  <span class="solar-income-label">Total</span>
+                  <span class="solar-income-val" id="solar-income-total">&mdash;</span>
+                </div>
+              </div>
+              <div class="solar-result-actions">
+                <a href="#" id="solar-result-reset" class="solar-secondary-cta">Try another postcode</a>
+                <a href="/solar-calculator/" id="solar-result-cta" class="solar-promo-cta">Use the full calculator →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <div class="data-card posts-card">
@@ -777,7 +1041,7 @@ const hideLoader = id => {
 
 // ── View tabs (live / last 7 days / last 28 days / decarbonising) ─
 const charts = {};
-const PANE_FOR_VIEW = { live: 'live', 'recent-7': 'recent', 'recent-28': 'recent', decarb: 'decarb', '12mo': '12mo', history: 'history', blueprint: 'blueprint' };
+const PANE_FOR_VIEW = { live: 'live', 'recent-7': 'recent', 'recent-28': 'recent', decarb: 'decarb', '12mo': '12mo', history: 'history', blueprint: 'blueprint', solar: 'solar' };
 document.getElementById('view-tabs')?.addEventListener('click', e => {
   const btn = e.target.closest('.view-tab');
   if (!btn) return;
@@ -796,6 +1060,86 @@ document.getElementById('view-tabs')?.addEventListener('click', e => {
       view === 'recent-7' ? '/last-28-days/?window=7' : '/last-28-days/';
   }
 });
+
+// ── Solar Calculator tab: inline quick estimate ───────────────────
+// Beginner-mode preset: medium demand, 12-panel south-facing roof,
+// 5kWh battery, home some of the day. Uses the same SolarCalc engine
+// (assets/solar-calc.js) as the full calculator, so the numbers agree.
+(() => {
+  const input        = document.getElementById('home-pc-input');
+  const btn          = document.getElementById('home-pc-btn');
+  const errorEl       = document.getElementById('home-pc-error');
+  const formState      = document.getElementById('solar-form-state');
+  const configState    = document.getElementById('solar-result-config');
+  const resultState    = document.getElementById('solar-result-state');
+  const locationEl     = document.getElementById('solar-result-location');
+  const costRangeEl    = document.getElementById('solar-cost-range');
+  const billEl         = document.getElementById('solar-income-bill');
+  const exportIncomeEl = document.getElementById('solar-income-export');
+  const batteryEl      = document.getElementById('solar-income-battery');
+  const totalEl        = document.getElementById('solar-income-total');
+  const ctaEl          = document.getElementById('solar-result-cta');
+  const resetLink      = document.getElementById('solar-result-reset');
+  if (!input || !btn) return;
+
+  const PRESET = {
+    arrays: [{ panels: 12, azimuth: 0, tilt: 35 }], // 12 panels, south-facing, typical 35° pitch
+    battery: 10,
+    archtype: 'inhalftheday',                        // "sometimes home" during the day
+    demand: 2700,                                     // medium household use
+    importP: 0.247, exportP: 0.07, cheapP: 0.07,
+    inflRate: 1.03, houseVal: 0, plugIn: false,
+  };
+
+  // Kick the (small) data load off as soon as this tab exists, not on click.
+  let dataLoadPromise = null;
+  const ensureData = () => (dataLoadPromise ||= SolarCalc.loadData('/solar-calculator'));
+  ensureData().catch(() => {});
+
+  async function go() {
+    const pc = input.value.trim();
+    if (!pc) { input.focus(); return; }
+    errorEl.hidden = true;
+    btn.disabled = true;
+    btn.textContent = 'Looking up…';
+    try {
+      await ensureData();
+      const loc = await SolarCalc.resolveLocation(pc);
+      const r = SolarCalc.runCalc({ ...PRESET, zoneKey: loc.zoneKey });
+      if (!r) throw new Error('calculation unavailable');
+
+      locationEl.textContent    = loc.displayCode;
+      costRangeEl.textContent   = '£' + r.costs[0].toLocaleString() + ' – £' + r.costs[2].toLocaleString();
+      billEl.textContent         = '£' + r.importSaved.toLocaleString();
+      exportIncomeEl.textContent = '£' + r.exportEarned.toLocaleString();
+      batteryEl.textContent      = '£' + r.arbitrageSaving.toLocaleString();
+      totalEl.textContent        = '£' + r.totalSaving.toLocaleString();
+      ctaEl.href = '/solar-calculator/?postcode=' + encodeURIComponent(pc);
+
+      formState.hidden = true;
+      configState.hidden = false;
+      resultState.hidden = false;
+    } catch (e) {
+      console.error('Homepage solar estimate error:', e);
+      errorEl.textContent = 'Location not recognised - try a postcode (e.g. SW1A 1AA) or a street address';
+      errorEl.hidden = false;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Find location →';
+    }
+  }
+
+  btn.addEventListener('click', go);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  resetLink?.addEventListener('click', e => {
+    e.preventDefault();
+    configState.hidden = true;
+    resultState.hidden = true;
+    formState.hidden = false;
+    input.value = '';
+    input.focus();
+  });
+})();
 
 (async () => {
   const DATA = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data';
