@@ -31,20 +31,20 @@
 
     .range-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
     .range-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
-    .range-btn:hover { border-color: #a8cce4; color: #1a4d7a; }
-    .range-btn.active { background: #1a4d7a; border-color: #1a4d7a; color: #fff; }
+    .range-btn:hover { border-color: #a8cce4; color: var(--brand); }
+    .range-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
 
     .sliders { display:flex; flex-wrap:wrap; gap:26px; margin: 4px 0 22px; }
     .sliders label { font-size:13.5px; color:var(--muted); display:flex; flex-direction:column; gap:7px; min-width:280px; flex:1; }
     .sliders .sl-top { display:flex; justify-content:space-between; }
-    .sliders b { color:#1a4d7a; font-size:15px; font-variant-numeric: tabular-nums; }
-    .sliders input[type=range] { width:100%; accent-color:#1a4d7a; }
+    .sliders b { color:var(--brand); font-size:15px; font-variant-numeric: tabular-nums; }
+    .sliders input[type=range] { width:100%; accent-color:var(--brand); }
 
     .chart-section { margin-bottom: 48px; }
-    .chart-section h2 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; font-weight: 400; color: #1a4d7a; margin-bottom: 6px; }
+    .chart-section h2 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.4rem; font-weight: 400; color: var(--brand); margin-bottom: 6px; }
     .chart-section p { color: var(--muted); font-size: 14px; line-height: 1.65; margin-bottom: 16px; }
     .loading-state { text-align: center; padding: 56px 20px; color: var(--muted); }
-    .loading-state::before { content:''; display:block; width:32px; height:32px; border:3px solid rgba(26,77,122,.15); border-top-color:#1a4d7a; border-radius:50%; animation:spin .75s linear infinite; margin:0 auto 16px; }
+    .loading-state::before { content:''; display:block; width:32px; height:32px; border:3px solid rgba(26,77,122,.15); border-top-color:var(--brand); border-radius:50%; animation:spin .75s linear infinite; margin:0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .error-state { background:#fef2f2; border:1px solid #fca5a5; border-radius:var(--radius); padding:16px 20px; color:#991b1b; font-size:14px; margin-bottom:24px; }
     .data-note { font-size: 12.5px; color: var(--muted); margin-top: 8px; font-style: italic; }

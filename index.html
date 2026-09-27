@@ -463,17 +463,17 @@
     .pane-detail-link {
       display: inline-block;
       margin-top: 16px;
-      background: var(--surface);
-      color: var(--brand);
-      border: 1px solid var(--border);
+      background: var(--brand);
+      color: #fff;
+      border: 1px solid var(--brand);
       font-size: 13px;
       font-weight: 600;
       padding: 9px 18px;
       border-radius: 8px;
       text-decoration: none;
-      transition: border-color .15s, background .15s;
+      transition: background .15s, border-color .15s;
     }
-    .pane-detail-link:hover { border-color: var(--brand); background: var(--brand-bg); text-decoration: none; }
+    .pane-detail-link:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; text-decoration: none; }
 
     /* ── Blueprint tab: today vs blueprint comparison ── */
     .blueprint-compare {

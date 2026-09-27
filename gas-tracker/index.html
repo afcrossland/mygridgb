@@ -77,10 +77,10 @@
       cursor: pointer;
       transition: background .15s, color .15s, border-color .15s;
     }
-    .range-btn:hover { border-color: #a8cce4; color: #1a4d7a; }
+    .range-btn:hover { border-color: #a8cce4; color: var(--brand); }
     .range-btn.active {
-      background: #1a4d7a;
-      border-color: #1a4d7a;
+      background: var(--brand);
+      border-color: var(--brand);
       color: #fff;
     }
 
@@ -92,14 +92,14 @@
       line-height: 1.7;
     }
     .assump li { margin-bottom: 4px; }
-    .assump strong { color: #1a4d7a; }
+    .assump strong { color: var(--brand); }
 
     .chart-section { margin-bottom: 48px; }
     .chart-section h2 {
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 1.4rem;
       font-weight: 400;
-      color: #1a4d7a;
+      color: var(--brand);
       margin-bottom: 6px;
     }
     .chart-section p {
@@ -120,7 +120,7 @@
       width: 32px;
       height: 32px;
       border: 3px solid rgba(26,77,122,.15);
-      border-top-color: #1a4d7a;
+      border-top-color: var(--brand);
       border-radius: 50%;
       animation: spin .75s linear infinite;
       margin: 0 auto 16px;
@@ -265,6 +265,7 @@
 </div>
 
 <script>
+const themeColor = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1sECfXJOZx1MGoRDIllBhPoyijTe0UGri2wBYF-VM5HI/gviz/tq?tqx=out:csv&sheet=data';
 
 const DEMAND_KEYS   = ['ldz_total', 'power', 'industrial', 'exports', 'storage_injection'];
@@ -390,7 +391,7 @@ const importExportLabels = {
     const { ctx, chartArea: { left, right, top, bottom }, scales: { y } } = chart;
     const zeroY = Math.max(top, Math.min(bottom, y.getPixelForValue(0)));
     ctx.save();
-    ctx.strokeStyle = '#94a3b8';
+    ctx.strokeStyle = themeColor('--muted');
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(left, zeroY); ctx.lineTo(right, zeroY); ctx.stroke();
     ctx.font = '700 11px ' + FONT;
@@ -444,13 +445,13 @@ function stackedBarChart(canvasId, rows, keys, labels, colors, opts = {}) {
         x: {
           stacked: true, grid: { display: false },
           ticks: {
-            font: { family: FONT, size: 11 }, color: '#94a3b8', autoSkip: false, maxRotation: 90, minRotation: 0,
+            font: { family: FONT, size: 11 }, color: themeColor('--muted'), autoSkip: false, maxRotation: 90, minRotation: 0,
             callback: (val, index) => (showLabelAt.has(index) ? xLabels[index] : ''),
           },
         },
         y: {
-          stacked: true, grid: { color: '#f1f5f9' },
-          ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' GWh' },
+          stacked: true, grid: { color: themeColor('--border') },
+          ticks: { font: { family: FONT, size: 11 }, color: themeColor('--muted'), callback: v => fmt(v) + ' GWh' },
         },
       },
     },
@@ -473,7 +474,7 @@ function treemapChart(canvasId, rows, keys, labels, colors) {
       datasets: [{
         tree, key: 'value',
         backgroundColor: ctx => (ctx.type !== 'data' ? 'transparent' : (ctx.raw._data.color || '#9CA3AF')),
-        borderWidth: 2, borderColor: '#fff', spacing: 0,
+        borderWidth: 2, borderColor: themeColor('--surface'), spacing: 0,
         labels: {
           display: 'auto', color: '#fff', padding: 6,
           font: { family: FONT, size: 13, weight: '600' },
@@ -524,8 +525,8 @@ function annualSourcesChart(canvasId, rows) {
         },
       },
       scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { family: FONT, size: 12 }, color: '#94a3b8' } },
-        y: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' TWh' } },
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: FONT, size: 12 }, color: themeColor('--muted') } },
+        y: { stacked: true, grid: { color: themeColor('--border') }, ticks: { font: { family: FONT, size: 11 }, color: themeColor('--muted'), callback: v => fmt(v) + ' TWh' } },
       },
     },
   });
@@ -578,13 +579,13 @@ function heatPumpChart(canvasId, rows) {
         x: {
           grid: { display: false },
           ticks: {
-            font: { family: FONT, size: 11 }, color: '#94a3b8', autoSkip: false, maxRotation: 90, minRotation: 0,
+            font: { family: FONT, size: 11 }, color: themeColor('--muted'), autoSkip: false, maxRotation: 90, minRotation: 0,
             callback: (val, index) => (showLabelAt.has(index) ? xLabels[index] : ''),
           },
         },
         y: {
-          beginAtZero: true, grid: { color: '#f1f5f9' },
-          ticks: { font: { family: FONT, size: 11 }, color: '#94a3b8', callback: v => fmt(v) + ' GWh' },
+          beginAtZero: true, grid: { color: themeColor('--border') },
+          ticks: { font: { family: FONT, size: 11 }, color: themeColor('--muted'), callback: v => fmt(v) + ' GWh' },
         },
       },
     },

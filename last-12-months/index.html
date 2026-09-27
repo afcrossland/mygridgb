@@ -64,7 +64,7 @@
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 1.4rem;
       font-weight: 400;
-      color: #1a4d7a;
+      color: var(--brand);
       margin-bottom: 6px;
     }
     .chart-section p {
@@ -104,7 +104,7 @@
 
     <!-- ── Column charts shared filter ───────────────── -->
     <div>
-      <h2 style="font-family:'DM Serif Display',Georgia,serif; font-size:1.4rem; font-weight:400; color:#1a4d7a; margin-bottom:10px;">Monthly generation &amp; carbon intensity</h2>
+      <h2 style="font-family:'DM Serif Display',Georgia,serif; font-size:1.4rem; font-weight:400; color:var(--brand); margin-bottom:10px;">Monthly generation &amp; carbon intensity</h2>
       <div class="filter-bar" id="column-filter">
         <span class="filter-bar-label">Show:</span>
         <button class="filter-btn active" data-months="12">12 months</button>
@@ -151,6 +151,7 @@
 </div>
 
 <script>
+const themeColor = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const hideLoader = id => {
   const el = document.getElementById(id + '-loading');
   if (!el) return;
@@ -230,7 +231,7 @@ const hideLoader = id => {
           return PALETTE[ctx.raw._data.source] ?? '#9CA3AF';
         },
         borderWidth: 2,
-        borderColor: '#fff',
+        borderColor: themeColor('--surface'),
         labels: {
           display: 'auto',
           formatter(ctx) {
@@ -307,10 +308,10 @@ const hideLoader = id => {
             display: true,
             text: 'Energy, TWh',
             font: { family: FONT, size: 12 },
-            color: '#555'
+            color: themeColor('--muted')
           },
           ticks: { font: { family: FONT, size: 11 } },
-          grid: { color: '#eeeeee' }
+          grid: { color: themeColor('--border') }
         }
       }
     }
@@ -353,10 +354,10 @@ const hideLoader = id => {
             display: true,
             text: 'gCO₂eq/kWh',
             font: { family: FONT, size: 12 },
-            color: '#555'
+            color: themeColor('--muted')
           },
           ticks: { font: { family: FONT, size: 11 } },
-          grid: { color: '#eeeeee' }
+          grid: { color: themeColor('--border') }
         }
       }
     }
@@ -456,7 +457,7 @@ const hideLoader = id => {
           type: 'sankey', orientation: 'h', arrangement: 'fixed',
           node: {
             pad: 14, thickness: 20,
-            line: { color: '#fff', width: 0.5 },
+            line: { color: themeColor('--surface'), width: 0.5 },
             label: sankeyData.nodeLabels, color: sankeyData.nodeColors,
             x: sankeyData.nodeX, y: sankeyData.nodeY,
             hoverinfo: 'none',
@@ -467,7 +468,7 @@ const hideLoader = id => {
             hoverinfo: 'none',
           },
         }], {
-          font: { family: FONT, size: 11.5, color: '#0F172A' },
+          font: { family: FONT, size: 11.5, color: themeColor('--text') },
           paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
           margin: { l: 10, r: 10, t: 10, b: 10 },
         }, { responsive: true, displayModeBar: false });

@@ -28,7 +28,7 @@
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 1.4rem;
       font-weight: 400;
-      color: #1a4d7a;
+      color: var(--brand);
       margin: 40px 0 8px;
     }
     .section-p {
@@ -166,7 +166,7 @@
       border-radius: 6px;
     }
     .compare-panel-title--now {
-      color: #1a4d7a;
+      color: var(--brand);
       background: var(--brand-bg);
     }
     .compare-panel-title--manifesto {
@@ -211,7 +211,7 @@
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 1.2rem;
       font-weight: 400;
-      color: #1a4d7a;
+      color: var(--brand);
       background: var(--surface);
       user-select: none;
       list-style: none;
@@ -344,6 +344,7 @@
 </div>
 
 <script>
+const themeColor = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const hideLoader = id => {
   const el = document.getElementById(id + '-loading');
   if (!el) return;
@@ -622,7 +623,7 @@ const hideLoader = id => {
         type: 'pie',
         data: {
           labels: entries.map(e => e.label),
-          datasets: [{ data: entries.map(e => e.value), backgroundColor: entries.map(e => e.color), borderColor: '#fff', borderWidth: 2, hoverOffset: 6 }]
+          datasets: [{ data: entries.map(e => e.value), backgroundColor: entries.map(e => e.color), borderColor: themeColor('--surface'), borderWidth: 2, hoverOffset: 6 }]
         },
         options: {
           responsive: true,
@@ -746,9 +747,9 @@ const hideLoader = id => {
             stacked: true,
             beginAtZero: true,
             min: 0,
-            title: { display: true, text: 'Power, GW', font: { family: FONT, size: 12 }, color: '#555' },
+            title: { display: true, text: 'Power, GW', font: { family: FONT, size: 12 }, color: themeColor('--muted') },
             ticks: { font: { family: FONT, size: 11 } },
-            grid: { color: '#eeeeee' }
+            grid: { color: themeColor('--border') }
           }
         }
       }
@@ -801,7 +802,7 @@ const hideLoader = id => {
           x: {
             stacked: true, min: 0, max: 1,
             ticks: { font: { family: FONT, size: 11 }, callback: v => Math.round(v * 100) + '%' },
-            grid: { color: '#eeeeee' }
+            grid: { color: themeColor('--border') }
           },
           y: {
             stacked: true,

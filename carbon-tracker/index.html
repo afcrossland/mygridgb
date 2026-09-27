@@ -29,7 +29,7 @@
       font-family: 'DM Serif Display', Georgia, serif;
       font-size: 1.4rem;
       font-weight: 400;
-      color: #1a4d7a;
+      color: var(--brand);
       margin-bottom: 6px;
     }
     .chart-section p {
@@ -92,6 +92,7 @@
 </div>
 
 <script>
+const themeColor = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const hideLoader = id => {
   const el = document.getElementById(id + '-loading');
   if (!el) return;
@@ -198,8 +199,8 @@ const hideLoader = id => {
             tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)} MtCO₂` } },
           },
           scales: {
-            x: { stacked: true, grid: { display: false }, ticks: { font: { family: FONT, size: 11 }, color: '#555', autoSkip: false, maxRotation: 90, minRotation: 0, callback: (v, i) => ['01', '04', '07', '10'].includes(months[i].slice(5)) ? labels[i] : '' } },
-            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'MtCO₂ per month', font: { family: FONT, size: 12 }, color: '#555' }, grid: { color: '#eeeeee' }, ticks: { font: { family: FONT, size: 11 } } },
+            x: { stacked: true, grid: { display: false }, ticks: { font: { family: FONT, size: 11 }, color: themeColor('--muted'), autoSkip: false, maxRotation: 90, minRotation: 0, callback: (v, i) => ['01', '04', '07', '10'].includes(months[i].slice(5)) ? labels[i] : '' } },
+            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'MtCO₂ per month', font: { family: FONT, size: 12 }, color: themeColor('--muted') }, grid: { color: themeColor('--border') }, ticks: { font: { family: FONT, size: 11 } } },
           },
         },
       });
@@ -257,10 +258,10 @@ const hideLoader = id => {
               display: true,
               text: 'Hours of electricity at 2030 target',
               font: { family: FONT, size: 12 },
-              color: '#555',
+              color: themeColor('--muted'),
             },
             ticks: { font: { family: FONT, size: 11 } },
-            grid: { color: '#eeeeee' },
+            grid: { color: themeColor('--border') },
           }
         }
       }
@@ -348,10 +349,10 @@ const hideLoader = id => {
               display: true,
               text: 'Cumulative hours of electricity at target',
               font: { family: FONT, size: 12 },
-              color: '#555',
+              color: themeColor('--muted'),
             },
             ticks: { font: { family: FONT, size: 11 } },
-            grid: { color: '#eeeeee' },
+            grid: { color: themeColor('--border') },
           }
         }
       }

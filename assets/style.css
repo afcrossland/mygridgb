@@ -26,13 +26,9 @@
   --shadow:       0 1px 3px rgba(0,0,0,.04);
 }
 
-/* ===== DARK MODE — TEMPORARILY DISABLED =====
-   Site-wide dark mode is still being audited page-by-page (headings and
-   Chart.js/Plotly colors on several pages don't yet adapt). Disabled here
-   so the site is safe to push in the meantime. To re-enable: delete this
-   comment wrapper (and the matching closing comment below) and un-hide
-   #theme-toggle in assets/nav.js. */
-/*
+/* ===== DARK MODE =====
+   Follows the OS by default; an explicit choice from the theme toggle
+   (assets/nav.js) sets data-theme and wins over the OS setting either way. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --brand:        #cfe7fa;
@@ -67,8 +63,6 @@
   --bad:          #f87171;
   --chart-bar-strong: #94a3b8;
 }
-*/
-/* ===== END DARK MODE (disabled) ===== */
 
 body {
   font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
@@ -212,11 +206,8 @@ nav ul ul li a:hover {
   text-decoration: none;
 }
 
-/* ===== THEME TOGGLE (hidden while dark mode is disabled — see above) ===== */
+/* ===== THEME TOGGLE ===== */
 #theme-toggle {
-  display: none;
-}
-#theme-toggle.old-display {
   display: inline-flex;
   align-items: center;
   justify-content: center;
