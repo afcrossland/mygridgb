@@ -100,6 +100,8 @@
     }
     @media (max-width: 640px) {
       .stat-strip { grid-template-columns: repeat(2, 1fr); }
+      .stat-num { font-size: 2rem; }
+      .stat-card { padding: 16px 14px; }
     }
 
     .stat-card {
@@ -109,6 +111,7 @@
       padding: 20px 22px;
       text-align: left;
       transition: border-color .2s;
+      min-width: 0;
     }
 
     .stat-label {
