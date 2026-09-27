@@ -53,7 +53,7 @@
       color: var(--brand);
     }
     .filter-btn.active {
-      background: var(--brand);
+      background: var(--brand-solid);
       color: #fff;
       border-color: var(--brand);
     }
@@ -168,7 +168,7 @@ const hideLoader = id => {
     'Biomass':     '#824e1a',
     'Wind':        '#0d9e6e',
     'Solar':       '#f59e0b',
-    'Coal':        '#111827',
+    'Coal':        themeColor('--coal'),
     'Gas':         '#6b7280',
     'Storage':     '#f96c00',
     'Large Hydro': '#3b82f6',
@@ -326,7 +326,7 @@ const hideLoader = id => {
       labels: carbonInit.map(r => r.c[0].v),
       datasets: [{
         data: carbonInit.map(r => r.c[1]?.v ?? 0),
-        backgroundColor: '#111827',
+        backgroundColor: themeColor('--coal'),
         borderWidth: 0,
         categoryPercentage: 0.75,
         barPercentage: 0.85,

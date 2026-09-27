@@ -19,6 +19,13 @@
   --overlay:      rgba(255,255,255,.88);
   --bad:          #ef4444;
   --chart-bar-strong: #222222;
+  /* Solid-fill button/tag colours: unlike --brand/--brand-dark (which lighten
+     in dark mode for text legibility on a dark page), these stay constant so
+     white text on a solid-colour button/tag keeps working in both themes. */
+  --brand-solid:      #1a4d7a;
+  --brand-solid-dark: #143d61;
+  /* Coal needs to lighten in dark mode - #111827 is invisible on a dark card. */
+  --coal:         #111827;
   --sidebar-width: 260px;
   --nav-height:   60px;
   --radius:       10px;
@@ -45,6 +52,7 @@
     --overlay:      rgba(16,28,43,.88);
     --bad:          #f87171;
     --chart-bar-strong: #94a3b8;
+    --coal:         #9ca3af;
   }
 }
 :root[data-theme="dark"] {
@@ -62,6 +70,7 @@
   --overlay:      rgba(16,28,43,.88);
   --bad:          #f87171;
   --chart-bar-strong: #94a3b8;
+  --coal:         #9ca3af;
 }
 
 body {
@@ -607,4 +616,4 @@ nav ul ul li a:hover {
   transition: background .15s, color .15s, border-color .15s;
 }
 .filter-btn:hover  { border-color: var(--brand); color: var(--brand); }
-.filter-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+.filter-btn.active { background: var(--brand-solid); color: #fff; border-color: var(--brand-solid); }

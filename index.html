@@ -371,7 +371,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .06em;
-      background: var(--brand);
+      background: var(--brand-solid);
       color: #fff;
       padding: 2px 7px;
       border-radius: 4px;
@@ -463,9 +463,9 @@
     .pane-detail-link {
       display: inline-block;
       margin-top: 16px;
-      background: var(--brand);
+      background: var(--brand-solid);
       color: #fff;
-      border: 1px solid var(--brand);
+      border: 1px solid var(--brand-solid);
       font-size: 13px;
       font-weight: 600;
       padding: 9px 18px;
@@ -473,7 +473,7 @@
       text-decoration: none;
       transition: background .15s, border-color .15s;
     }
-    .pane-detail-link:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; text-decoration: none; }
+    .pane-detail-link:hover { background: var(--brand-solid-dark); border-color: var(--brand-solid-dark); color: #fff; text-decoration: none; }
 
     /* ── Blueprint tab: today vs blueprint comparison ── */
     .blueprint-compare {
@@ -1322,7 +1322,7 @@ updateTabArrows();
     'Wind':          '#0d9e6e',
     'Embedded Wind': '#5cc9a0',
     'Solar':         '#f59e0b',
-    'Coal':          '#111827',
+    'Coal':          themeColor('--coal'),
     'Gas':           '#6b7280',
     'Storage':       '#f96c00',
     'Large Hydro':   '#3b82f6',
@@ -1627,7 +1627,7 @@ updateTabArrows();
     'Nuclear':       '#4ade80', 'Biomass':       '#824e1a',
     'Large Hydro':   '#3b82f6', 'Onshore Wind':  '#0d9e6e',
     'Offshore Wind': '#0b7a56', 'Solar':         '#f59e0b',
-    'Imports':       '#7100e2', 'Coal':          '#111827',
+    'Imports':       '#7100e2', 'Coal':          themeColor('--coal'),
     'Gas':           '#6b7280', 'Storage':       '#f96c00',
   };
   const STACK_SOURCES = [
@@ -1747,7 +1747,7 @@ updateTabArrows();
   const FONT = "'DM Sans','Segoe UI',Arial,sans-serif";
   const PALETTE = {
     'Nuclear': '#4ade80', 'Biomass': '#824e1a', 'Wind': '#0d9e6e', 'Solar': '#f59e0b',
-    'Coal': '#111827', 'Gas': '#6b7280', 'Storage': '#f96c00', 'Large Hydro': '#3b82f6', 'Imports': '#7100e2',
+    'Coal': themeColor('--coal'), 'Gas': '#6b7280', 'Storage': '#f96c00', 'Large Hydro': '#3b82f6', 'Imports': '#7100e2',
   };
   const SOURCES = [
     { label: 'Nuclear', col: 1 }, { label: 'Biomass', col: 2 }, { label: 'Wind', col: 3 },
@@ -1799,7 +1799,7 @@ updateTabArrows();
   const SOURCES = [
     { label: 'Nuclear', color: '#4ade80', col: 1 }, { label: 'Biomass', color: '#824e1a', col: 2 },
     { label: 'Wind', color: '#0d9e6e', col: 3 }, { label: 'Solar', color: '#f59e0b', col: 4 },
-    { label: 'Large Hydro', color: '#3b82f6', col: 5 }, { label: 'Coal', color: '#111827', col: 6 },
+    { label: 'Large Hydro', color: '#3b82f6', col: 5 }, { label: 'Coal', color: themeColor('--coal'), col: 6 },
     { label: 'Gas', color: '#6b7280', col: 7 }, { label: 'Imports', color: '#7100e2', col: 8 },
   ];
   try {
@@ -2058,9 +2058,27 @@ updateTabArrows();
 })();
 
 // ── Recolour charts when the theme toggle fires ──────────────────
+// Coal's colour is a CSS token (--coal) rather than a fixed hex, since
+// #111827 (near-black) is invisible on a dark card - it needs repainting
+// on every chart that plots it whenever the theme changes.
+function recolorCoal(chart) {
+  if (!chart) return;
+  const coal = themeColor('--coal');
+  const labels = chart.data.labels;
+  const coalIdx = Array.isArray(labels) ? labels.findIndex(l => String(l).split(',')[0].trim() === 'Coal') : -1;
+  if (coalIdx > -1 && Array.isArray(chart.data.datasets[0]?.backgroundColor)) {
+    chart.data.datasets[0].backgroundColor[coalIdx] = coal;
+  }
+  const ds = chart.data.datasets.find(d => d.label === 'Coal');
+  if (ds) {
+    if (ds.backgroundColor) ds.backgroundColor = coal;
+    if (ds.borderColor) ds.borderColor = coal;
+  }
+}
 document.addEventListener('themechange', () => {
   if (charts.live) {
     charts.live.data.datasets[0].borderColor = themeColor('--surface');
+    recolorCoal(charts.live);
     charts.live.update();
   }
   if (charts.decarb) {
@@ -2080,6 +2098,7 @@ document.addEventListener('themechange', () => {
     charts.recent.options.scales.y.title.color = themeColor('--muted');
     charts.recent.options.scales.y.ticks.color = themeColor('--muted');
     charts.recent.options.scales.y.grid.color = themeColor('--border');
+    recolorCoal(charts.recent);
     charts.recent.update();
   }
   ['12mo', 'history', 'blueprintDispatch'].forEach(key => {
@@ -2092,6 +2111,7 @@ document.addEventListener('themechange', () => {
     c.options.scales.y.grid.color = themeColor('--border');
     const curtail = c.data.datasets.find(d => d.label === 'Curtailed');
     if (curtail) curtail.borderColor = themeColor('--bad');
+    recolorCoal(c);
     c.update();
   });
 });

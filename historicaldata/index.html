@@ -107,7 +107,7 @@ const hideLoader = id => {
     { label: 'Wind',        color: '#0d9e6e', col: 3 },
     { label: 'Solar',       color: '#f59e0b', col: 4 },
     { label: 'Large Hydro', color: '#3b82f6', col: 5 },
-    { label: 'Coal',        color: '#111827', col: 6 },
+    { label: 'Coal',        color: themeColor('--coal'), col: 6 },
     { label: 'Gas',         color: '#6b7280', col: 7 },
     { label: 'Imports',     color: '#7100e2', col: 8 },
   ];
@@ -197,7 +197,7 @@ const hideLoader = id => {
     { label: 'Wind',        color: '#0d9e6e', col: 3 },
     { label: 'Solar',       color: '#f59e0b', col: 4 },
     { label: 'Large Hydro', color: '#3b82f6', col: 5 },
-    { label: 'Coal',        color: '#111827', col: 6 },
+    { label: 'Coal',        color: themeColor('--coal'), col: 6 },
     { label: 'Gas',         color: '#6b7280', col: 7 },
     { label: 'Imports',     color: '#7100e2', col: 8 },
   ];
@@ -289,7 +289,7 @@ const hideLoader = id => {
     const labels  = rows.map(r => String(r.c[1]?.v ?? '').match(/(\d{4})/)?.[1] ?? '');
     const values  = rows.map(r => parseFloat(r.c[0]?.v ?? 0));
     const partial = rows.map(r => String(r.c[1]?.v ?? '').includes('so far'));
-    const colors  = rows.map((_, i) => partial[i] ? '#9E9E9E' : '#111827');
+    const colors  = rows.map((_, i) => partial[i] ? '#9E9E9E' : themeColor('--coal'));
 
     hideLoader('carbon-emissions-chart');
     new Chart(document.getElementById('carbon-emissions-chart'), {
