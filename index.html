@@ -100,8 +100,6 @@
     }
     @media (max-width: 640px) {
       .stat-strip { grid-template-columns: repeat(2, 1fr); }
-      .stat-num { font-size: 2rem; }
-      .stat-card { padding: 16px 14px; }
     }
 
     .stat-card {
@@ -136,6 +134,11 @@
       font-weight: 500;
       color: var(--muted);
       margin-left: 3px;
+    }
+    @media (max-width: 640px) {
+      .stat-card { padding: 14px 12px; }
+      .stat-num { font-size: 1.7rem; }
+      .stat-unit { font-size: 0.7rem; }
     }
 
     /* Stat card traffic light */
@@ -677,7 +680,7 @@
 
     <div class="site-intro">
       <p>Britain is transitioning to low carbon electricity. Coal power stations are decommissioned and gas and low carbon power stations are taking their place. But how much can wind turbines, solar farms, energy storage and nuclear power plants reduce carbon emissions? Can Britain keep the lights on? How can Britain provide low carbon energy for electric vehicles and heat pumps?</p>
-      <p>MyGridGB charts this change. It tells you how much electricity is produced, where that electricity comes from and how much carbon is being emitted - all in real time so you can come back again and again to see how Britain is tracking against carbon targets. Read more about MyGridGB <a href="/about/">here</a>.</p>
+      <p>MyGridGB charts this change. It tells you how much electricity is generated, where that electricity comes from and how much CO2 is being created. MyGridGB is real time so you can come back again to see how Britain is tracking against carbon targets. Read more about MyGridGB <a href="/about/">here</a>.</p>
     </div>
 
     <section class="data-card">
