@@ -407,6 +407,27 @@
       scrollbar-width: none;
     }
     .view-tabs::-webkit-scrollbar { display: none; }
+    .view-tabs-wrap { display: flex; align-items: stretch; }
+    .view-tabs-wrap .view-tabs { flex: 1; min-width: 0; }
+    .view-tabs-arrow {
+      display: none;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding-bottom: 12px;
+    }
+    .view-tabs-arrow:hover:not(:disabled) { color: var(--brand); }
+    .view-tabs-arrow:disabled { opacity: .3; cursor: default; }
+    @media (max-width: 700px) {
+      .view-tabs-arrow { display: flex; }
+    }
     .view-tab {
       padding: 4px 2px 12px;
       border: none;
@@ -684,15 +705,19 @@
     </div>
 
     <section class="data-card">
-      <div class="view-tabs" id="view-tabs" role="tablist">
-        <button class="view-tab active" data-view="live" role="tab" aria-selected="true">Live</button>
-        <button class="view-tab view-tab--solar" data-view="solar" role="tab" aria-selected="false">Solar Calculator</button>
-        <button class="view-tab" data-view="recent-7" data-hours="168" role="tab" aria-selected="false">Last 7 days</button>
-        <button class="view-tab" data-view="recent-28" data-hours="672" role="tab" aria-selected="false">Last 28 days</button>
-        <button class="view-tab" data-view="12mo" role="tab" aria-selected="false">Last 12 months</button>
-        <button class="view-tab" data-view="history" role="tab" aria-selected="false">Historical data</button>
-        <button class="view-tab" data-view="decarb" role="tab" aria-selected="false">Carbon Reduction</button>
-        <button class="view-tab" data-view="blueprint" role="tab" aria-selected="false">My 2030 Blueprint</button>
+      <div class="view-tabs-wrap">
+        <button class="view-tabs-arrow view-tabs-arrow--prev" id="view-tabs-prev" type="button" aria-label="Previous view" disabled>‹</button>
+        <div class="view-tabs" id="view-tabs" role="tablist">
+          <button class="view-tab active" data-view="live" role="tab" aria-selected="true">Live</button>
+          <button class="view-tab view-tab--solar" data-view="solar" role="tab" aria-selected="false">Solar Calculator</button>
+          <button class="view-tab" data-view="recent-7" data-hours="168" role="tab" aria-selected="false">Last 7 days</button>
+          <button class="view-tab" data-view="recent-28" data-hours="672" role="tab" aria-selected="false">Last 28 days</button>
+          <button class="view-tab" data-view="12mo" role="tab" aria-selected="false">Last 12 months</button>
+          <button class="view-tab" data-view="history" role="tab" aria-selected="false">Historical data</button>
+          <button class="view-tab" data-view="decarb" role="tab" aria-selected="false">Carbon Reduction</button>
+          <button class="view-tab" data-view="blueprint" role="tab" aria-selected="false">My 2030 Blueprint</button>
+        </div>
+        <button class="view-tabs-arrow view-tabs-arrow--next" id="view-tabs-next" type="button" aria-label="Next view">›</button>
       </div>
 
       <div class="view-pane active" id="view-live" data-view-pane>
@@ -1065,7 +1090,30 @@ document.getElementById('view-tabs')?.addEventListener('click', e => {
     document.getElementById('recent-detail-link').href =
       view === 'recent-7' ? '/last-28-days/?window=7' : '/last-28-days/';
   }
+  updateTabArrows();
 });
+
+// ── Mobile prev/next arrows to step between tabs ──────────────────
+const tabPrevBtn = document.getElementById('view-tabs-prev');
+const tabNextBtn = document.getElementById('view-tabs-next');
+function allTabs() { return Array.from(document.querySelectorAll('#view-tabs .view-tab')); }
+function updateTabArrows() {
+  const tabs = allTabs();
+  const idx = tabs.findIndex(t => t.classList.contains('active'));
+  if (tabPrevBtn) tabPrevBtn.disabled = idx <= 0;
+  if (tabNextBtn) tabNextBtn.disabled = idx >= tabs.length - 1;
+}
+function goToTab(delta) {
+  const tabs = allTabs();
+  const idx = tabs.findIndex(t => t.classList.contains('active'));
+  const next = tabs[idx + delta];
+  if (!next) return;
+  next.click();
+  next.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+}
+tabPrevBtn?.addEventListener('click', () => goToTab(-1));
+tabNextBtn?.addEventListener('click', () => goToTab(1));
+updateTabArrows();
 
 // ── Solar Calculator tab: inline quick estimate ───────────────────
 // Beginner-mode preset: medium demand, 12-panel south-facing roof,
