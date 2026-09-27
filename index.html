@@ -463,30 +463,95 @@
     .pane-detail-link {
       display: inline-block;
       margin-top: 16px;
+      background: var(--surface);
+      color: var(--brand);
+      border: 1px solid var(--border);
       font-size: 13px;
       font-weight: 600;
-      color: var(--brand);
+      padding: 9px 18px;
+      border-radius: 8px;
       text-decoration: none;
+      transition: border-color .15s, background .15s;
     }
-    .pane-detail-link:hover { text-decoration: underline; }
+    .pane-detail-link:hover { border-color: var(--brand); background: var(--brand-bg); text-decoration: none; }
 
-    /* ── Blueprint tab: today vs blueprint mix ── */
-    .blueprint-pies {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      flex-wrap: wrap;
-      margin: 8px 0 4px;
+    /* ── Blueprint tab: today vs blueprint comparison ── */
+    .blueprint-compare {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
-    .blueprint-pie-col { text-align: center; width: 220px; }
-    .blueprint-pie-label {
-      margin-top: 10px;
-      font-size: 12px;
+    @media (max-width: 640px) {
+      .blueprint-compare { grid-template-columns: 1fr; }
+    }
+    .blueprint-metric {
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      min-width: 0;
+    }
+    .blueprint-icon { display: block; margin-bottom: 10px; }
+    .blueprint-metric-label {
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .06em;
       color: var(--muted);
+      margin-bottom: 10px;
     }
+    .blueprint-metric-sub {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--muted);
+      opacity: .8;
+      margin-top: 1px;
+    }
+    .blueprint-metric-vals {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .blueprint-val-before {
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--muted);
+    }
+    .blueprint-arrow { color: var(--muted); font-size: 1.1rem; }
+    .blueprint-val-after {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .blueprint-unit { font-size: .8rem; color: var(--muted); }
+    .blueprint-metric-change {
+      margin-top: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .blueprint-metric-change--good { color: #15803d; }
+    .blueprint-metric-change--bad  { color: #dc2626; }
+    .blueprint-additions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .blueprint-addition {
+      background: var(--brand-bg);
+      color: var(--brand);
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .blueprint-addition-val { font-weight: 700; margin-right: 3px; }
 
     /* ── Solar Calculator tab ── */
     .solar-calc-grid {
@@ -855,24 +920,72 @@
 
       <div class="view-pane" id="view-blueprint" data-view-pane>
         <h2 class="sr-only">My 2030 Blueprint</h2>
-        <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">My vision for low carbon, low cost British electricity. A simulation replacing gas with wind, solar and storage, run against real weather and demand to show it can work.</p>
-        <div class="blueprint-pies">
-          <div class="blueprint-pie-col">
-            <div class="pie-col" style="max-width:220px; height:220px;">
-              <div class="chart-loading" id="blueprint-actual-loading"></div>
-              <canvas id="blueprint-actual-chart"></canvas>
+        <p style="color:var(--muted); font-size:14px; margin-bottom:16px;">My vision for low carbon, low cost British electricity: a simulation replacing gas with wind, solar and storage, run against real weather and demand to show it can work.</p>
+        <div class="blueprint-compare" id="blueprint-compare">
+          <div class="blueprint-metric" id="bp-carbon">
+            <svg class="blueprint-icon" viewBox="0 0 44 32" width="44" height="32" aria-hidden="true">
+              <rect id="bp-carbon-bar-before" x="8" width="10" fill="#94a3b8" rx="1"/>
+              <rect id="bp-carbon-bar-after" x="26" width="10" fill="#22c55e" rx="1"/>
+            </svg>
+            <div class="blueprint-metric-label">Electricity from Fossil Fuels</div>
+            <div class="blueprint-metric-vals">
+              <span class="blueprint-val-before" id="bp-carbon-before">&mdash;</span>
+              <span class="blueprint-arrow">→</span>
+              <span class="blueprint-val-after" id="bp-carbon-after">&mdash;</span>
+              <span class="blueprint-unit">%</span>
             </div>
-            <div class="blueprint-pie-label">Today</div>
+            <div class="blueprint-metric-change" id="bp-carbon-change">&mdash;</div>
           </div>
-          <div class="blueprint-pie-col">
-            <div class="pie-col" style="max-width:220px; height:220px;">
-              <div class="chart-loading" id="blueprint-manifesto-loading"></div>
-              <canvas id="blueprint-manifesto-chart"></canvas>
+          <div class="blueprint-metric" id="bp-independence">
+            <svg class="blueprint-icon" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+              <circle cx="16" cy="16" r="13" fill="none" stroke="var(--border)" stroke-width="5"/>
+              <circle id="bp-independence-arc" cx="16" cy="16" r="13" fill="none" stroke="#15803d" stroke-width="5" stroke-linecap="round" transform="rotate(-90 16 16)"/>
+            </svg>
+            <div class="blueprint-metric-label">Energy Independence</div>
+            <div class="blueprint-metric-vals">
+              <span class="blueprint-val-before" id="bp-independence-before">&mdash;</span>
+              <span class="blueprint-arrow">→</span>
+              <span class="blueprint-val-after" id="bp-independence-after">&mdash;</span>
+              <span class="blueprint-unit">%</span>
             </div>
-            <div class="blueprint-pie-label">Blueprint</div>
+            <div class="blueprint-metric-change" id="bp-independence-change">&mdash;</div>
+          </div>
+          <div class="blueprint-metric" id="bp-cost">
+            <svg class="blueprint-icon" viewBox="0 0 44 24" width="44" height="24" aria-hidden="true">
+              <circle cx="12" cy="16" r="6.5" fill="none" stroke="#f59e0b" stroke-width="2"/>
+              <circle cx="22" cy="12" r="9" fill="none" stroke="#f59e0b" stroke-width="2"/>
+              <text x="22" y="15.5" text-anchor="middle" font-size="9" font-weight="700" fill="#f59e0b" font-family="'DM Sans', sans-serif">£</text>
+            </svg>
+            <div class="blueprint-metric-label">System Cost <span class="blueprint-metric-sub">after economic curtailment</span></div>
+            <div class="blueprint-metric-vals">
+              <span class="blueprint-val-before" id="bp-cost-before">&mdash;</span>
+              <span class="blueprint-arrow">→</span>
+              <span class="blueprint-val-after" id="bp-cost-after">&mdash;</span>
+              <span class="blueprint-unit">£/MWh</span>
+            </div>
+            <div class="blueprint-metric-change" id="bp-cost-change">&mdash;</div>
           </div>
         </div>
-        <a class="pane-detail-link" href="/2030grid/">Full simulation, incl. cost &amp; curtailment →</a>
+
+        <div class="blueprint-additions">
+          <div class="blueprint-addition"><span class="blueprint-addition-val">+3.2 GW</span> nuclear</div>
+          <div class="blueprint-addition"><span class="blueprint-addition-val">×3</span> wind</div>
+          <div class="blueprint-addition"><span class="blueprint-addition-val">×3</span> solar</div>
+          <div class="blueprint-addition"><span class="blueprint-addition-val">200 GWh</span> storage</div>
+        </div>
+
+        <h3 style="font-size:.95rem; font-weight:600; color:var(--text); margin:20px 0 4px;">Blueprint dispatch, last 7 days</h3>
+        <p style="color:var(--muted); font-size:13px; margin-bottom:14px;">The Blueprint's generating capacity, simulated against real weather and demand. The dashed line marks curtailed (surplus, unused) renewable output.</p>
+        <div style="position:relative; height:280px;">
+          <div class="chart-loading" id="blueprint-dispatch-loading"></div>
+          <canvas id="blueprint-dispatch-chart" data-share
+            data-share-title="2030 Blueprint dispatch, last 7 days"
+            data-share-subtitle="Simulated generation by source against real weather and demand"
+            data-share-source="Source: Elexon/BMRS, Sheffield Solar"
+            data-share-filename="mygridgb-blueprint-dispatch"></canvas>
+        </div>
+
+        <a class="pane-detail-link" href="/2030grid/">View detail →</a>
       </div>
 
       <div class="view-pane" id="view-solar" data-view-pane>
@@ -1729,43 +1842,219 @@ updateTabArrows();
   } catch (e) { console.error('Historical chart error:', e); }
 })();
 
-// ── 2030 Blueprint (today vs blueprint mix, mini pies) ─────────────
+// ── 2030 Blueprint: today vs blueprint, summarised as 3 metrics ────
 (async () => {
-  const URL = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data/2030-mix.json';
+  const DATA = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data';
+  const MIX_URL     = `${DATA}/2030-mix.json`;
+  const CURTAIL_URL = `${DATA}/2030-curtailment.json`;
   const SOURCES = [
-    { label: 'Nuclear', col: 1, color: '#4ade80' }, { label: 'Biomass', col: 2, color: '#824e1a' },
-    { label: 'Wind', col: 3, color: '#0d9e6e' }, { label: 'Solar', col: 4, color: '#f59e0b' },
-    { label: 'Gas', col: 5, color: '#6b7280' }, { label: 'Storage', col: 6, color: '#f96c00' },
-    { label: 'Large Hydro', col: 7, color: '#3b82f6' }, { label: 'Imports', col: 8, color: '#7100e2' },
-    { label: 'Coal', col: 9, color: '#111827' },
+    { label: 'Nuclear', col: 1 }, { label: 'Biomass', col: 2 },
+    { label: 'Wind', col: 3 }, { label: 'Solar', col: 4 },
+    { label: 'Gas', col: 5 }, { label: 'Storage', col: 6 },
+    { label: 'Large Hydro', col: 7 }, { label: 'Imports', col: 8 },
+    { label: 'Coal', col: 9 },
   ];
-  function buildPie(canvasId, row) {
-    const entries = SOURCES.map(s => ({ label: s.label, color: s.color, value: row.c[s.col]?.v ?? 0 })).filter(e => e.value > 0);
-    const total = entries.reduce((s, e) => s + e.value, 0);
-    return new Chart(document.getElementById(canvasId), {
-      type: 'pie',
-      data: {
-        labels: entries.map(e => e.label),
-        datasets: [{ data: entries.map(e => e.value), backgroundColor: entries.map(e => e.color), borderColor: themeColor('--surface'), borderWidth: 2, hoverOffset: 6 }],
-      },
+
+  // System LCOE (£/MWh delivered) - same methodology as /2030grid/, mid
+  // scenario (no credit for usefully-consumed curtailed energy).
+  const LCOE_RATES = {
+    Wind: 80, Solar: 60, Biomass: 120, 'Large Hydro': 60,
+    Storage: 90, Imports: 100, Coal: 220,
+  };
+  const GAS_CAPACITY_GW = 35, WINDOW_HOURS = 28 * 24, GAS_LCOE_CAP = 250;
+  function gasLcoeFromRow(row) {
+    const src = SOURCES.find(s => s.label === 'Gas');
+    const gwh = row.c[src.col]?.v ?? 0;
+    if (gwh <= 0) return 160;
+    const lf = Math.max(0.01, gwh / (GAS_CAPACITY_GW * WINDOW_HOURS));
+    return Math.min(GAS_LCOE_CAP, Math.round(16.74 / lf + 104));
+  }
+  // curtailUsefulFrac: fraction of curtailed (surplus) renewable energy assumed
+  // put to economic use (e.g. charging EVs/heat pumps when cheap) rather than wasted.
+  function calcSystemLCOE(row, curtailRows, isBlueprint, curtailUsefulFrac = 0) {
+    let totalCost = 0, totalGWh = 0;
+    const rates = { ...LCOE_RATES, Gas: gasLcoeFromRow(row) };
+    const curtailMap = {};
+    if (isBlueprint && curtailRows) {
+      curtailRows.forEach(r => {
+        const label = r.c[0]?.v;
+        if (label) curtailMap[label] = { directFrac: r.c[1]?.v ?? 0, curtailFrac: r.c[3]?.v ?? 0 };
+      });
+    }
+    SOURCES.forEach(src => {
+      if (src.label === 'Nuclear') return; // excluded: amortised existing fleet vs new-build cost
+      const directGwh = row.c[src.col]?.v ?? 0;
+      if (directGwh <= 0) return;
+      const rate = rates[src.label] ?? 100;
+      const cd = curtailMap[src.label];
+      if (cd && cd.directFrac > 0) {
+        // Sheet value = direct delivery; scale up to total generated (includes via-storage + curtailed)
+        const totalGenerated = directGwh / cd.directFrac;
+        const usefulExtra = totalGenerated * cd.curtailFrac * curtailUsefulFrac;
+        totalCost += totalGenerated * rate;          // pay for all generated, including curtailed
+        totalGWh  += directGwh + usefulExtra;         // denominator = direct + usefully-consumed curtailed
+      } else {
+        totalCost += directGwh * rate;
+        totalGWh += directGwh;
+      }
+    });
+    return totalGWh > 0 ? Math.round(totalCost / totalGWh) : 0;
+  }
+
+  function rowTotals(row) {
+    const totals = {};
+    SOURCES.forEach(({ label, col }) => { totals[label] = row.c[col]?.v ?? 0; });
+    return totals;
+  }
+  function setMetric(prefix, before, after, unit, higherIsBetter) {
+    document.getElementById(`bp-${prefix}-before`).textContent = before.toLocaleString();
+    document.getElementById(`bp-${prefix}-after`).textContent  = after.toLocaleString();
+    const pctChange = before !== 0 ? Math.round((after - before) / before * 100) : 0;
+    const changeEl = document.getElementById(`bp-${prefix}-change`);
+    const improved = higherIsBetter ? after > before : after < before;
+    changeEl.textContent = (pctChange > 0 ? '+' : '') + pctChange + '%';
+    changeEl.classList.add(improved ? 'blueprint-metric-change--good' : 'blueprint-metric-change--bad');
+  }
+  function drawCarbonBars(before, after) {
+    const maxH = 28, base = 30, maxVal = Math.max(before, after, 1);
+    const beforeH = Math.max(2, Math.round(before / maxVal * maxH));
+    const afterH  = Math.max(2, Math.round(after  / maxVal * maxH));
+    const beforeBar = document.getElementById('bp-carbon-bar-before');
+    const afterBar  = document.getElementById('bp-carbon-bar-after');
+    beforeBar.setAttribute('height', beforeH);
+    beforeBar.setAttribute('y', base - beforeH);
+    afterBar.setAttribute('height', afterH);
+    afterBar.setAttribute('y', base - afterH);
+  }
+  function drawIndependenceArc(pct) {
+    const r = 13, circumference = 2 * Math.PI * r;
+    const arc = document.getElementById('bp-independence-arc');
+    arc.setAttribute('stroke-dasharray', `${circumference * pct / 100} ${circumference}`);
+  }
+
+  try {
+    const [mixText, curtailText] = await Promise.all([
+      fetch(MIX_URL).then(r => r.text()),
+      fetch(CURTAIL_URL).then(r => r.text()).catch(() => null),
+    ]);
+    const rows = JSON.parse(mixText.slice(mixText.indexOf('(') + 1, mixText.lastIndexOf(')'))).table.rows;
+    const curtailRows = curtailText
+      ? JSON.parse(curtailText.slice(curtailText.indexOf('(') + 1, curtailText.lastIndexOf(')'))).table.rows
+      : null;
+    const todayRow = rows[0], blueprintRow = rows[1];
+
+    const todayStats      = computeGenerationStats(rowTotals(todayRow));
+    const blueprintStats  = computeGenerationStats(rowTotals(blueprintRow));
+    const todayLcoe        = calcSystemLCOE(todayRow, null, false);
+    // Blueprint cost assumes half of surplus (curtailed) renewable output is put to
+    // economic use - e.g. charging EVs or heat pumps when the grid is oversupplied.
+    const blueprintLcoe    = calcSystemLCOE(blueprintRow, curtailRows, true, 0.5);
+
+    function fossilPct(totals) {
+      const total = Object.values(totals).reduce((s, v) => s + (v || 0), 0);
+      const fossil = (totals.Gas || 0) + (totals.Coal || 0);
+      return total > 0 ? Math.round(fossil / total * 100) : 0;
+    }
+    const todayFossilPct     = fossilPct(rowTotals(todayRow));
+    const blueprintFossilPct = fossilPct(rowTotals(blueprintRow));
+
+    setMetric('carbon', todayFossilPct, blueprintFossilPct, '%', false);
+    setMetric('independence', todayStats.independencePct, blueprintStats.independencePct, '%', true);
+    setMetric('cost', todayLcoe, blueprintLcoe, '£/MWh', false);
+    drawCarbonBars(todayFossilPct, blueprintFossilPct);
+    drawIndependenceArc(blueprintStats.independencePct);
+  } catch (e) { console.error('Blueprint compare error:', e); }
+})();
+
+// ── 2030 Blueprint: simulated dispatch, last 7 days ────────────────
+(async () => {
+  const URL = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data/2030-timeseries.json';
+  const FONT = "'DM Sans','Segoe UI',Arial,sans-serif";
+  const PALETTE = {
+    'Nuclear': '#4ade80', 'Large Hydro': '#3b82f6', 'Wind': '#0d9e6e', 'Solar': '#f59e0b',
+    'Biomass': '#824e1a', 'Storage': '#f96c00', 'Imports': '#7100e2', 'Gas': '#6b7280',
+  };
+  const SOURCES = [
+    { label: 'Nuclear', col: 1 }, { label: 'Large Hydro', col: 2 }, { label: 'Wind', col: 4 },
+    { label: 'Solar', col: 3 }, { label: 'Biomass', col: 5 }, { label: 'Storage', col: 6 },
+    { label: 'Imports', col: 7 }, { label: 'Gas', col: 8 },
+  ];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function parseGDate(v) {
+    const m = String(v).match(/Date\((\d+),(\d+),(\d+)/);
+    return m ? new Date(+m[1], +m[2], +m[3]) : null;
+  }
+  function fmtDate(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+
+  try {
+    const t = await (await fetch(URL)).text();
+    const allRows = JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table.rows;
+    const rows = allRows.slice(-168);
+    const labels = rows.map(r => { const d = parseGDate(r.c[0].v); return d ? fmtDate(d) : ''; });
+    const hasCurtail = rows.some(r => r.c[9]?.v > 0);
+
+    const datasets = SOURCES.map(({ label, col }) => ({
+      label,
+      data: rows.map(r => r.c[col]?.v ?? null),
+      backgroundColor: PALETTE[label],
+      borderColor: PALETTE[label],
+      borderWidth: 0.5,
+      fill: true,
+      pointRadius: 0,
+      tension: 0.2,
+      stack: 'sources',
+    }));
+    if (hasCurtail) {
+      datasets.push({
+        label: 'Curtailed',
+        data: rows.map(r => r.c[9]?.v ?? null),
+        borderColor: themeColor('--bad'),
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        borderDash: [6, 4],
+        fill: false,
+        pointRadius: 0,
+        tension: 0.2,
+        stack: 'curtail',
+      });
+    }
+
+    hideLoader('blueprint-dispatch');
+    charts.blueprintDispatch = new Chart(document.getElementById('blueprint-dispatch-chart'), {
+      type: 'line',
+      data: { labels, datasets },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${Math.round(ctx.parsed / total * 100)}%` } },
+          legend: {
+            position: 'top',
+            labels: { font: { family: FONT, size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle', boxWidth: 9, boxHeight: 9, color: themeColor('--text') },
+          },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) + ' GW' : '—'}` } },
+        },
+        scales: {
+          x: {
+            stacked: true,
+            ticks: {
+              font: { family: FONT, size: 10 }, maxRotation: 0, autoSkip: false, color: themeColor('--muted'),
+              callback: (_, idx) => (labels[idx] !== labels[idx - 1] ? labels[idx] : ''),
+            },
+            grid: { display: false },
+          },
+          y: {
+            stacked: true, beginAtZero: true, min: 0,
+            title: { display: true, text: 'Power, GW', font: { family: FONT, size: 11 }, color: themeColor('--muted') },
+            ticks: { font: { family: FONT, size: 10 }, color: themeColor('--muted') },
+            grid: { color: themeColor('--border') },
+          },
         },
       },
     });
-  }
-  try {
-    const t = await (await fetch(URL)).text();
-    const rows = JSON.parse(t.slice(t.indexOf('(') + 1, t.lastIndexOf(')'))).table.rows;
-    hideLoader('blueprint-actual');
-    hideLoader('blueprint-manifesto');
-    charts.blueprintActual = buildPie('blueprint-actual-chart', rows[0]);
-    charts.blueprintManifesto = buildPie('blueprint-manifesto-chart', rows[1]);
-    charts.blueprint = { resize: () => { charts.blueprintActual.resize(); charts.blueprintManifesto.resize(); } };
-  } catch (e) { console.error('Blueprint chart error:', e); }
+    charts.blueprint = { resize: () => charts.blueprintDispatch?.resize() };
+  } catch (e) { console.error('Blueprint dispatch chart error:', e); }
 })();
 
 // ── Recolour charts when the theme toggle fires ──────────────────
@@ -1793,7 +2082,7 @@ document.addEventListener('themechange', () => {
     charts.recent.options.scales.y.grid.color = themeColor('--border');
     charts.recent.update();
   }
-  ['12mo', 'history'].forEach(key => {
+  ['12mo', 'history', 'blueprintDispatch'].forEach(key => {
     const c = charts[key];
     if (!c) return;
     c.options.plugins.legend.labels.color = themeColor('--text');
@@ -1801,12 +2090,8 @@ document.addEventListener('themechange', () => {
     c.options.scales.y.title.color = themeColor('--muted');
     c.options.scales.y.ticks.color = themeColor('--muted');
     c.options.scales.y.grid.color = themeColor('--border');
-    c.update();
-  });
-  ['blueprintActual', 'blueprintManifesto'].forEach(key => {
-    const c = charts[key];
-    if (!c) return;
-    c.data.datasets[0].borderColor = themeColor('--surface');
+    const curtail = c.data.datasets.find(d => d.label === 'Curtailed');
+    if (curtail) curtail.borderColor = themeColor('--bad');
     c.update();
   });
 });
