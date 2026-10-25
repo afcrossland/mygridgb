@@ -617,3 +617,180 @@ nav ul ul li a:hover {
 }
 .filter-btn:hover  { border-color: var(--brand); color: var(--brand); }
 .filter-btn.active { background: var(--brand-solid); color: #fff; border-color: var(--brand-solid); }
+
+/* ── Shared stat strip (graded traffic-light tiles, e.g. homepage Live tab) ── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 20px 0 28px;
+}
+@media (max-width: 640px) {
+  .stat-strip { grid-template-columns: repeat(2, 1fr); }
+}
+.stat-num {
+  font-size: 2.6rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text);
+  transition: color .3s;
+}
+.stat-unit {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: 3px;
+}
+@media (max-width: 640px) {
+  .stat-strip .stat-card { padding: 14px 12px; }
+  .stat-num { font-size: 1.7rem; }
+  .stat-unit { font-size: 0.7rem; }
+}
+.stat-strip .stat-card {
+  border-left: 3px solid var(--border);
+  text-align: left;
+  transition: border-color .2s;
+}
+.stat-card--low  { border-left-color: #16a34a; }
+.stat-card--mid  { border-left-color: #f59e0b; }
+.stat-card--high { border-left-color: #ef4444; }
+.stat-card--low  .stat-num { color: #15803d; }
+.stat-card--mid  .stat-num { color: #d97706; }
+.stat-card--high .stat-num { color: #dc2626; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .stat-card--low  .stat-num { color: #4ade80; }
+  :root:not([data-theme="light"]) .stat-card--mid  .stat-num { color: #fbbf24; }
+  :root:not([data-theme="light"]) .stat-card--high .stat-num { color: #f87171; }
+}
+:root[data-theme="dark"] .stat-card--low  .stat-num { color: #4ade80; }
+:root[data-theme="dark"] .stat-card--mid  .stat-num { color: #fbbf24; }
+:root[data-theme="dark"] .stat-card--high .stat-num { color: #f87171; }
+
+/* ── Shared stat card (tracker pages: gas/fuel/whole-energy-system etc.) ── */
+.gas-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  min-width: 0;
+}
+.stat-card.highlight {
+  background: var(--brand-bg);
+  border-color: #a8cce4;
+  border-left: 3px solid var(--brand);
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.stat-val {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--brand);
+  line-height: 1.1;
+}
+.stat-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.stat-card .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.stat-sub .up   { color: #b91c1c; font-weight: 600; }
+.stat-sub .down { color: #059669; font-weight: 600; }
+
+/* ── Shared range/filter pill button (tracker pages) ── */
+.range-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.range-btn:hover { border-color: #a8cce4; color: var(--brand); }
+.range-btn.active {
+  background: var(--brand-solid);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+/* ── Shared serif section heading (chart-section / section-h2 patterns) ── */
+.section-h2,
+.chart-section h2 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--brand);
+  margin: 40px 0 8px;
+}
+.section-p,
+.chart-section p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+/* ── Shared before→after comparison metric card (generalised from the homepage's 2030 Blueprint tiles) ── */
+.compare-metric {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  min-width: 0;
+}
+.compare-metric-icon { display: block; margin-bottom: 10px; }
+.compare-metric-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.compare-metric-sub {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+  opacity: .8;
+  margin-top: 1px;
+}
+.compare-metric-vals {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+.compare-metric-before { font-size: 1.4rem; font-weight: 300; color: var(--muted); }
+.compare-metric-arrow  { color: var(--muted); font-size: 1.1rem; }
+.compare-metric-after  { font-size: 1.8rem; font-weight: 700; color: var(--text); }
+.compare-metric-unit   { font-size: .8rem; color: var(--muted); }
+.compare-metric-change { margin-top: 6px; font-size: 13px; font-weight: 600; }
+.compare-metric-change--good { color: #15803d; }
+.compare-metric-change--bad  { color: #dc2626; }

@@ -32,9 +32,29 @@
     <h1 class="page-title">Last 28 Days</h1>
     <p class="page-intro">British electricity generation over the last 28 days. Data sources: MyGridGB, Elexon Portal, Sheffield University.</p>
 
+    <!-- At a glance -->
+    <div class="stat-strip">
+      <div class="stat-card" id="l28-lowcarbon-card">
+        <div class="stat-label">Low Carbon</div>
+        <div class="stat-num"><span id="l28-stat-lowcarbon">&mdash;</span><span class="stat-unit">%</span></div>
+      </div>
+      <div class="stat-card" id="l28-generation-card">
+        <div class="stat-label">Generation</div>
+        <div class="stat-num"><span id="l28-stat-generation">&mdash;</span><span class="stat-unit">TWh</span></div>
+      </div>
+      <div class="stat-card" id="l28-independence-card">
+        <div class="stat-label">Electricity Independence</div>
+        <div class="stat-num"><span id="l28-stat-independence">&mdash;</span><span class="stat-unit">%</span></div>
+      </div>
+      <div class="stat-card" id="l28-carbon-card">
+        <div class="stat-label">Carbon Intensity</div>
+        <div class="stat-num"><span id="l28-stat-carbon">&mdash;</span><span class="stat-unit">gCO₂/kWh</span></div>
+      </div>
+    </div>
+
     <!-- Treemap -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:24px 0 8px;">Generation mix share</h2>
-    <p style="color:var(--muted); margin-bottom:16px;">Each tile shows the average contribution of a fuel type to British electricity over the last 28 days, sized by its share of the mix. In windy periods, renewables dominate; gas and nuclear fill the gaps when weather-dependent generation is low.</p>
+    <h2 class="section-h2" style="margin-top:24px;">Generation mix share</h2>
+    <p class="section-p">Each tile shows the average contribution of a fuel type to British electricity over the last 28 days, sized by its share of the mix. In windy periods, renewables dominate; gas and nuclear fill the gaps when weather-dependent generation is low.</p>
     <div style="position:relative; height:420px;">
       <div class="chart-loading" id="treemap-chart-loading"></div>
       <canvas id="treemap-chart" data-share
@@ -45,8 +65,8 @@
     </div>
 
     <!-- Stacked area -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:32px 0 12px;">Hourly electricity generation</h2>
-    <p style="color:var(--muted); margin-bottom:20px;">Hourly generation across the last 28 days, showing how the electricity mix shifts through the day and across weather patterns. Solar peaks sharply around midday in bright weather. Wind can supply the majority of demand for sustained periods, then drop to near zero as weather fronts pass - these fluctuations drive the need for flexible backup from gas and storage.</p>
+    <h2 class="section-h2" style="margin-top:32px;">Hourly electricity generation</h2>
+    <p class="section-p" style="margin-bottom:20px;">Hourly generation across the last 28 days, showing how the electricity mix shifts through the day and across weather patterns. Solar peaks sharply around midday in bright weather. Wind can supply the majority of demand for sustained periods, then drop to near zero as weather fronts pass - these fluctuations drive the need for flexible backup from gas and storage.</p>
     <div class="filter-bar" id="gen-filter">
       <span class="filter-bar-label">Show:</span>
       <button class="filter-btn active" data-hours="0">All data</button>
@@ -63,8 +83,8 @@
     </div>
 
     <!-- Carbon intensity -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:40px 0 12px;">Carbon intensity</h2>
-    <p style="color:var(--muted); margin-bottom:20px;">Hourly carbon intensity of British electricity over the last 28 days (gCO₂eq/kWh). The red line marks the 2030 clean power target of 100 gCO₂eq/kWh. Intensity falls when renewables are generating strongly and rises when gas fills a larger share of demand.</p>
+    <h2 class="section-h2">Carbon intensity</h2>
+    <p class="section-p" style="margin-bottom:20px;">Hourly carbon intensity of British electricity over the last 28 days (gCO₂eq/kWh). The red line marks the 2030 clean power target of 100 gCO₂eq/kWh. Intensity falls when renewables are generating strongly and rises when gas fills a larger share of demand.</p>
     <div style="position:relative; height:320px;">
       <div class="chart-loading" id="carbon-intensity-chart-loading"></div>
       <canvas id="carbon-intensity-chart" data-share
@@ -75,8 +95,8 @@
     </div>
 
     <!-- Conversion & grid losses -->
-    <h2 style="font-size:1.4rem; font-weight:400; font-family:'DM Serif Display',Georgia,serif; color:var(--brand); margin:40px 0 12px;">Conversion &amp; grid losses</h2>
-    <p style="color:var(--muted); margin-bottom:20px;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram shows total TWh over the last 28 days - every unit of energy from source to delivered electricity.</p>
+    <h2 class="section-h2">Conversion &amp; grid losses</h2>
+    <p class="section-p" style="margin-bottom:20px;">Not all energy becomes electricity. Gas turbines convert around 57% of fuel into power; nuclear reactors around 35%; biomass stations around 39%. The rest escapes as waste heat. A further 6% is lost in transmission once electricity reaches the grid. The diagram shows total TWh over the last 28 days - every unit of energy from source to delivered electricity.</p>
     <div style="position:relative; height:500px; width:100%;">
       <div class="chart-loading" id="sankey-chart-loading"></div>
       <div id="sankey-chart" style="height:100%; width:100%;"></div>
@@ -98,6 +118,54 @@ const themeColorAlpha = (name, alpha) => {
   const r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16);
   return `rgba(${r},${g},${b},${alpha})`;
 };
+
+// ── At-a-glance stat strip (same grading as the homepage's Live tab) ──
+const STAT_CARBON_FACTORS = {
+  'Nuclear': 12, 'Biomass': 230, 'Wind': 12, 'Wind*': 12, 'Embedded Wind': 12,
+  'Onshore Wind': 12, 'Offshore Wind': 12, 'Solar': 44, 'Coal': 820, 'Gas': 490,
+  'Storage': 24, 'Large Hydro': 24, 'Hydro': 24, 'Imports': 300,
+};
+const STAT_LOW_CARBON_MAX = 100;
+const STAT_IMPORT_WEIGHTED = new Set(['Gas', 'Biomass', 'Nuclear']);
+
+function computeGenerationStats(totalsBySource) {
+  let total = 0, lowCarbon = 0, carbonWeighted = 0, importDependent = 0;
+  Object.entries(totalsBySource).forEach(([source, value]) => {
+    if (!value || value <= 0) return;
+    total += value;
+    const factor = STAT_CARBON_FACTORS[source] ?? 300;
+    if (factor < STAT_LOW_CARBON_MAX) lowCarbon += value;
+    carbonWeighted += value * factor;
+    if (source === 'Imports') importDependent += value;
+    else if (STAT_IMPORT_WEIGHTED.has(source)) importDependent += value * 0.8;
+  });
+  if (total <= 0) return null;
+  return {
+    lowCarbonPct: Math.round(lowCarbon / total * 100),
+    carbonIntensity: Math.round(carbonWeighted / total),
+    independencePct: Math.max(0, Math.round((total - importDependent) / total * 100)),
+    totalValue: total,
+  };
+}
+
+function renderStatStrip(prefix, stats) {
+  if (!stats) return;
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setText(prefix + '-stat-lowcarbon', stats.lowCarbonPct);
+  setText(prefix + '-stat-generation', (stats.totalValue / 1000).toFixed(1));
+  setText(prefix + '-stat-independence', stats.independencePct);
+  setText(prefix + '-stat-carbon', stats.carbonIntensity);
+
+  const recolor = (id, cls) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('stat-card--low', 'stat-card--mid', 'stat-card--high');
+    el.classList.add(cls);
+  };
+  recolor(prefix + '-lowcarbon-card', stats.lowCarbonPct > 80 ? 'stat-card--low' : stats.lowCarbonPct > 60 ? 'stat-card--mid' : 'stat-card--high');
+  recolor(prefix + '-independence-card', stats.independencePct > 60 ? 'stat-card--low' : stats.independencePct > 40 ? 'stat-card--mid' : 'stat-card--high');
+  recolor(prefix + '-carbon-card', stats.carbonIntensity < 100 ? 'stat-card--low' : stats.carbonIntensity < 250 ? 'stat-card--mid' : 'stat-card--high');
+}
 (async () => {
   const DATA = 'https://raw.githubusercontent.com/afcrossland/mygridgb/main/data';
   const TREEMAP_URL = `${DATA}/28day-treemap.json`;
@@ -169,6 +237,10 @@ const themeColorAlpha = (name, alpha) => {
         const gwh    = Math.round(r.c[1].v * 672);       // avg GW × 28 days × 24 hrs
         return { source, pct, gwh, value: r.c[1].v };
       });
+
+    const totalsBySource = {};
+    treeItems.forEach(({ source, gwh }) => { totalsBySource[source] = (totalsBySource[source] ?? 0) + gwh; });
+    renderStatStrip('l28', computeGenerationStats(totalsBySource));
 
     hideLoader('treemap-chart');
     new Chart(document.getElementById('treemap-chart'), {

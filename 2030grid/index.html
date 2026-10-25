@@ -24,32 +24,12 @@
   <script src="../assets/chartshare.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    .section-h2 {
-      font-family: 'DM Serif Display', Georgia, serif;
-      font-size: 1.4rem;
-      font-weight: 400;
-      color: var(--brand);
-      margin: 40px 0 8px;
-    }
-    .section-p {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-
     /* ── Comparison stat strip ── */
     .compare-strip {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       margin: 28px 0 36px;
-    }
-    .compare-card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px 20px;
-      position: relative;
     }
     .lcoe-tip {
       display: none;
@@ -85,12 +65,6 @@
       letter-spacing: .08em;
       color: var(--muted);
       margin-bottom: 10px;
-    }
-    .compare-values {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      flex-wrap: wrap;
     }
     .compare-val {
       font-size: 2rem;
@@ -231,13 +205,6 @@
     .manifesto-body p { font-size: 14px; line-height: 1.75; color: var(--text); margin-bottom: 12px; }
     .manifesto-body ul { margin: 0 0 14px 20px; font-size: 14px; line-height: 1.9; color: var(--text); }
     .manifesto-body a { color: var(--brand); }
-
-    /* ── Tile "was X" secondary line ── */
-    .compare-was {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
 
     /* ── Responsive text helpers ── */
     .mobile-only  { display: none; }
@@ -557,28 +524,41 @@ const hideLoader = id => {
     // Comparison strip
     const stripEl = document.getElementById('compare-strip');
     const metrics = [
-      { label: 'Carbon Intensity', suffix: '<span class="compare-val-sfx"> g/kWh</span>', unit: 'gCO₂eq/kWh',
-        now: actual.ci,    after: manifesto.ci,    nowGood: false },
-      { label: 'Low Carbon',       suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
-        now: actual.lcPct, after: manifesto.lcPct, nowGood: actual.lcPct > 60 },
-      { label: 'Renewables',       suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
-        now: actual.renPct, after: manifesto.renPct, nowGood: actual.renPct > 50 },
-      { label: 'Gas',              suffix: '<span class="compare-val-sfx">%</span>', unit: '% of generation',
-        now: actual.gasPct, after: manifesto.gasPct, nowGood: false },
-      { label: 'Thermal Losses',   suffix: '<span class="compare-val-sfx">%</span>', unit: '% of input energy',
-        now: actual.thermalLossPct, after: manifesto.thermalLossPct, nowGood: false },
+      { label: 'Carbon Intensity', unit: 'gCO₂eq/kWh',
+        now: actual.ci,    after: manifesto.ci,    higherIsBetter: false },
+      { label: 'Low Carbon',       unit: '% of generation',
+        now: actual.lcPct, after: manifesto.lcPct, higherIsBetter: true },
+      { label: 'Renewables',       unit: '% of generation',
+        now: actual.renPct, after: manifesto.renPct, higherIsBetter: true },
+      { label: 'Gas',              unit: '% of generation',
+        now: actual.gasPct, after: manifesto.gasPct, higherIsBetter: false },
+      { label: 'Thermal Losses',   unit: '% of input energy',
+        now: actual.thermalLossPct, after: manifesto.thermalLossPct, higherIsBetter: false },
     ];
 
     metrics.forEach(m => {
       const pre = m.prefix ?? '';
+      const improved = m.higherIsBetter ? m.after > m.now : m.after < m.now;
+      const pctChange = m.now !== 0 ? Math.round((m.after - m.now) / m.now * 100) : 0;
+      const maxVal = Math.max(m.now, m.after, 1);
+      const maxH = 28, base = 30;
+      const beforeH = Math.max(2, Math.round(m.now  / maxVal * maxH));
+      const afterH  = Math.max(2, Math.round(m.after / maxVal * maxH));
+      const afterColor = improved ? '#22c55e' : '#ef4444';
       stripEl.insertAdjacentHTML('beforeend', `
-        <div class="compare-card">
-          <div class="compare-card-label">${m.label}</div>
-          <div class="compare-values">
-            <span class="compare-val compare-val--manifesto">${pre}${m.after}${m.suffix}</span>
+        <div class="compare-metric">
+          <svg class="compare-metric-icon" viewBox="0 0 44 32" width="44" height="32" aria-hidden="true">
+            <rect x="8"  y="${base - beforeH}" width="10" height="${beforeH}" fill="#94a3b8" rx="1"/>
+            <rect x="26" y="${base - afterH}"  width="10" height="${afterH}"  fill="${afterColor}" rx="1"/>
+          </svg>
+          <div class="compare-metric-label">${m.label}</div>
+          <div class="compare-metric-vals">
+            <span class="compare-metric-before">${pre}${m.now}</span>
+            <span class="compare-metric-arrow">→</span>
+            <span class="compare-metric-after">${pre}${m.after}</span>
+            <span class="compare-metric-unit">${m.unit}</span>
           </div>
-          <div class="compare-was">was ${pre}${m.now}</div>
-          <div class="compare-unit">${m.unit}</div>
+          <div class="compare-metric-change ${improved ? 'compare-metric-change--good' : 'compare-metric-change--bad'}">${pctChange > 0 ? '+' : ''}${pctChange}%</div>
         </div>`);
     });
 
